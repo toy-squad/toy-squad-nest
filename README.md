@@ -2,6 +2,8 @@
 
 - [Notion 페이지](https://periodic-quokka-f6d.notion.site/Toy-Squad-c86cdb10cff44743829f0e2178416f75)
 
+- swagger 확인
+  - 로컬호스트: `localhost:PORT_NUMBER/api`
 
 ## 설치
 
@@ -34,4 +36,3 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
-
