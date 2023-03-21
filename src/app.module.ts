@@ -10,7 +10,7 @@ import * as Joi from 'joi';
       envFilePath: '.env',
       isGlobal: true,
       validationSchema: Joi.object({
-        SERVER_PORT: Joi.number().default(3001).required(),
+        SERVER_PORT: Joi.number().default(3000).required(),
       }),
     }),
   ],
