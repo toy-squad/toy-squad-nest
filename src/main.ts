@@ -6,10 +6,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const swaggerConfig = new DocumentBuilder()
-    .setTitle()
-    .setDescription()
+    .setTitle('Toy-Squad Server Swagger')
+    .setDescription('토이스쿼드 서버 스웨거 입니다.')
     .setVersion('1.0')
-    .addTags('Toy-Squads')
+    .addTag('Toy-Squads')
     .build();
 
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
