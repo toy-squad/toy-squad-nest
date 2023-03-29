@@ -14,7 +14,10 @@ async function bootstrap() {
 
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
 
-  SwaggerModule.setup('api', app, swaggerDocument);
+  /**
+   * https://localhost:3000/swagger 브라우저 창에 입력시 스웨거가 생성됩니다.
+   */
+  SwaggerModule.setup('swagger', app, swaggerDocument);
 
   await app.listen(process.env.SERVER_PORT);
 }
