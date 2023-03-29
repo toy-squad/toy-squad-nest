@@ -1,9 +1,11 @@
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const PORT = process.env.SERVER_PORT || 3000;
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Toy-Squad Server Swagger')
@@ -19,6 +21,21 @@ async function bootstrap() {
    */
   SwaggerModule.setup('swagger', app, swaggerDocument);
 
-  await app.listen(process.env.SERVER_PORT);
+  // 파이프 추가
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+    }),
+  );
+
+  // swagger을 제외한 모든 API는 맨앞에 '/api'를 붙인다.
+  app.setGlobalPrefix('/api');
+
+  await app.listen(PORT, () => {
+    new Logger(`MODE ${process.env.NODE_ENV.toUpperCase()}`).localInstance.log(
+      `APP LISTEN ON PORT: ${PORT}`,
+    );
+  });
 }
 bootstrap();
