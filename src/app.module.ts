@@ -18,9 +18,9 @@ import { LoggersMiddleware } from './loggers/loggers.middleware';
         /* DATABASE (RDBMS) */
         DB_HOST: Joi.string().required(),
         DB_PORT: Joi.number().required(),
-        DB_USERNAME: Joi.string().required(),
-        DB_PASSWORD: Joi.string().required(),
-        DB_DATABASE: Joi.string().required(),
+        DB_USER: Joi.string().required(),
+        DB_PWD: Joi.string().required(),
+        DB_NAME: Joi.string().required(),
       }),
     }),
     MysqlModule,
