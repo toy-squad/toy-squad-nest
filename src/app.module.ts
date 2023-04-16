@@ -6,6 +6,7 @@ import { MysqlModule } from './mysql/mysql.module';
 import { LoggersModule } from './loggers/loggers.module';
 import * as Joi from 'joi';
 import { LoggersMiddleware } from './loggers/loggers.middleware';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { LoggersMiddleware } from './loggers/loggers.middleware';
     }),
     MysqlModule,
     LoggersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
