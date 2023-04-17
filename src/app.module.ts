@@ -3,9 +3,9 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MysqlModule } from './mysql/mysql.module';
-import { LoggersModule } from './loggers/loggers.module';
+import { LoggersModule } from './commons/loggers/loggers.module';
 import * as Joi from 'joi';
-import { LoggersMiddleware } from './loggers/loggers.middleware';
+import { LoggersMiddleware } from './commons/loggers/loggers.middleware';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 
