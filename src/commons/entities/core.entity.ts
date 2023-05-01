@@ -1,4 +1,9 @@
-import { CreateDateColumn, DeleteDateColumn, Entity } from 'typeorm';
+import {
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity()
 export class CoreEntity {
@@ -9,6 +14,13 @@ export class CoreEntity {
     comment: '생성일자',
   })
   createdAt: Date;
+
+  @UpdateDateColumn({
+    name: 'updated_at',
+    nullable: true,
+    comment: '수정일자',
+  })
+  updatedAt: Date;
 
   @DeleteDateColumn({
     name: 'deleted_at',
