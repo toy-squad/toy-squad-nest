@@ -49,6 +49,25 @@ export class User extends CoreEntity {
 
   /**
    * [Todo]
-   *    요구사항 확인하여 유저 엔티티에 필요한 컬럼확인 및 보충
    * */
+  @Column({ nullable: true })
+  img_url: string;
+
+  @Column()
+  field: string;
+
+  @Column()
+  tendency: string;
+
+  @Column({ nullable: true })
+  intro: string;
+
+  @Column({ nullable: true })
+  skills: string;
+
+  @Column({ type: 'int' })
+  like: number;
+
+  @Column()
+  position: string;
 }
