@@ -36,27 +36,35 @@ export class User extends CoreEntity {
   @Column({
     name: 'kakao_auth_id',
     nullable: true,
-    default: '카카오 연동 로그인 아이디',
+    default: null,
+    comment: '카카오 연동 로그인 아이디',
   })
   kakaoId: string;
 
   @Column({
     name: 'google_auth_id',
     nullable: true,
-    default: '구글 연동 로그인 아이디',
+    default: null,
+    comment: '구글 연동 로그인 아이디',
   })
   googleId: string;
 
   /**
    * [Todo]
    * */
-  @Column({ nullable: true })
+  @Column({ name: 'img_url', nullable: true, default: null })
   img_url: string;
 
-  @Column()
+  @Column({
+    name: 'field',
+    comment: '관심분야',
+  })
   field: string;
 
-  @Column()
+  @Column({
+    name: 'tendency',
+    comment: '성향',
+  })
   tendency: string;
 
   @Column({ nullable: true })
