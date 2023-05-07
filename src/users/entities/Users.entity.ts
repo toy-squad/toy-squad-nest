@@ -3,9 +3,6 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ schema: process.env.DB_NAME })
 export class User extends CoreEntity {
-  @PrimaryGeneratedColumn('uuid')
-  userId: string;
-
   @Column({
     name: 'email',
     unique: true,
@@ -29,6 +26,7 @@ export class User extends CoreEntity {
 
   @Column({
     name: 'phone',
+    nullable: false,
     comment: '연락처',
   })
   phone: string;
@@ -52,30 +50,45 @@ export class User extends CoreEntity {
   /**
    * [Todo]
    * */
-  @Column({ name: 'img_url', nullable: true, default: null })
+  @Column({
+    name: 'img_url',
+    nullable: true,
+    default: null,
+    comment: '유저이미지',
+  })
   img_url: string;
 
   @Column({
     name: 'field',
-    comment: '관심분야',
+    type: 'simple-array',
+    comment: '선호하는 분야',
   })
-  field: string;
+  field: string[];
 
   @Column({
     name: 'tendency',
-    comment: '성향',
+    type: 'simple-array',
+    comment: '작업성향',
   })
-  tendency: string;
+  tendency: string[];
 
-  @Column({ nullable: true })
+  @Column({
+    name: 'position',
+    comment: '포지션',
+  })
+  position: string;
+
+  @Column({ name: 'intro', nullable: true, comment: '자기소개' })
   intro: string;
 
-  @Column({ nullable: true })
-  skills: string;
+  @Column({
+    type: 'simple-array',
+    name: 'skills',
+    nullable: true,
+    comment: '주요 스킬',
+  })
+  skills: string[];
 
-  @Column({ type: 'int' })
+  @Column({ name: 'like', comment: '좋아요수' })
   like: number;
-
-  @Column()
-  position: string;
 }

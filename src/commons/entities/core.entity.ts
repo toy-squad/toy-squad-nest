@@ -2,11 +2,15 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
 export class CoreEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
   @CreateDateColumn({
     name: 'created_at',
     nullable: false,
@@ -14,13 +18,6 @@ export class CoreEntity {
     comment: '생성일자',
   })
   createdAt: Date;
-
-  @UpdateDateColumn({
-    name: 'updated_at',
-    nullable: true,
-    comment: '수정일자',
-  })
-  updatedAt: Date;
 
   @DeleteDateColumn({
     name: 'deleted_at',
