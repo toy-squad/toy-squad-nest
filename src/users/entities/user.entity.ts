@@ -1,5 +1,5 @@
 import { CoreEntity } from '../../commons/entities/core.entity';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity } from 'typeorm';
 
 @Entity({ schema: process.env.DB_NAME })
 export class User extends CoreEntity {
@@ -47,9 +47,6 @@ export class User extends CoreEntity {
   })
   googleId: string;
 
-  /**
-   * [Todo]
-   * */
   @Column({
     name: 'img_url',
     nullable: true,
