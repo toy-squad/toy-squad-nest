@@ -2,7 +2,6 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { MysqlModule } from './mysql/typeorm.module';
 import { LoggersModule } from './commons/loggers/loggers.module';
 import * as Joi from 'joi';
 import { LoggersMiddleware } from './commons/loggers/loggers.middleware';
@@ -39,7 +38,6 @@ import { User } from './users/entities/user.entity';
       logging: process.env.NODE_ENV !== 'production',
       charset: 'utf8mb4',
     }),
-    MysqlModule,
     LoggersModule,
     AuthModule,
     UsersModule,
