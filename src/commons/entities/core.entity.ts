@@ -1,4 +1,3 @@
-import { timestamp } from 'rxjs';
 import {
   CreateDateColumn,
   DeleteDateColumn,
@@ -12,10 +11,8 @@ export class CoreEntity {
   id: string;
 
   @CreateDateColumn({
-    type: 'timestamp',
     name: 'created_at',
     nullable: false,
-    default: () => 'CURRENT_TIMESTAMP',
     comment: '생성일자',
   })
   createdAt: string;
