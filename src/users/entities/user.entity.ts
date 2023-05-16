@@ -60,7 +60,7 @@ export class User extends CoreEntity {
     type: 'simple-array',
     comment: '선호하는 분야',
   })
-  field: string[];
+  fields: string[];
 
   @Column({
     name: 'tendency',
