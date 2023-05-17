@@ -1,4 +1,4 @@
-export enum skill {
+export enum skillEnum {
   REACT = '리액트',
   NODE = 'Node.js',
   NEST = 'Nest.js',

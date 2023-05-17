@@ -79,7 +79,7 @@ export class User extends CoreEntity {
   intro: string;
 
   @Column({
-    type: 'simple-array',
+    type: 'set',
     name: 'skills',
     nullable: true,
     comment: '주요 스킬',
