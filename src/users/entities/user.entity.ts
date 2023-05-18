@@ -87,6 +87,6 @@ export class User extends CoreEntity {
   })
   skills: SKILL_TYPE[];
 
-  @Column({ name: 'like', comment: '좋아요수' })
+  @Column({ name: 'like', default: 0, comment: '좋아요수' })
   like: number;
 }
