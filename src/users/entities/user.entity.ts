@@ -1,5 +1,6 @@
 import { CoreEntity } from '../../commons/entities/core.entity';
 import { Column, Entity } from 'typeorm';
+import { SKILL_TYPE } from '../types/skill.type';
 
 @Entity({ schema: process.env.DB_NAME })
 export class User extends CoreEntity {
@@ -84,7 +85,7 @@ export class User extends CoreEntity {
     nullable: true,
     comment: '주요 스킬',
   })
-  skills: string[];
+  skills: SKILL_TYPE[];
 
   @Column({ name: 'like', comment: '좋아요수' })
   like: number;
