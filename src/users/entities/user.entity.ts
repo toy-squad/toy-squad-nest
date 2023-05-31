@@ -1,6 +1,6 @@
 import { CoreEntity } from '../../commons/entities/core.entity';
 import { Column, Entity } from 'typeorm';
-import { SKILL_TYPE } from '../types/skill.type';
+import { SKILL_TYPE, SKILL_TYPE_SET } from '../types/skill.type';
 
 @Entity({ schema: process.env.DB_NAME })
 export class User extends CoreEntity {
@@ -80,13 +80,12 @@ export class User extends CoreEntity {
   intro: string;
 
   @Column({
-    type: 'set',
+    type: 'simple-array',
     name: 'skills',
-    nullable: true,
     comment: '주요 스킬',
   })
-  skills: SKILL_TYPE[];
+  skills: string[];
 
-  @Column({ name: 'like', default: 0, comment: '좋아요수' })
-  like: number;
+  @Column({ name: 'likes', default: 0, comment: '좋아요수' })
+  likes: number;
 }
