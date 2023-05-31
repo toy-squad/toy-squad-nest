@@ -49,6 +49,8 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     if (process.env.NODE_ENV !== 'production') {
       consumer.apply(LoggersMiddleware).forRoutes('*');
+
+      // 회원가입, 로그인을 제외한, 나머지 API에서는 accessToken 검증이 필요하다.
     }
   }
 }

@@ -1,5 +1,4 @@
-import { Controller, Get, Logger, Query } from '@nestjs/common';
-import { GetPositionDetailRequestDto } from './dtos/get-position-detail-request.dto';
+import { Controller, Get, Logger, Param, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -15,11 +14,25 @@ export class UsersController {
    * @param GetPositionDetailRequestDto
    */
 
+  @Get()
+  async() {
+    this.logger.log('hello');
+  }
+
+  /**
+   * 회원가입 API
+   */
+  // @Post()
+  // async;
+
   @Get('/position')
-  async getPosition(@Query() GetPositionDetailRequestDto) {
+  async getDetailPositions(@Query('position') position: any) {
     try {
-    } catch (error) {
-      throw error;
+      const result = await this.userService.getDetailPositions(position);
+      return result;
+    } catch (e) {
+      console.error(e.message);
+      throw e;
     }
   }
 }
