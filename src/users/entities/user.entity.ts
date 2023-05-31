@@ -79,6 +79,7 @@ export class User extends CoreEntity {
   @Column({ name: 'intro', nullable: true, comment: '자기소개' })
   intro: string;
 
+  // 주요스킬이 없다면 null 로 한다.
   @Column({
     type: 'simple-array',
     name: 'skills',
