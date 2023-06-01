@@ -1,5 +1,14 @@
-import { Controller, Get, Logger, Param, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Logger,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
+import { CreateUserRequestDto } from './dtos/create-user-request.dto';
 
 @Controller('users')
 export class UsersController {
@@ -22,8 +31,14 @@ export class UsersController {
   /**
    * 회원가입 API
    */
-  // @Post()
-  // async;
+  @Post()
+  async generateNewUser(@Body() dto: CreateUserRequestDto) {
+    try {
+    } catch (e) {
+      this.logger.error(e.message);
+      throw e;
+    }
+  }
 
   @Get('/position')
   async getDetailPositions(@Query('position') position: any) {
