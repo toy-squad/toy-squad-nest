@@ -1,0 +1,12 @@
+version: '3'
+services:
+  db:
+    container_name: ${CONTAINER_NAME}
+    image: mysql:8.0
+    restart: always
+    ports:
+      - ${MYSQL_PORT}:3306
+    environment:
+      MYSQL_ROOT_HOST: ${MYSQL_ROOT_HOST}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      TZ: ${MYSQL_TIMEZONE}
