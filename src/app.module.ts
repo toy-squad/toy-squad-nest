@@ -2,10 +2,13 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { MysqlModule } from './mysql/mysql.module';
-import { LoggersModule } from './loggers/loggers.module';
+import { LoggersModule } from './commons/loggers/loggers.module';
 import * as Joi from 'joi';
-import { LoggersMiddleware } from './loggers/loggers.middleware';
+import { LoggersMiddleware } from './commons/loggers/loggers.middleware';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './users/entities/user.entity';
 
 @Module({
   imports: [
@@ -23,8 +26,21 @@ import { LoggersMiddleware } from './loggers/loggers.middleware';
         DB_NAME: Joi.string().required(),
       }),
     }),
-    MysqlModule,
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: process.env.DB_HOST,
+      port: +process.env.DB_PORT,
+      username: process.env.DB_USER,
+      password: process.env.DB_PWD,
+      database: process.env.DB_NAME,
+      entities: [User],
+      synchronize: process.env.NODE_ENV !== 'production',
+      logging: process.env.NODE_ENV !== 'production',
+      charset: 'utf8mb4',
+    }),
     LoggersModule,
+    AuthModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
@@ -33,6 +49,8 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     if (process.env.NODE_ENV !== 'production') {
       consumer.apply(LoggersMiddleware).forRoutes('*');
+
+      // 회원가입, 로그인을 제외한, 나머지 API에서는 accessToken 검증이 필요하다.
     }
   }
 }

@@ -24,7 +24,7 @@ async function bootstrap() {
   // 파이프 추가
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,
+      // whitelist: true,
       transform: true,
     }),
   );
