@@ -30,24 +30,23 @@ export class UsersController {
 
   /**
    * 회원가입 API
+   * URL: /api/users
    */
   @Post()
-  async generateNewUser(@Body() dto: CreateUserRequestDto) {
-    try {
-    } catch (e) {
-      this.logger.error(e.message);
-      throw e;
-    }
-  }
+  async generateNewUser(@Body() dto: CreateUserRequestDto) {}
 
+  /**
+   * 상세 포지션 선택
+   * URL: /api/users/position
+   */
   @Get('/position')
   async getDetailPositions(@Query('position') position: any) {
-    try {
-      const result = await this.userService.getDetailPositions(position);
-      return result;
-    } catch (e) {
-      console.error(e.message);
-      throw e;
-    }
+    const result = await this.userService.getDetailPositions(position);
+    return result;
   }
+
+  /**
+   * 마이페이지
+   * URL: /api/users/my
+   */
 }
