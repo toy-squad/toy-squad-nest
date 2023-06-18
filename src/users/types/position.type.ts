@@ -4,12 +4,10 @@
  * DESIGNER: 디자이너
  * MANAGER: 기획자
  */
-export type PrePosition = 'DEVELOPER' | 'DESIGNER' | 'MANAGER';
-
-export const PrePositions = ['DEVELOPER', 'DESIGNER', 'MANAGER'];
+export type positionCategory = 'DEVELOPER' | 'DESIGNER' | 'MANAGER';
 
 // 세부포지션
-// map[key:prePosition] = []
+// map[key:positionCategory] = []
 export const POSITION = {
   MANAGER: [
     '서비스 기획자',
