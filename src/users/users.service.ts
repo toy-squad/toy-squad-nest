@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { CreateUserRequestDto } from './dtos/create-user-request.dto';
 import { POSITION } from './types/position.type';
 import { UsersRepository } from './users.repository';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -37,14 +38,13 @@ export class UsersService {
       // 포지션리스트를 찾는다.
       const detailPositionList = await this.getDetailPositions(category);
 
+      // positionCategory[category] 에 해당하는 포지션인지 확인
       // 입력포지션이 포지션리스트에 포함되어 있는지 확인
       return detailPositionList.includes(position);
     } catch (err) {
       console.error(err.message);
       throw err;
     }
-
-    // positionCategory[category] 에 해당하는 포지션인지 확인
   }
 
   async createUser(dto: CreateUserRequestDto) {
@@ -52,6 +52,10 @@ export class UsersService {
       const { positionCategory, position } = dto;
 
       // 이미 존재하는 아이디인지 확인
+      const { email } = dto;
+      const checkExistUser = this.usersRepository.findUser({
+        email: dto.email,
+      });
 
       // 비밀번호 암호화
 
