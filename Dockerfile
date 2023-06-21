@@ -2,9 +2,7 @@
 FROM node:16-buster AS builder
 WORKDIR /app
 COPY package*.json .
-RUN npm ci --only=production
-ENV NODE_ENV production
-
+RUN npm ci
 COPY . .
 RUN npm run build
 
@@ -14,4 +12,4 @@ WORKDIR /usr/share/nginx/html
 COPY --from=builder /app/dist .
 
 EXPOSE 8080
-CMD ["npm", "start"]
+CMD ["nginx", "-g", "daemon off;"]
