@@ -1,11 +1,13 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Logger,
   Param,
   ParseIntPipe,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
@@ -79,4 +81,18 @@ export class UsersController {
    */
   @Get('/detail/:id')
   async getUserDetail(@Param('id') userId: string) {}
+
+  /**
+   * 유저정보 수정
+   * URL: /api/users/:id
+   */
+  @Put('/:id')
+  async updateUserInfo() {}
+
+  /**
+   * 회원탈퇴
+   * URL: /api/users/:id
+   */
+  @Delete('/:id')
+  async deleteUser() {}
 }
