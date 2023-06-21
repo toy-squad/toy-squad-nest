@@ -10,7 +10,7 @@ env:
   IMAGE_NAME: ${{ github.repository }}
   SPACE_NAME: dmsrkd1216
   PROJECT_NAME: toy-squad
-  REPOSITORY_NAME: toy-squad-nest
+  REPOSITORY_NAME: toy-squad-container
 
 jobs:
   build-and-push-image:
