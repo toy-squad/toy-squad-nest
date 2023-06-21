@@ -9,7 +9,7 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
   SPACE_NAME: dmsrkd1216
-  PROJECT_NAME: toy-squad
+  PROJECT_NAME: toy-squads
   REPOSITORY_NAME: toy-squad-container
 
 jobs:
