@@ -51,7 +51,7 @@ jobs:
         with:
           token: ${{ secrets.CLOUDTYPE_TOKEN }}
           project: ${{ env.SPACE_NAME }}/${{ env.PROJECT_NAME }}
-          stage: main
+          stage: develop
           yaml: |
             name: ${{ env.REPOSITORY_NAME }} 
             app: container
