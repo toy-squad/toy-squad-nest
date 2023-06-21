@@ -13,5 +13,5 @@ FROM nginxinc/nginx-unprivileged:1.23 AS runner
 WORKDIR /usr/share/nginx/html
 COPY --from=builder /app/dist .
 
-EXPOSE 3001
-CMD ["npm", "start"]
+EXPOSE 8080
+CMD ["nginx", "-g", "daemon off;"]
