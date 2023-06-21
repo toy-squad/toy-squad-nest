@@ -11,7 +11,6 @@ env:
   SPACE_NAME: dmsrkd1216
   PROJECT_NAME: toy-squad
   REPOSITORY_NAME: toy-squad-nest
-  TARGET_BRANCH: develop
 
 jobs:
   build-and-push-image:
@@ -52,10 +51,10 @@ jobs:
         with:
           token: ${{ secrets.CLOUDTYPE_TOKEN }}
           project: ${{ env.SPACE_NAME }}/${{ env.PROJECT_NAME }}
-          stage: ${{ env.TARGET_BRANCH }}
+          stage: main
           yaml: |
-            name: ${{ env.REPOSITORY_NAME }}
+            name: ${{ env.REPOSITORY_NAME }} 
             app: container
             options:
-              ports: 8080
+              ports: 3001
               image: ${{ steps.meta.outputs.tags }}
