@@ -56,5 +56,5 @@ jobs:
             name: ${{ env.REPOSITORY_NAME }} 
             app: container
             options:
-              ports: 3001
+              ports: 8080
               image: ${{ steps.meta.outputs.tags }}
