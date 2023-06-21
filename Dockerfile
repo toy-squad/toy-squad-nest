@@ -14,4 +14,4 @@ WORKDIR /usr/share/nginx/html
 COPY --from=builder /app/dist .
 
 EXPOSE 8080
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["npm", "start"]
