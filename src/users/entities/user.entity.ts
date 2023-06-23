@@ -1,6 +1,8 @@
 import { CoreEntity } from '../../commons/entities/core.entity';
-import { Column, Entity } from 'typeorm';
+import { Project } from '../../project/entities/project.entity';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { SKILL_TYPE, SKILL_TYPE_SET } from '../types/skill.type';
+import { on } from 'events';
 
 @Entity({ schema: process.env.DB_NAME })
 export class User extends CoreEntity {
@@ -89,4 +91,7 @@ export class User extends CoreEntity {
 
   @Column({ name: 'likes', default: 0, comment: '좋아요수' })
   likes: number;
+
+  @OneToMany(() => Project, (project) => project.user , { onDelete: 'CASCADE' })
+  project: Project[];
 }

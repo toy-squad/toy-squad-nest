@@ -1,11 +1,11 @@
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { CoreEntity } from '../../commons/entities/core.entity';
-import { Column, Entity } from 'typeorm';
-import { SKILL_TYPE, SKILL_TYPE_SET } from '../../users/types/skill.type';
-import { type } from 'os';
+import { SKILL_TYPE } from '../../users/types/skill.type';
+import { User } from 'src/users/entities/user.entity';
 
 @Entity({ schema: process.env.DB_NAME })
 export class Project extends CoreEntity {
-    
+
     @Column({
         name: 'name',
         unique: true,
@@ -25,7 +25,7 @@ export class Project extends CoreEntity {
         nullable: false,
         comment: '프로젝트 주요 기술',
     })
-    skills: SKILL_TYPE[];
+    skills: string;
 
     @Column({
         name: 'img_url',
@@ -35,27 +35,21 @@ export class Project extends CoreEntity {
     })
     imgUrl: string;
 
-    @Column({
-        name: 'leader_id',
-        nullable: false,
-        comment: '팀장 ID',
-    })
-    leaderId: string;
 
     @Column({
-        name: 'recruits_number',
+        name: 'recruitment',
         nullable: false,
+        default: '1',
         comment: '모집인원',
     })
-    recruitsNumber: number;
+    recruitment: string;
 
     @Column({
-        name: 'participants_number',
+        name: 'participants',
         nullable: false,
         comment: '참여인원',
-        default: 1,
     })
-    participantsNumber: number;
+    participants: string;
 
     @Column({
         name: 'completion_status',
@@ -92,5 +86,12 @@ export class Project extends CoreEntity {
         comment: '게시글',
     })
     post: string;
+
+    @ManyToOne(() => User, (user) => user.project ,{ onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'leader_id' })
+    user: User;
+
+    // @OneToMany(() => Comments, (comments) => comments.project)
+    // comments: Comments[];
 
 }

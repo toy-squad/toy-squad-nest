@@ -9,8 +9,8 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/entities/user.entity';
-import { ProductModule } from './product/product.module';
-
+import { ProjectModule } from './project/project.module';
+import { Project } from './project/entities/project.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -34,7 +34,7 @@ import { ProductModule } from './product/product.module';
       username: process.env.DB_USER,
       password: process.env.DB_PWD,
       database: process.env.DB_NAME,
-      entities: [User],
+      entities: [User,Project],
       synchronize: process.env.NODE_ENV !== 'production',
       logging: process.env.NODE_ENV !== 'production',
       charset: 'utf8mb4',
@@ -42,7 +42,7 @@ import { ProductModule } from './product/product.module';
     LoggersModule,
     AuthModule,
     UsersModule,
-    ProductModule,
+    ProjectModule,
   ],
   controllers: [AppController],
   providers: [AppService],
