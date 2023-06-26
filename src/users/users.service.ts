@@ -3,6 +3,7 @@ import { CreateUserRequestDto } from './dtos/create-user-request.dto';
 import { POSITION } from './types/position.type';
 import { UsersRepository } from './users.repository';
 import * as bcrypt from 'bcrypt';
+import { FindUserRequestDto } from './dtos/find-user-request.dto';
 
 @Injectable()
 export class UsersService {
@@ -47,17 +48,29 @@ export class UsersService {
     }
   }
 
+  private async comparePassword(
+    plainTextPassword: string,
+    realPassword: string,
+  ) {
+    return await bcrypt.compare(plainTextPassword, realPassword);
+  }
+
   async createUser(dto: CreateUserRequestDto) {
     try {
-      const { positionCategory, position } = dto;
+      const { positionCategory, position, password } = dto;
 
       // 이미 존재하는 아이디인지 확인
       const { email } = dto;
-      const checkExistUser = this.usersRepository.findUser({
+      const user = this.usersRepository.findUser({
         email: dto.email,
       });
 
+      if (user) {
+        throw new BadRequestException('이미 존재하는 유저입니다.');
+      }
+
       // 비밀번호 암호화
+      const hashedPassword = await bcrypt.hash(password, 10);
 
       // 포지션 유효성 검사
       const checkAvailablePosition = await this.checkAllowedDetailPosition(
@@ -69,11 +82,22 @@ export class UsersService {
         throw new BadRequestException('존재하지 않은 포지션 입니다');
       }
 
-      const newUser = this.usersRepository.createNewUser(dto);
+      const newUser = this.usersRepository.createNewUser({
+        ...dto,
+        password: hashedPassword,
+      });
       return newUser;
     } catch (e) {
       this.logger.error(e.message);
       throw e;
+    }
+  }
+
+  async findUser(dto: FindUserRequestDto) {
+    try {
+      return this.usersRepository.findUser(dto);
+    } catch (err) {
+      throw new err();
     }
   }
 }
