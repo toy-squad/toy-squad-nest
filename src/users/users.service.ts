@@ -3,7 +3,7 @@ import { CreateUserRequestDto } from './dtos/create-user-request.dto';
 import { POSITION } from './types/position.type';
 import { UsersRepository } from './users.repository';
 import * as bcrypt from 'bcrypt';
-import { FindUserRequestDto } from './dtos/find-user-request.dto';
+import { FindUserRequestDto } from './dtos/find-one-user-request.dto';
 
 @Injectable()
 export class UsersService {
@@ -57,12 +57,11 @@ export class UsersService {
 
   async createUser(dto: CreateUserRequestDto) {
     try {
-      const { positionCategory, position, password } = dto;
+      const { positionCategory, position, password, email } = dto;
 
       // 이미 존재하는 아이디인지 확인
-      const { email } = dto;
-      const user = this.usersRepository.findUser({
-        email: dto.email,
+      const user = await this.usersRepository.findOneUser({
+        email: email,
       });
 
       if (user) {
@@ -87,17 +86,32 @@ export class UsersService {
         password: hashedPassword,
       });
       return newUser;
-    } catch (e) {
-      this.logger.error(e.message);
-      throw e;
+    } catch (err) {
+      this.logger.error(err.message);
+      throw err;
     }
   }
 
-  async findUser(dto: FindUserRequestDto) {
+  /**
+   * 단일 유저 검색
+   */
+  async findOneUser(dto: FindUserRequestDto) {
     try {
-      return this.usersRepository.findUser(dto);
+      return await this.usersRepository.findOneUser(dto);
     } catch (err) {
-      throw new err();
+      throw err;
+    }
+  }
+
+  /**
+   *
+   * 유저리스트 검색
+   */
+  async findUserList(dto: FindUserRequestDto) {
+    try {
+      return await this.usersRepository;
+    } catch (err) {
+      throw err;
     }
   }
 }
