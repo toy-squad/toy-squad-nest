@@ -9,8 +9,8 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/entities/user.entity';
-import { ProjectModule } from './project/project.module';
-import { Project } from './project/entities/project.entity';
+import { ProjectModule } from './projects/project.module';
+import { Project } from './projects/entities/project.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -18,7 +18,7 @@ import { Project } from './project/entities/project.entity';
       isGlobal: true,
       validationSchema: Joi.object({
         NODE_ENV: Joi.string().valid('development', 'production').required(),
-        SERVER_PORT: Joi.number().default(3000).required(),
+        SERVER_PORT: Joi.number().default(3001).required(),
         /* DATABASE (RDBMS) */
         DB_HOST: Joi.string().required(),
         DB_PORT: Joi.number().required(),
@@ -34,7 +34,7 @@ import { Project } from './project/entities/project.entity';
       username: process.env.DB_USER,
       password: process.env.DB_PWD,
       database: process.env.DB_NAME,
-      entities: [User,Project],
+      entities: [User, Project],
       synchronize: process.env.NODE_ENV !== 'production',
       logging: process.env.NODE_ENV !== 'production',
       charset: 'utf8mb4',
