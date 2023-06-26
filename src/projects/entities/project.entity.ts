@@ -35,19 +35,20 @@ export class Project extends CoreEntity {
   imgUrl: string;
 
   @Column({
-    name: 'recruitment',
+    name: 'recruitments',
     nullable: false,
-    default: '1',
+    default: 0,
     comment: '모집인원',
   })
-  recruitment: string;
+  recruitments: number;
 
   @Column({
     name: 'participants',
     nullable: false,
+    default: 0,
     comment: '참여인원',
   })
-  participants: string;
+  participants: number;
 
   @Column({
     name: 'completion_status',
@@ -86,7 +87,7 @@ export class Project extends CoreEntity {
   post: string;
 
   @ManyToOne(() => User, (user) => user.project, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'leader_id' })
+  @JoinColumn({ name: 'leader_id', referencedColumnName: 'id' })
   user: User;
 
   // @OneToMany(() => Comments, (comments) => comments.project)
