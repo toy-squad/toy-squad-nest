@@ -29,7 +29,8 @@ export class User extends CoreEntity {
 
   @Column({
     name: 'phone',
-    nullable: false,
+    nullable: true,
+    default: null,
     comment: '연락처',
   })
   phone: string;
@@ -59,8 +60,10 @@ export class User extends CoreEntity {
   img_url: string;
 
   @Column({
-    name: 'field',
+    name: 'fields',
     type: 'simple-array',
+    nullable: true,
+    default: null,
     comment: '선호하는 분야',
   })
   fields: string[];
@@ -68,6 +71,8 @@ export class User extends CoreEntity {
   @Column({
     name: 'tendency',
     type: 'simple-array',
+    nullable: true,
+    default: null,
     comment: '작업성향',
   })
   tendency: string[];
@@ -78,13 +83,15 @@ export class User extends CoreEntity {
   })
   position: string;
 
-  @Column({ name: 'intro', nullable: true, comment: '자기소개' })
+  @Column({ name: 'intro', nullable: true, default: null, comment: '자기소개' })
   intro: string;
 
   // 주요스킬이 없다면 null 로 한다.
   @Column({
     type: 'simple-array',
     name: 'skills',
+    nullable: true,
+    default: null,
     comment: '주요 스킬',
   })
   skills: string[];
