@@ -94,5 +94,7 @@ export class UsersController {
    * URL: /api/users/:id
    */
   @Delete('/:id')
-  async deleteUser() {}
+  async deleteUser(@Param('id') userId: string) {
+    return await this.userService.deleteUser(userId);
+  }
 }

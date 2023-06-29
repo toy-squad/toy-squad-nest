@@ -4,6 +4,8 @@ import { POSITION } from './types/position.type';
 import { UsersRepository } from './users.repository';
 import * as bcrypt from 'bcrypt';
 import { FindUserRequestDto } from './dtos/find-one-user-request.dto';
+import { ConfirmPasswordRequestDto } from './dtos/confirm-password-request.dto';
+import { FindUserListRequestDto } from './dtos/find-user-list-request.dto';
 
 @Injectable()
 export class UsersService {
@@ -42,17 +44,10 @@ export class UsersService {
       // positionCategory[category] 에 해당하는 포지션인지 확인
       // 입력포지션이 포지션리스트에 포함되어 있는지 확인
       return detailPositionList.includes(position);
-    } catch (err) {
-      console.error(err.message);
-      throw err;
+    } catch (error) {
+      console.error(error.message);
+      throw error;
     }
-  }
-
-  private async comparePassword(
-    plainTextPassword: string,
-    realPassword: string,
-  ) {
-    return await bcrypt.compare(plainTextPassword, realPassword);
   }
 
   async createUser(dto: CreateUserRequestDto) {
@@ -86,9 +81,9 @@ export class UsersService {
         password: hashedPassword,
       });
       return newUser;
-    } catch (err) {
-      this.logger.error(err.message);
-      throw err;
+    } catch (error) {
+      this.logger.error(error.message);
+      throw error;
     }
   }
 
@@ -96,22 +91,49 @@ export class UsersService {
    * 단일 유저 검색
    */
   async findOneUser(dto: FindUserRequestDto) {
-    try {
-      return await this.usersRepository.findOneUser(dto);
-    } catch (err) {
-      throw err;
-    }
+    return await this.usersRepository.findOneUser(dto);
   }
 
   /**
    *
    * 유저리스트 검색
    */
-  async findUserList(dto: FindUserRequestDto) {
+  async findUserList(dto: FindUserListRequestDto) {
+    return await this.usersRepository.findUserList(dto);
+  }
+
+  /**
+   * 유저 삭제
+   * - softDelete로 유저삭제: DeleteDateColumn 값이 YYYY-mm-dd UTC 형식
+   */
+  async deleteUser(userId: string) {
+    return await this.usersRepository.softDeleteUser(userId);
+  }
+
+  /**
+   * 비밀번호 확인
+   * - 회원탈퇴 할때
+   * - 로그인 할때
+   * - 유저정보 수정할때
+   */
+  private async confirmPassword(dto: ConfirmPasswordRequestDto) {
     try {
-      return await this.usersRepository;
-    } catch (err) {
-      throw err;
+      // email에 해당하는 계정정보를 불러온다.
+      const { email, plainTextPassword } = dto;
+      const userInfo = await this.usersRepository.findOneUser({ email: email });
+
+      const isMatched = await bcrypt.compare(
+        plainTextPassword,
+        userInfo.password,
+      );
+
+      if (!isMatched) {
+        throw new BadRequestException('이메일과 비밀번호가 올바르지 않습니다.');
+      }
+
+      return;
+    } catch (error) {
+      throw error;
     }
   }
 }
