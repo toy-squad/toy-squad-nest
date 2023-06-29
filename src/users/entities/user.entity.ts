@@ -3,7 +3,7 @@ import { Column, Entity } from 'typeorm';
 import { SKILL_TYPE, SKILL_TYPE_SET } from '../types/skill.type';
 
 @Entity({ schema: process.env.DB_NAME })
-export class User extends CoreEntity {
+export class Users extends CoreEntity {
   @Column({
     name: 'email',
     unique: true,

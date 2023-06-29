@@ -97,6 +97,12 @@ export class UsersService {
   /**
    *
    * 유저리스트 검색
+   *
+   * 검색조건
+   * - 이메일
+   * - 이름
+   * - 포지션
+   * - 스킬
    */
   async findUserList(dto: FindUserListRequestDto) {
     return await this.usersRepository.findUserList(dto);

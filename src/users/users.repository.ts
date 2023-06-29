@@ -4,14 +4,18 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
-import { DeleteDateColumn, Repository } from 'typeorm';
+import { Users } from './entities/user.entity';
+import { DataSource, DeleteDateColumn, Repository } from 'typeorm';
 import { CreateUserRequestDto } from './dtos/create-user-request.dto';
 import { FindUserRequestDto } from './dtos/find-one-user-request.dto';
+import { FindUserListRequestDto } from './dtos/find-user-list-request.dto';
 
 @Injectable()
 export class UsersRepository {
-  constructor(@InjectRepository(User) private repo: Repository<User>) {}
+  constructor(
+    @InjectRepository(Users) private readonly repo: Repository<Users>,
+    private readonly dataSource: DataSource,
+  ) {}
 
   async createNewUser(dto: CreateUserRequestDto) {
     try {
@@ -42,13 +46,18 @@ export class UsersRepository {
     }
   }
 
-  async findUserList(dto: FindUserRequestDto) {
+  async findUserList(dto: FindUserListRequestDto) {
+    const { page, take } = dto;
     try {
-      const user = await this.repo.find({
-        where: { ...dto },
-      });
+      // Todo : FindUserListResponseDto 리스폰스받는 컬럼들 정의할것
+      const userList = await this.dataSource
+        .getRepository(Users)
+        .createQueryBuilder('u')
+        .take(take) // LIMIT
+        .skip(take * (page - 1))
+        .getMany();
 
-      return user;
+      return userList;
     } catch (error) {
       throw error;
     }

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Delete,
   Get,
   Logger,
@@ -12,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserRequestDto } from './dtos/create-user-request.dto';
+import { DEFAULT_PAGE, DEFAULT_TAKE } from 'commons/dtos/pagination-query-dto';
 
 @Controller('users')
 export class UsersController {
@@ -73,7 +75,17 @@ export class UsersController {
    * URL: /api/users/list
    */
   @Get('/list')
-  async getUsers(@Query('page') page: number) {}
+  async getUsers(
+    @Query('page', new DefaultValuePipe(DEFAULT_PAGE), ParseIntPipe)
+    page: number,
+    @Query('take', new DefaultValuePipe(DEFAULT_TAKE), ParseIntPipe)
+    take?: number,
+  ) {
+    return await this.userService.findUserList({
+      page: page,
+      take: take,
+    });
+  }
 
   /**
    * 유저 상세 페이지
