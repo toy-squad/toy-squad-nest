@@ -10,3 +10,16 @@ services:
       MYSQL_DATABASE: ${DB_NAME}
       MYSQL_ROOT_PASSWORD: ${DB_PWD}
       TZ: Asia/Seoul
+
+  redis:
+    image: redis:latest
+    container_name: toysquad_redis
+    ports:
+      - ${REDIS_PORT}:6379
+    command: redis-server --port 6379
+    labels:
+      - "name=redis"
+      - "mode=standalone" 
+
+
+  

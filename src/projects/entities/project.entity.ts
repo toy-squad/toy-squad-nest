@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { CoreEntity } from '../../commons/entities/core.entity';
 import { SKILL_TYPE } from '../../users/types/skill.type';
-import { User } from 'users/entities/user.entity';
+import { Users } from 'users/entities/user.entity';
 
 @Entity({ schema: process.env.DB_NAME })
 export class Project extends CoreEntity {
@@ -86,9 +86,9 @@ export class Project extends CoreEntity {
   })
   post: string;
 
-  @ManyToOne(() => User, (user) => user.project, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Users, (user) => user.project, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'leader_id', referencedColumnName: 'id' })
-  user: User;
+  user: Users;
 
   // @OneToMany(() => Comments, (comments) => comments.project)
   // comments: Comments[];

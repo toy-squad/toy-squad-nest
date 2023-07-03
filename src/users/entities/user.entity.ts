@@ -5,7 +5,7 @@ import { SKILL_TYPE, SKILL_TYPE_SET } from '../types/skill.type';
 import { on } from 'events';
 
 @Entity({ schema: process.env.DB_NAME })
-export class User extends CoreEntity {
+export class Users extends CoreEntity {
   @Column({
     name: 'email',
     unique: true,
@@ -41,7 +41,7 @@ export class User extends CoreEntity {
     default: null,
     comment: '카카오 연동 로그인 아이디',
   })
-  kakaoId: string;
+  kakaoAuthId: string;
 
   @Column({
     name: 'google_auth_id',
@@ -49,7 +49,7 @@ export class User extends CoreEntity {
     default: null,
     comment: '구글 연동 로그인 아이디',
   })
-  googleId: string;
+  googleAuthId: string;
 
   @Column({
     name: 'img_url',
@@ -57,7 +57,7 @@ export class User extends CoreEntity {
     default: null,
     comment: '유저이미지',
   })
-  img_url: string;
+  imgUrl: string;
 
   @Column({
     name: 'fields',
