@@ -1,11 +1,12 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
-import { CreateUserRequestDto } from './dtos/create-user-request.dto';
+import { CreateUserRequestDto } from './dtos/requests/create-user-request.dto';
 import { POSITION } from './types/position.type';
 import { UsersRepository } from './users.repository';
 import * as bcrypt from 'bcrypt';
-import { FindUserRequestDto } from './dtos/find-one-user-request.dto';
-import { ConfirmPasswordRequestDto } from './dtos/confirm-password-request.dto';
-import { FindUserListRequestDto } from './dtos/find-user-list-request.dto';
+import { FindUserRequestDto } from './dtos/requests/find-one-user-request.dto';
+import { ConfirmPasswordRequestDto } from './dtos/requests/confirm-password-request.dto';
+import { FindUserListRequestDto } from './dtos/requests/find-user-list-request.dto';
+import { GetUserDetailRequestDto } from './dtos/requests/get-user-detail-request.dto';
 
 @Injectable()
 export class UsersService {
@@ -122,7 +123,7 @@ export class UsersService {
    * - 로그인 할때
    * - 유저정보 수정할때
    */
-  private async confirmPassword(dto: ConfirmPasswordRequestDto) {
+  async confirmPassword(dto: ConfirmPasswordRequestDto) {
     try {
       // email에 해당하는 계정정보를 불러온다.
       const { email, plainTextPassword } = dto;

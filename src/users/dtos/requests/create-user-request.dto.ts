@@ -6,8 +6,7 @@ import {
   IsString,
   isEnum,
 } from 'class-validator';
-import { positionCategory } from '../types/position.type';
-import { AllowedPositionCategory } from '../enums/position.enum';
+import { positionCategory } from 'users/types/position.type';
 
 export class CreateUserRequestDto {
   @IsNotEmpty()

@@ -3,7 +3,7 @@ import { IsOptional, IsString } from 'class-validator';
 export class FindUserRequestDto {
   @IsOptional()
   @IsString()
-  email: string | undefined;
+  email?: string | undefined;
 
   @IsOptional()
   @IsString()

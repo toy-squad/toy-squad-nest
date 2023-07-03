@@ -7,26 +7,21 @@ import {
   Logger,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Put,
   Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserRequestDto } from './dtos/create-user-request.dto';
+import { CreateUserRequestDto } from './dtos/requests/create-user-request.dto';
 import { DEFAULT_PAGE, DEFAULT_TAKE } from 'commons/dtos/pagination-query-dto';
+import { UpdateUserInfoRequestDto } from './dtos/requests/update-user-info-request.dto';
 
 @Controller('users')
 export class UsersController {
   private readonly logger = new Logger(UsersController.name);
 
   constructor(private readonly userService: UsersService) {}
-  /**
-   * 포지션 요청 API
-   * - request: category
-   * -          category: 개발자/기획자/디자이너 포지션
-   * - response: map[category]
-   * @param GetPositionDetailRequestDto
-   */
 
   @Get()
   async() {
@@ -46,6 +41,9 @@ export class UsersController {
   /**
    * 상세 포지션 선택
    * URL: /api/users/position
+   * - request: category
+   * -          category: 개발자/기획자/디자이너 포지션
+   * - response: map[category]
    */
   @Get('/position')
   async getDetailPositions(@Query('position') categoryPosition: any) {
@@ -89,17 +87,24 @@ export class UsersController {
 
   /**
    * 유저 상세 페이지
-   * URL: /api/users/detail/:id
+   * URL: /api/users/:id/detail/
    */
-  @Get('/detail/:id')
-  async getUserDetail(@Param('id') userId: string) {}
+  @Get('/:id/detail')
+  async getUserDetail(@Param('id') userId: string) {
+    return await this.userService.findOneUser({ userId: userId });
+  }
 
   /**
    * 유저정보 수정
    * URL: /api/users/:id
    */
-  @Put('/:id')
-  async updateUserInfo() {}
+  // @Patch('/:id')
+  // async updateUserInfo(
+  //   @Param('id') userId: string,
+  //   @Body() dto: UpdateUserInfoRequestDto,
+  // ) {
+  //   return await this.userService.updateUserInfo({});
+  // }
 
   /**
    * 회원탈퇴

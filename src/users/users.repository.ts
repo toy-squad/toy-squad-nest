@@ -4,11 +4,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Users } from './entities/user.entity';
 import { DataSource, DeleteDateColumn, Repository } from 'typeorm';
-import { CreateUserRequestDto } from './dtos/create-user-request.dto';
-import { FindUserRequestDto } from './dtos/find-one-user-request.dto';
-import { FindUserListRequestDto } from './dtos/find-user-list-request.dto';
+import { Users } from './entities/user.entity';
+import { CreateUserRequestDto } from './dtos/requests/create-user-request.dto';
+import { FindUserRequestDto } from './dtos/requests/find-one-user-request.dto';
+import { FindUserListRequestDto } from './dtos/requests/find-user-list-request.dto';
+import { RealUserInfoType } from './types/real-user-info.type';
+// import { FindUserListResponseDto } from './dtos/responses/find-user-list-response.dto';
 
 @Injectable()
 export class UsersRepository {
@@ -49,13 +51,24 @@ export class UsersRepository {
   async findUserList(dto: FindUserListRequestDto) {
     const { page, take } = dto;
     try {
-      // Todo : FindUserListResponseDto 리스폰스받는 컬럼들 정의할것
-      const userList = await this.dataSource
+      const _userList = await this.dataSource
         .getRepository(Users)
         .createQueryBuilder('u')
         .take(take) // LIMIT
         .skip(take * (page - 1))
         .getMany();
+
+      const userList: RealUserInfoType = _userList.map((userInfo) => {
+        const {
+          password,
+          kakaoAuthId,
+          googleAuthId,
+          createdAt,
+          deletedAt,
+          ...realInfo
+        } = userInfo;
+        return realInfo;
+      });
 
       return userList;
     } catch (error) {
