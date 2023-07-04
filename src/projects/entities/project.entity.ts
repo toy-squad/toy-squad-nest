@@ -15,7 +15,8 @@ export class Project extends CoreEntity {
 
   @Column({
     name: 'intro',
-    nullable: false,
+    nullable: true,
+    default: null,
     comment: '프로젝트 소개',
   })
   intro: string;
@@ -64,7 +65,8 @@ export class Project extends CoreEntity {
 
   @Column({
     name: 'period',
-    nullable: false,
+    nullable: true,
+    default: null,
     comment: '프로젝트 기간',
   })
   period: string;
@@ -89,7 +91,8 @@ export class Project extends CoreEntity {
    */
   @Column({
     name: 'type',
-    nullable: false,
+    nullable: true,
+    default: null,
     comment: '프로젝트 타입',
   })
   type: string;
@@ -101,6 +104,7 @@ export class Project extends CoreEntity {
    */
   @Column({
     name: 'contact',
+    nullable: false,
     default: true,
     comment: '프로젝트 대면/비대면 여부',
   })
