@@ -1,8 +1,6 @@
 import { CoreEntity } from '../../commons/entities/core.entity';
 import { Project } from '../../projects/entities/project.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
-import { SKILL_TYPE, SKILL_TYPE_SET } from '../types/skill.type';
-import { on } from 'events';
 
 @Entity({ schema: process.env.DB_NAME })
 export class Users extends CoreEntity {
