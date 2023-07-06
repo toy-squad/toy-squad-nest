@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserRequestDto } from './dtos/requests/create-user-request.dto';
 import { POSITION } from './types/position.type';
 import { UsersRepository } from './users.repository';
@@ -7,6 +12,8 @@ import { FindUserRequestDto } from './dtos/requests/find-one-user-request.dto';
 import { ConfirmPasswordRequestDto } from './dtos/requests/confirm-password-request.dto';
 import { FindUserListRequestDto } from './dtos/requests/find-user-list-request.dto';
 import { GetUserDetailRequestDto } from './dtos/requests/get-user-detail-request.dto';
+import { UpdateUserInfoRequestDto } from './dtos/requests/update-user-info-request.dto';
+import { UpdatedUserInfoType } from './types/update-user-info.type';
 
 @Injectable()
 export class UsersService {
@@ -139,6 +146,37 @@ export class UsersService {
       }
 
       return;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * 유저정보수정
+   * - dto: 정보수정 요청 데이터
+   * - defaultUserInfo: 기존 DB에 저장된 유저정보
+   */
+  async updateUserInfo(dto: UpdateUserInfoRequestDto) {
+    try {
+      const { userId, ...updatedUserInfo } = dto;
+
+      // userId 를 갖는 유저가 존재하는지 확인
+      const defaultUserInfo: UpdatedUserInfoType =
+        await this.usersRepository.findOneUser({
+          userId: userId,
+        });
+      if (!defaultUserInfo) {
+        throw new NotFoundException('존재하지 않은 회원입니다.');
+      }
+
+      // const entries = Object.entries(dto);
+      // for (const [key, value] of entries) {
+      //   if (value === null) {
+      //     // dto 에서 값이 존재하지 않으면 기존 정보를 저장하도록한다.
+      //     dto[key] = defaultUserInfo[key];
+      //   }
+      // }
+      await this.usersRepository.updateUserInfo(dto);
     } catch (error) {
       throw error;
     }

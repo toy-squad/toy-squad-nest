@@ -10,6 +10,7 @@ import { CreateUserRequestDto } from './dtos/requests/create-user-request.dto';
 import { FindUserRequestDto } from './dtos/requests/find-one-user-request.dto';
 import { FindUserListRequestDto } from './dtos/requests/find-user-list-request.dto';
 import { RealUserInfoType } from './types/real-user-info.type';
+import { UpdateUserInfoRequestDto } from './dtos/requests/update-user-info-request.dto';
 // import { FindUserListResponseDto } from './dtos/responses/find-user-list-response.dto';
 
 @Injectable()
@@ -19,10 +20,10 @@ export class UsersRepository {
     private readonly dataSource: DataSource,
   ) {}
 
-  async createNewUser(dto: CreateUserRequestDto) {
+  async createNewUser(dto: any) {
     try {
-      const { positionCategory, ...newUser } = dto;
-      return await this.repo.save(newUser);
+      const { positionCategory, ...userInfo } = dto;
+      return await this.repo.save(userInfo);
     } catch (error) {
       throw error;
     }
@@ -79,6 +80,21 @@ export class UsersRepository {
   async softDeleteUser(userId: string): Promise<void> {
     try {
       await this.repo.softDelete(userId);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateUserInfo(dto: UpdateUserInfoRequestDto) {
+    try {
+      const { userId, ...updatedUserInfo } = dto;
+      await this.dataSource
+        .getRepository(Users)
+        .createQueryBuilder()
+        .update(Users)
+        .set(updatedUserInfo)
+        .where('id = :id', { id: userId })
+        .execute();
     } catch (error) {
       throw error;
     }

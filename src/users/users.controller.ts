@@ -98,13 +98,10 @@ export class UsersController {
    * 유저정보 수정
    * URL: /api/users/:id
    */
-  // @Patch('/:id')
-  // async updateUserInfo(
-  //   @Param('id') userId: string,
-  //   @Body() dto: UpdateUserInfoRequestDto,
-  // ) {
-  //   return await this.userService.updateUserInfo({});
-  // }
+  @Patch('/:id')
+  async updateUserInfo(@Param('id') userId: string, @Body() dto: any) {
+    return await this.userService.updateUserInfo({ userId, ...dto });
+  }
 
   /**
    * 회원탈퇴
