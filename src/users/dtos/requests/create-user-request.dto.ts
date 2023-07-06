@@ -1,4 +1,13 @@
-import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  isEnum,
+} from 'class-validator';
+import { positionCategory } from 'users/types/position.type';
+
 export class CreateUserRequestDto {
   @IsNotEmpty()
   @IsString()
@@ -20,7 +29,9 @@ export class CreateUserRequestDto {
   @IsArray()
   fields: string[];
 
-  @IsNotEmpty({ message: '포지션을 선택해주세요.' })
+  @IsString()
+  positionCategory: positionCategory;
+
   @IsString()
   position: string; // 세부포지션선택
 

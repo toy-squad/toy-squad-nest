@@ -8,8 +8,11 @@ import { LoggersMiddleware } from './commons/loggers/loggers.middleware';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './users/entities/user.entity';
+import { Users } from './users/entities/user.entity';
+import { RedisModule } from './redis/redis.module';
 
+import { ProjectModule } from './projects/project.module';
+import { Project } from './projects/entities/project.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -17,7 +20,7 @@ import { User } from './users/entities/user.entity';
       isGlobal: true,
       validationSchema: Joi.object({
         NODE_ENV: Joi.string().valid('development', 'production').required(),
-        SERVER_PORT: Joi.number().default(3000).required(),
+        SERVER_PORT: Joi.number().default(3001).required(),
         /* DATABASE (RDBMS) */
         DB_HOST: Joi.string().required(),
         DB_PORT: Joi.number().required(),
@@ -33,7 +36,7 @@ import { User } from './users/entities/user.entity';
       username: process.env.DB_USER,
       password: process.env.DB_PWD,
       database: process.env.DB_NAME,
-      entities: [User],
+      entities: [Users, Project],
       synchronize: process.env.NODE_ENV !== 'production',
       logging: process.env.NODE_ENV !== 'production',
       charset: 'utf8mb4',
@@ -41,6 +44,8 @@ import { User } from './users/entities/user.entity';
     LoggersModule,
     AuthModule,
     UsersModule,
+    RedisModule,
+    ProjectModule,
   ],
   controllers: [AppController],
   providers: [AppService],

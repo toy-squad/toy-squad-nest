@@ -1,9 +1,9 @@
 import { CoreEntity } from '../../commons/entities/core.entity';
-import { Column, Entity } from 'typeorm';
-import { SKILL_TYPE, SKILL_TYPE_SET } from '../types/skill.type';
+import { Project } from '../../projects/entities/project.entity';
+import { Column, Entity, OneToMany } from 'typeorm';
 
 @Entity({ schema: process.env.DB_NAME })
-export class User extends CoreEntity {
+export class Users extends CoreEntity {
   @Column({
     name: 'email',
     unique: true,
@@ -27,7 +27,8 @@ export class User extends CoreEntity {
 
   @Column({
     name: 'phone',
-    nullable: false,
+    nullable: true,
+    default: null,
     comment: '연락처',
   })
   phone: string;
@@ -38,7 +39,7 @@ export class User extends CoreEntity {
     default: null,
     comment: '카카오 연동 로그인 아이디',
   })
-  kakaoId: string;
+  kakaoAuthId: string;
 
   @Column({
     name: 'google_auth_id',
@@ -46,7 +47,7 @@ export class User extends CoreEntity {
     default: null,
     comment: '구글 연동 로그인 아이디',
   })
-  googleId: string;
+  googleAuthId: string;
 
   @Column({
     name: 'img_url',
@@ -54,11 +55,13 @@ export class User extends CoreEntity {
     default: null,
     comment: '유저이미지',
   })
-  img_url: string;
+  imgUrl: string;
 
   @Column({
-    name: 'field',
+    name: 'fields',
     type: 'simple-array',
+    nullable: true,
+    default: null,
     comment: '선호하는 분야',
   })
   fields: string[];
@@ -66,6 +69,8 @@ export class User extends CoreEntity {
   @Column({
     name: 'tendency',
     type: 'simple-array',
+    nullable: true,
+    default: null,
     comment: '작업성향',
   })
   tendency: string[];
@@ -76,17 +81,22 @@ export class User extends CoreEntity {
   })
   position: string;
 
-  @Column({ name: 'intro', nullable: true, comment: '자기소개' })
+  @Column({ name: 'intro', nullable: true, default: null, comment: '자기소개' })
   intro: string;
 
   // 주요스킬이 없다면 null 로 한다.
   @Column({
     type: 'simple-array',
     name: 'skills',
+    nullable: true,
+    default: null,
     comment: '주요 스킬',
   })
   skills: string[];
 
   @Column({ name: 'likes', default: 0, comment: '좋아요수' })
   likes: number;
+
+  @OneToMany(() => Project, (project) => project.user, { onDelete: 'CASCADE' })
+  project: Project[];
 }
