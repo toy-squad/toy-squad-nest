@@ -13,6 +13,7 @@ import { RedisModule } from './redis/redis.module';
 
 import { ProjectModule } from './projects/project.module';
 import { Project } from './projects/entities/project.entity';
+import { EmailModule } from './email/email.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -27,6 +28,10 @@ import { Project } from './projects/entities/project.entity';
         DB_USER: Joi.string().required(),
         DB_PWD: Joi.string().required(),
         DB_NAME: Joi.string().required(),
+        /** EMAIL */
+        MAILER_HOST: Joi.string(),
+        MAILER_USER: Joi.string(),
+        MAILER_PASSWORD: Joi.string(),
       }),
     }),
     TypeOrmModule.forRoot({
@@ -46,6 +51,7 @@ import { Project } from './projects/entities/project.entity';
     UsersModule,
     RedisModule,
     ProjectModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
