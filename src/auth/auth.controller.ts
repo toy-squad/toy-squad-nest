@@ -1,7 +1,13 @@
 import { Controller, Post } from '@nestjs/common';
+import { EmailService } from 'email/email.service';
+import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
+  constructor(
+    private readonly emailService: EmailService,
+    private readonly authService: AuthService,
+  ) {}
   /**
    *
    * 일반: 로그인
@@ -17,5 +23,9 @@ export class AuthController {
   /**
    *
    * sns: gmail 연동 로그인
+   */
+
+  /**
+   * 이메일 인증
    */
 }
