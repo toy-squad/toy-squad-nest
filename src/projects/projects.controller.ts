@@ -11,5 +11,7 @@ export class ProjectsController {
    * 가드/미들웨어/인터셉터 넣기
    * */
   @Post()
-  async createNewProject(@Body() requestDto: CreateNewProjectRequestDto) {}
+  async generateNewProject(@Body() requestDto: CreateNewProjectRequestDto) {
+    return await this.projectsService.createProject(requestDto);
+  }
 }

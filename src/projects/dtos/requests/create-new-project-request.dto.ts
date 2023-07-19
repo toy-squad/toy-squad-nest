@@ -5,4 +5,5 @@
  */
 export class CreateNewProjectRequestDto {
   name: string; // 프로젝트명
+
 }

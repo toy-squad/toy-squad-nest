@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from './entities/project.entity';
 import { Repository } from 'typeorm';
+import { CreateNewProjectRequestDto } from './dtos/requests/create-new-project-request.dto';
 
 @Injectable()
 export class ProjectsRepository {
@@ -21,5 +22,9 @@ export class ProjectsRepository {
 
   async findOne(id: string) {
     this.repo.findOneBy({ id: id });
+  }
+
+  async createProject(requestDto: CreateNewProjectRequestDto) {
+    this.repo.save(requestDto);
   }
 }

@@ -135,9 +135,9 @@ export class Project extends CoreEntity {
   /**
    * 프로젝트 팀장(유저) : 프로젝트 = 1:N
    */
-  @ManyToOne(() => Users, (user) => user.project)
-  @JoinColumn({ name: 'leader_id', referencedColumnName: 'id' })
-  user: Users;
+  // @ManyToOne(() => Users, (user) => user.project)
+  // @JoinColumn({ name: 'leader_id', referencedColumnName: 'id' })
+  // user: Users;
 
   // @OneToMany(() => Comments, (comments) => comments.project)
   // comments: Comments[];

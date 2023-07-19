@@ -99,6 +99,6 @@ export class Users extends CoreEntity {
   @Column({ name: 'likes', default: 0, comment: '좋아요수' })
   likes: number;
 
-  @OneToMany(() => Project, (project) => project.user, { onDelete: 'CASCADE' })
-  project: Project[];
+  // @OneToMany(() => Project, (project) => project.user, { onDelete: 'CASCADE' })
+  // project: Project[];
 }
