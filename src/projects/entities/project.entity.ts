@@ -86,9 +86,9 @@ export class Project extends CoreEntity {
   })
   post: string;
 
-  @ManyToOne(() => Users, (user) => user.project, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'leader_id', referencedColumnName: 'id' })
-  user: Users;
+  // @ManyToOne(() => Users, (user) => user.project, { onDelete: 'CASCADE' })
+  // @JoinColumn({ name: 'leader_id', referencedColumnName: 'id' })
+  // user: Users;
 
   // @OneToMany(() => Comments, (comments) => comments.project)
   // comments: Comments[];
