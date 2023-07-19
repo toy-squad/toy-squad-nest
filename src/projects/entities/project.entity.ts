@@ -9,6 +9,7 @@ export class Project extends CoreEntity {
   @Column({
     name: 'name',
     unique: true,
+    default: '',
     comment: '프로젝트이름',
   })
   name: string;
