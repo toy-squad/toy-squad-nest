@@ -15,7 +15,6 @@ export class HealthController {
   ) {}
 
   private SERVER_URL = this.configService.get('SERVER_URL');
-  private SERVER_PORT: number = +this.configService.get('SERVER_PORT') ?? 3001;
 
   @Get()
   @HealthCheck()
@@ -24,7 +23,7 @@ export class HealthController {
       () =>
         this.http.pingCheck(
           'toy-squad-server',
-          `${this.SERVER_URL}:${this.SERVER_PORT}`,
+          `${this.SERVER_URL}/health_check`,
         ),
     ]);
   }
