@@ -14,6 +14,7 @@ import { RedisModule } from './redis/redis.module';
 import { ProjectModule } from './projects/project.module';
 import { Project } from './projects/entities/project.entity';
 import { EmailModule } from './email/email.module';
+import { HealthModule } from './health/health.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -52,6 +53,7 @@ import { EmailModule } from './email/email.module';
     RedisModule,
     ProjectModule,
     EmailModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
