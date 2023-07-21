@@ -8,9 +8,9 @@ import { SKILL_TYPE_SET } from 'commons/types/skill.type';
 export class Project extends CoreEntity {
   @Column({
     name: 'name',
-    unique: true,
-    default: '',
+    nullable: false,
     comment: '프로젝트이름',
+    unique: true,
   })
   name: string;
 
