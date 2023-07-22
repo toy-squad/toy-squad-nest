@@ -8,7 +8,7 @@ import { LoggersMiddleware } from './commons/loggers/loggers.middleware';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Users } from './users/entities/user.entity';
+import { User } from './users/entities/user.entity';
 import { RedisModule } from './redis/redis.module';
 
 import { ProjectModule } from './projects/project.module';
@@ -36,7 +36,7 @@ import { Project } from './projects/entities/project.entity';
       username: process.env.DB_USER,
       password: process.env.DB_PWD,
       database: process.env.DB_NAME,
-      entities: [Users, Project],
+      entities: [User, Project],
       synchronize: process.env.NODE_ENV !== 'production',
       logging: process.env.NODE_ENV !== 'production',
       charset: 'utf8mb4',

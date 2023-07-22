@@ -1,4 +1,4 @@
-import { Users } from 'users/entities/user.entity';
+import { User } from 'users/entities/user.entity';
 
 /**
  * password, kakaoAuthId, googleAuthId, createdAt, deletedAt
@@ -6,6 +6,6 @@ import { Users } from 'users/entities/user.entity';
  * 위의 필드를 제외한 나머지는 유저정보로 공개한다.
  */
 export type RealUserInfoType = Omit<
-  Users,
+  User,
   'password' | 'kakaoAuthId' | 'googleAuthId' | 'createdAt' | 'deletedAt'
 >[];

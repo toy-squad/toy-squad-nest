@@ -5,7 +5,7 @@ import { SKILL_TYPE, SKILL_TYPE_SET } from '../types/skill.type';
 import { on } from 'events';
 
 @Entity({ schema: process.env.DB_NAME })
-export class Users extends CoreEntity {
+export class User extends CoreEntity {
   @Column({
     name: 'email',
     unique: true,

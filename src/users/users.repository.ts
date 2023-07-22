@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, DeleteDateColumn, Repository } from 'typeorm';
-import { Users } from './entities/user.entity';
+import { User } from './entities/user.entity';
 import { CreateUserRequestDto } from './dtos/requests/create-user-request.dto';
 import { FindUserRequestDto } from './dtos/requests/find-one-user-request.dto';
 import { FindUserListRequestDto } from './dtos/requests/find-user-list-request.dto';
@@ -15,7 +15,7 @@ import { RealUserInfoType } from './types/real-user-info.type';
 @Injectable()
 export class UsersRepository {
   constructor(
-    @InjectRepository(Users) private readonly repo: Repository<Users>,
+    @InjectRepository(User) private readonly repo: Repository<User>,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -52,7 +52,7 @@ export class UsersRepository {
     const { page, take } = dto;
     try {
       const _userList = await this.dataSource
-        .getRepository(Users)
+        .getRepository(User)
         .createQueryBuilder('u')
         .take(take) // LIMIT
         .skip(take * (page - 1))
