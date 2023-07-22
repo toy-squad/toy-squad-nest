@@ -3,7 +3,7 @@ import { Project } from '../../projects/entities/project.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 
 @Entity({ schema: process.env.DB_NAME })
-export class Users extends CoreEntity {
+export class User extends CoreEntity {
   @Column({
     name: 'email',
     unique: true,
