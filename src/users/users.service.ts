@@ -126,8 +126,13 @@ export class UsersService {
 
   /**
    * 비밀번호 확인
-   * - 회원탈퇴 할때
+   * 1) 인자정보
+   * - 첫번째인자: plainTextPassword  / 입력 비밀번호
+   * - 두번째인자: savedPassword      / DB에 저장된 비밀번호
+   *
+   * 2) 사용
    * - 로그인 할때
+   * - 회원탈퇴 할때
    * - 유저정보 수정할때
    */
   async confirmPassword(dto: ConfirmPasswordRequestDto) {
@@ -135,6 +140,10 @@ export class UsersService {
       // email에 해당하는 계정정보를 불러온다.
       const { email, plainTextPassword } = dto;
       const userInfo = await this.usersRepository.findOneUser({ email: email });
+
+      if (!userInfo) {
+        throw new NotFoundException('유저가 존재하지 않습니다.');
+      }
 
       const isMatched = await bcrypt.compare(
         plainTextPassword,
@@ -145,7 +154,7 @@ export class UsersService {
         throw new BadRequestException('이메일과 비밀번호가 올바르지 않습니다.');
       }
 
-      return;
+      return isMatched;
     } catch (error) {
       throw error;
     }
