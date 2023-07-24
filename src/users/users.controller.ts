@@ -15,18 +15,12 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserRequestDto } from './dtos/requests/create-user-request.dto';
 import { DEFAULT_PAGE, DEFAULT_TAKE } from 'commons/dtos/pagination-query-dto';
-import { UpdateUserInfoRequestDto } from './dtos/requests/update-user-info-request.dto';
 
 @Controller('users')
 export class UsersController {
   private readonly logger = new Logger(UsersController.name);
 
   constructor(private readonly userService: UsersService) {}
-
-  @Get()
-  async() {
-    this.logger.log('hello');
-  }
 
   /**
    * 회원가입 API
@@ -109,6 +103,10 @@ export class UsersController {
    */
   @Delete('/:id')
   async deleteUser(@Param('id') userId: string) {
-    return await this.userService.deleteUser(userId);
+    try {
+      await this.userService.deleteUser(userId);
+    } catch (error) {
+      throw error;
+    }
   }
 }

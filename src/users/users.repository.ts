@@ -89,9 +89,9 @@ export class UsersRepository {
     try {
       const { userId, ...updatedUserInfo } = dto;
       await this.dataSource
-        .getRepository(Users)
+        .getRepository(User)
         .createQueryBuilder()
-        .update(Users)
+        .update(User)
         .set(updatedUserInfo)
         .where('id = :id', { id: userId })
         .execute();
