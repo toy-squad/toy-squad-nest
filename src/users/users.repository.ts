@@ -9,7 +9,7 @@ import { User } from './entities/user.entity';
 import { CreateUserRequestDto } from './dtos/requests/create-user-request.dto';
 import { FindUserRequestDto } from './dtos/requests/find-one-user-request.dto';
 import { FindUserListRequestDto } from './dtos/requests/find-user-list-request.dto';
-import { RealUserInfoType } from './types/real-user-info.type';
+import { PublicUserInfo } from './types/public-user-info.type';
 import { UpdateUserInfoRequestDto } from './dtos/requests/update-user-info-request.dto';
 // import { FindUserListResponseDto } from './dtos/responses/find-user-list-response.dto';
 
@@ -59,7 +59,7 @@ export class UsersRepository {
         .skip(take * (page - 1))
         .getMany();
 
-      const userList: RealUserInfoType = _userList.map((userInfo) => {
+      const userList: PublicUserInfo[] = _userList.map((userInfo) => {
         const {
           password,
           kakaoAuthId,
