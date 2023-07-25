@@ -1,6 +1,7 @@
-import { Controller, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { EmailService } from 'email/email.service';
 import { AuthService } from './auth.service';
+import { ValidateUserRequestDto } from './dtos/requests/validate-user-request.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -12,7 +13,12 @@ export class AuthController {
    *
    * 일반: 로그인
    */
-  
+  @HttpCode(HttpStatus.OK)
+  @Post('login')
+  async signIn(@Body() dto: ValidateUserRequestDto) {
+    this.authService.signIn(dto);
+  }
+
   /**
    *
    * 공통: 로그아웃
