@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from './entities/project.entity';
 import { Repository } from 'typeorm';
 import { CreateNewProjectRequestDto } from './dtos/requests/create-new-project-request.dto';
+import { UpdateProjectRequestDto } from './dtos/requests/update-project-request.dto';
 
 @Injectable()
 export class ProjectsRepository {
@@ -26,5 +27,9 @@ export class ProjectsRepository {
 
   async createProject(requestDto: CreateNewProjectRequestDto) {
     this.repo.save(requestDto);
+  }
+
+  async updateProject(id: string, requestDto: UpdateProjectRequestDto ){
+    this.repo.update(id, requestDto);
   }
 }
