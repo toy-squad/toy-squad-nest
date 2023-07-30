@@ -32,4 +32,8 @@ export class ProjectsRepository {
   async updateProject(id: string, requestDto: UpdateProjectRequestDto ){
     this.repo.update(id, requestDto);
   }
+  
+  async softDeleteProject(id: string){
+    this.repo.softDelete(id);
+  }
 }

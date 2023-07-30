@@ -24,4 +24,12 @@ export class ProjectsService {
       
     }
   }
+
+  async softDeleteProject(id: string){
+    try{
+      const newProject = await this.projectsRepository.softDeleteProject(id);
+    }catch(error){
+
+    }
+  }
 }
