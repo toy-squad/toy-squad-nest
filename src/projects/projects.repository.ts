@@ -9,6 +9,7 @@ import { UpdateProjectRequestDto } from './dtos/requests/update-project-request.
 export class ProjectsRepository {
   private queryRunner;
   private entityManager;
+
   constructor(
     @InjectRepository(Project)
     private readonly repo: Repository<Project>,
@@ -21,8 +22,12 @@ export class ProjectsRepository {
     this.repo.find();
   }
 
-  async findOne(id: string) {
-    this.repo.findOneBy({ id: id });
+  async findOneProject(id: string): Promise<Project> {
+    try {
+      return this.repo.findOneBy({ id: id });
+    } catch (error) {
+      throw error;
+    }
   }
 
   async createProject(requestDto: CreateNewProjectRequestDto) {
@@ -36,4 +41,5 @@ export class ProjectsRepository {
   async softDeleteProject(id: string){
     this.repo.softDelete(id);
   }
+
 }

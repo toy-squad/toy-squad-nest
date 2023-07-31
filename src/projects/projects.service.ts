@@ -32,4 +32,12 @@ export class ProjectsService {
 
     }
   }
+
+  async findOneProject(id: string) {
+    try {
+      return await this.projectsRepository.findOneProject(id);
+    } catch (error) {
+      throw error;
+    }
+  }
 }
