@@ -4,12 +4,14 @@ import { UsersService } from 'users/users.service';
 import { ValidateUserRequestDto } from './dtos/requests/validate-user-request.dto';
 import { ConfirmPasswordRequestDto } from 'users/dtos/requests/confirm-password-request.dto';
 import { PublicUserInfo } from 'users/types/public-user-info.type';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UsersService,
     private readonly emailService: EmailService,
+    private readonly jwtService: JwtService,
   ) {}
 
   /**
@@ -41,6 +43,7 @@ export class AuthService {
 
   async signIn(dto: ValidateUserRequestDto) {
     try {
+      // 저장완료되면 쿠키에 저장.
     } catch (error) {
       throw error;
     }
