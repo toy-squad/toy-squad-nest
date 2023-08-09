@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateNewProjectRequestDto } from './dtos/requests/create-new-project-request.dto';
 import { UpdateProjectRequestDto } from './dtos/requests/update-project-request.dto';
@@ -15,7 +23,7 @@ export class ProjectsController {
    * */
 
   @Get('/:id')
-  async findOneProject(@Param('id') id: string ){
+  async findOneProject(@Param('id') id: string) {
     return await this.projectsService.findOneProject(id);
   }
 
@@ -25,7 +33,10 @@ export class ProjectsController {
   }
 
   @Patch('/:id')
-  async updateProject(@Param('id') id: string, @Body() requestDto: UpdateProjectRequestDto) {
+  async updateProject(
+    @Param('id') id: string,
+    @Body() requestDto: UpdateProjectRequestDto,
+  ) {
     return await this.projectsService.updateProject(id, requestDto);
   }
 

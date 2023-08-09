@@ -43,6 +43,7 @@ export class AuthService {
 
   async signIn(dto: ValidateUserRequestDto) {
     try {
+      
       // 저장완료되면 쿠키에 저장.
     } catch (error) {
       throw error;

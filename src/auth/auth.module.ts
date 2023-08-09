@@ -19,6 +19,10 @@ import { JwtModule } from '@nestjs/jwt';
   ],
   providers: [
     {
+      /**
+       * authController에 정의되어있는 API들은
+       * 컨트롤러 내부에 진입하기전에,  AuthGuard에서 유저인증절차를 밟는다.
+       */
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
