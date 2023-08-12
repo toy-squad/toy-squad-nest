@@ -1,7 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { LoggersModule } from './commons/middlewares/loggers.module';
 import * as Joi from 'joi';
 import { LoggersMiddleware } from './commons/middlewares/loggers.middleware';
@@ -15,9 +14,8 @@ import { ProjectModule } from './projects/project.module';
 import { Project } from './projects/entities/project.entity';
 import { EmailModule } from './email/email.module';
 import { HealthModule } from './health/health.module';
-import { APP_GUARD } from '@nestjs/core';
-import { AuthGuard } from 'auth/guards/local-auth/local-auth.guard';
 import { PassportModule } from '@nestjs/passport';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -54,6 +52,13 @@ import { PassportModule } from '@nestjs/passport';
       logging: process.env.NODE_ENV !== 'production',
       charset: 'utf8mb4',
     }),
+    // JwtModule.register({
+    //   secret: process.env.JWT_SECRET,
+    //   signOptions: {
+    //     expiresIn: process.env.JWT_EXPIRATION,
+    //   },
+    // }),
+
     LoggersModule,
     AuthModule,
     UsersModule,
@@ -64,17 +69,7 @@ import { PassportModule } from '@nestjs/passport';
     PassportModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    {
-      /**
-       * authController에 정의되어있는 API들은
-       * 컨트롤러 내부에 진입하기전에,  AuthGuard에서 유저인증절차를 밟는다.
-       */
-      provide: APP_GUARD,
-      useClass: AuthGuard,
-    },
-  ],
+  providers: [],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

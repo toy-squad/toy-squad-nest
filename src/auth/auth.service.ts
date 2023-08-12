@@ -5,8 +5,6 @@ import { ValidateUserRequestDto } from './dtos/requests/validate-user-request.dt
 import { ConfirmPasswordRequestDto } from 'users/dtos/requests/confirm-password-request.dto';
 import { PublicUserInfo } from 'users/types/public-user-info.type';
 import { JwtService } from '@nestjs/jwt';
-import { SignInRequestDto } from './dtos/requests/sign-in-user-request.dto';
-import { Payload } from './interfaces/payload.interface';
 
 @Injectable()
 export class AuthService {
