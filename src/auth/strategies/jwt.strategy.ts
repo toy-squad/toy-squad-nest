@@ -2,12 +2,16 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { AuthService } from 'auth/auth.service';
 import { ValidateUserRequestDto } from 'auth/dtos/requests/validate-user-request.dto';
-import { Strategy } from 'passport-local';
+import { Strategy, ExtractJwt } from 'passport-jwt';
 
 @Injectable()
-export class LocalStrategy extends PassportStrategy(Strategy) {
-  constructor(private authService: AuthService) {
-    super();
+export class JwtStrategy extends PassportStrategy(Strategy) {
+  constructor(private readonly authService: AuthService) {
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: false,
+      secretOrKey: process.env.JWT_SECRET,
+    });
   }
 
   async validate(dto: ValidateUserRequestDto) {

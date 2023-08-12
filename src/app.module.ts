@@ -15,6 +15,10 @@ import { ProjectModule } from './projects/project.module';
 import { Project } from './projects/entities/project.entity';
 import { EmailModule } from './email/email.module';
 import { HealthModule } from './health/health.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from 'auth/guards/local-auth/local-auth.guard';
+import { PassportModule } from '@nestjs/passport';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -33,6 +37,9 @@ import { HealthModule } from './health/health.module';
         MAILER_HOST: Joi.string(),
         MAILER_USER: Joi.string(),
         MAILER_PASSWORD: Joi.string(),
+        /** JWT */
+        JWT_SECRET: Joi.string(),
+        JWT_EXPIRATION: Joi.string(),
       }),
     }),
     TypeOrmModule.forRoot({
@@ -54,9 +61,20 @@ import { HealthModule } from './health/health.module';
     ProjectModule,
     EmailModule,
     HealthModule,
+    PassportModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      /**
+       * authController에 정의되어있는 API들은
+       * 컨트롤러 내부에 진입하기전에,  AuthGuard에서 유저인증절차를 밟는다.
+       */
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

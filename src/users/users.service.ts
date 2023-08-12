@@ -25,7 +25,7 @@ export class UsersService {
   /**
    * 카테고리에 매핑되는 포지션 조회
    */
-  async getDetailPositions(positionCategory: string) {
+  async getDetailPositions(positionCategory: string): Promise<string[]> {
     // 선택한 포지션 카테고리
     const category = positionCategory.toUpperCase();
 

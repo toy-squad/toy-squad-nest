@@ -13,14 +13,8 @@ import {
   Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserRequestDto } from './dtos/requests/create-user-request.dto';
 import { DEFAULT_PAGE, DEFAULT_TAKE } from 'commons/dtos/pagination-query-dto';
-import {
-  ApiCreatedResponse,
-  ApiOperation,
-  ApiProperty,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('유저 API')
 @Controller('users')
@@ -28,20 +22,6 @@ export class UsersController {
   private readonly logger = new Logger(UsersController.name);
 
   constructor(private readonly userService: UsersService) {}
-
-  /**
-   * 회원가입 API
-   * URL: /api/users
-   */
-  @ApiOperation({
-    summary: '회원가입 API',
-    description: '일반 회원가입',
-  })
-  @Post()
-  async generateNewUser(@Body() dto: CreateUserRequestDto) {
-    const newUser = await this.userService.createUser(dto);
-    return newUser;
-  }
 
   /**
    * 상세 포지션 선택

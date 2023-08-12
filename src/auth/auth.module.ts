@@ -1,33 +1,29 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
 import { EmailModule } from 'email/email.module';
 import { UsersModule } from 'users/users.module';
-import { AuthGuard } from './guards/local-auth/local-auth.guard';
 import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { LocalStrategy } from './strategies/local.strategy';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [
     EmailModule,
     UsersModule,
-    JwtModule.register({
-      global: true,
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: process.env.JWT_EXPIRATION },
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: {
+          expiresIn: configService.get<string>('JWT_EXPIRATION'),
+        },
+      }),
+      inject: [ConfigService],
     }),
   ],
-  providers: [
-    {
-      /**
-       * authController에 정의되어있는 API들은
-       * 컨트롤러 내부에 진입하기전에,  AuthGuard에서 유저인증절차를 밟는다.
-       */
-      provide: APP_GUARD,
-      useClass: AuthGuard,
-    },
-    AuthService,
-  ],
-  controllers: [AuthController],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
+  exports: [AuthService],
 })
 export class AuthModule {}
