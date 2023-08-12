@@ -2,7 +2,9 @@ import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { EmailService } from 'email/email.service';
 import { AuthService } from './auth.service';
 import { ValidateUserRequestDto } from './dtos/requests/validate-user-request.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('회원 인증 API')
 @Controller('auth')
 export class AuthController {
   constructor(
