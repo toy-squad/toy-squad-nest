@@ -19,6 +19,7 @@ import { CreateUserRequestDto } from 'users/dtos/requests/create-user-request.dt
 import { UsersService } from 'users/users.service';
 import { LocalAuthGuard } from 'auth/guards/local-auth/local-auth.guard';
 import { JwtAuthGuard } from 'auth/guards/jwt-auth/jwt-auth.guard';
+import { RequestWithUser } from 'auth/interfaces/request-with-user.interface';
 
 @Controller()
 export class AppController {
@@ -54,9 +55,10 @@ export class AppController {
    * URL: /api/sign-in
    */
   @Post('/sign-in')
-  @UseGuards(JwtAuthGuard)
-  async signIn(@Request() req) {
-    await this.authService.signIn(req.user);
+  @UseGuards(LocalAuthGuard)
+  async signIn(@Request() request: RequestWithUser) {
+    const user = request.user;
+    return user;
   }
 
   /** 로그아웃 */

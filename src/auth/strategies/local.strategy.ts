@@ -7,14 +7,20 @@ import { Strategy } from 'passport-local';
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private authService: AuthService) {
-    super();
+    super({
+      usernameField: 'email',
+    });
   }
 
   async validate(dto: ValidateUserRequestDto) {
-    const user = await this.authService.validateUser(dto);
-    if (!user) {
-      throw new UnauthorizedException('유저 인증에 실패하였습니다.');
+    try {
+      const user = await this.authService.validateUser(dto);
+      if (!user) {
+        throw new UnauthorizedException('유저 인증에 실패하였습니다.');
+      }
+      return user;
+    } catch (error) {
+      throw error;
     }
-    return user;
   }
 }
