@@ -99,7 +99,8 @@ export class UsersService {
    * 단일 유저 검색
    */
   async findOneUser(dto: FindUserRequestDto) {
-    return await this.usersRepository.findOneUser(dto);
+    const user = await this.usersRepository.findOneUser(dto);
+    return user;
   }
 
   /**
@@ -139,7 +140,10 @@ export class UsersService {
     try {
       // email에 해당하는 계정정보를 불러온다.
       const { email, plainTextPassword } = dto;
-      const userInfo = await this.usersRepository.findOneUser({ email: email });
+      const userInfo = await this.usersRepository.findOneUser({
+        email: email,
+        allowPassword: true,
+      });
 
       if (!userInfo) {
         throw new NotFoundException('유저가 존재하지 않습니다.');

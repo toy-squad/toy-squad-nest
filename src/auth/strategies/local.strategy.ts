@@ -12,9 +12,12 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(dto: ValidateUserRequestDto) {
+  async validate(email: string, password: string) {
     try {
-      const user = await this.authService.validateUser(dto);
+      const user = await this.authService.validateUser({
+        email: email,
+        password: password,
+      });
       if (!user) {
         throw new UnauthorizedException('유저 인증에 실패하였습니다.');
       }

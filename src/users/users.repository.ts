@@ -31,15 +31,31 @@ export class UsersRepository {
 
   async findOneUser(dto: FindUserRequestDto) {
     try {
-      const userId = dto.userId ?? undefined;
-      const email = dto.email ?? undefined;
-      const phone = dto.phone ?? undefined;
+      const { allowPassword, userId, email, phone } = dto;
+
+      // password 옵션이 false라면, 비밀번호 제외하여 리턴한다.
+      const withoutPassword = allowPassword
+        ? {
+            id: true,
+            email: true,
+            name: true,
+            phone: true,
+            imgUrl: true,
+            fields: true,
+            tendency: true,
+            position: true,
+            intro: true,
+            skills: true,
+            likes: true,
+          }
+        : undefined;
 
       const user = await this.repo.findOne({
+        select: withoutPassword,
         where: {
-          id: userId,
-          email: email,
-          phone: phone,
+          id: userId ?? undefined,
+          email: email ?? undefined,
+          phone: phone ?? undefined,
         },
       });
 
@@ -55,21 +71,35 @@ export class UsersRepository {
       const _userList = await this.dataSource
         .getRepository(User)
         .createQueryBuilder('u')
+        .select('u.id')
+        .addSelect('u.email')
+        .addSelect('u.name')
+        .addSelect('u.phone')
+        .addSelect('u.imgUrl')
+        .addSelect('u.fields')
+        .addSelect('u.tendency')
+        .addSelect('u.position')
+        .addSelect('u.intro')
+        .addSelect('u.skills')
+        .addSelect('u.likes')
         .take(take) // LIMIT
         .skip(take * (page - 1))
         .getMany();
 
-      const userList: PublicUserInfo[] = _userList.map((userInfo) => {
-        const {
-          password,
-          kakaoAuthId,
-          googleAuthId,
-          createdAt,
-          deletedAt,
-          ...realInfo
-        } = userInfo;
-        return realInfo;
-      });
+      const userList: PublicUserInfo[] = _userList;
+      // .map((userInfo) =>
+      // {
+      // const {
+      // password,
+      // kakaoAuthId,
+      // googleAuthId,
+      // createdAt,
+      // deletedAt,
+      // ...realInfo
+      // } = userInfo;
+      // return realInfo;
+      // }
+      // );
 
       return userList;
     } catch (error) {

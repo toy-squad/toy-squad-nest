@@ -19,7 +19,7 @@ import { CreateUserRequestDto } from 'users/dtos/requests/create-user-request.dt
 import { UsersService } from 'users/users.service';
 import { LocalAuthGuard } from 'auth/guards/local-auth/local-auth.guard';
 import { JwtAuthGuard } from 'auth/guards/jwt-auth/jwt-auth.guard';
-import { RequestWithUser } from 'auth/interfaces/request-with-user.interface';
+import RequestWithUser from 'auth/interfaces/request-with-user.interface';
 
 @Controller()
 export class AppController {
