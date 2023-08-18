@@ -6,8 +6,9 @@ import {
   HttpStatus,
   Post,
   UseGuards,
-  Request,
+  Req,
   Logger,
+  Res,
 } from '@nestjs/common';
 
 import { AuthService } from 'auth/auth.service';
@@ -20,6 +21,7 @@ import { UsersService } from 'users/users.service';
 import { LocalAuthGuard } from 'auth/guards/local-auth/local-auth.guard';
 import { JwtAuthGuard } from 'auth/guards/jwt-auth/jwt-auth.guard';
 import RequestWithUser from 'auth/interfaces/request-with-user.interface';
+import { Response } from 'express';
 
 @Controller()
 export class AppController {
@@ -56,9 +58,18 @@ export class AppController {
    */
   @Post('/sign-in')
   @UseGuards(LocalAuthGuard)
-  async signIn(@Request() request: RequestWithUser) {
-    const user = request.user;
-    return user;
+  async signIn(@Req() request: RequestWithUser, @Res() response: Response) {
+    const { user } = request;
+
+    // 1. JWT 토큰을 쿠키에 저장.
+    // const cookie = this.authService.getCookieWithJwtToken(user.id, user.email);
+    // response.setHeader('Set-Cookie', cookie);
+    // return response.send(user);
+
+    // 2. 헤더에 Bearer Token 형태로 응답
+    const access_token = await this.authService.signIn(user.id, user.email);
+    response.setHeader('Authorization', `Bearer ${access_token}`);
+    return response.json(access_token);
   }
 
   /** 로그아웃 */

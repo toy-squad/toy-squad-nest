@@ -42,15 +42,15 @@ export class AuthService {
    * JWT 토큰 생성
    * @param payload : payload는 토큰에 담을 정보. 유저귀중정보를 제외한 나머지
    */
-  async signIn(data: any) {
+  async signIn(userId: string, email: string) {
     try {
-      // Payload
-      // JWT Payload 에는 토큰에 담을 정보가 들어있다.
-      //JWT토큰을 생성
-      // return {
-      //   access_token: this.jwtService.sign(payload),
-      // };
-      // JSON payload에
+      // Payload:  JWT Payload 에는 토큰에 담을 정보가 들어있다.
+      const payload: TokenPayload = { userId: userId, email: email };
+
+      //JWT토큰을 리턴
+      return {
+        access_token: this.jwtService.sign(payload),
+      };
     } catch (error) {
       throw error;
     }
@@ -62,10 +62,8 @@ export class AuthService {
   public getCookieWithJwtToken(userId: string, email: string) {
     const payload: TokenPayload = { userId: userId, email: email };
     const token = this.jwtService.sign(payload);
-    return `
-    Authentication=${token};
-    HttpOnly; 
-    Path=/; 
-    Max-Age=${this.configService.get('JWT_EXPIRATION')}`;
+    return `access_token=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get(
+      'JWT_EXPIRATION',
+    )}`;
   }
 }
