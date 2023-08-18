@@ -21,7 +21,7 @@ import { UsersService } from 'users/users.service';
 import { LocalAuthGuard } from 'auth/guards/local-auth/local-auth.guard';
 import { JwtAuthGuard } from 'auth/guards/jwt-auth/jwt-auth.guard';
 import RequestWithUser from 'auth/interfaces/request-with-user.interface';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 
 @Controller()
 export class AppController {
@@ -73,6 +73,33 @@ export class AppController {
   }
 
   /** 로그아웃 */
+  @Get('log-out')
+  @UseGuards(JwtAuthGuard)
+  async logOut(@Req() request: Request, @Res() response: Response) {
+    // 헤더에 토큰을 없앤다?
+  }
+
+  /**
+   * 마이페이지
+   * URL: /api/mypage
+   *
+   * - 내가 작성한 댓글 & 답글
+   * - 내가 참여한 프로젝트
+   * - 내가 완료한 프로젝트
+   * - 내가 받은 프로젝트 제안
+   * - 내가 생성한 프로젝트
+   * - 내가 작성한 전시물
+   *
+   */
+  @Get('/mypage')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: '마이페이지 API',
+    description: '로그인 유저 마이페이지',
+  })
+  async getMyPage(@Req() request: RequestWithUser) {
+    return request.user;
+  }
 
   /**
    *

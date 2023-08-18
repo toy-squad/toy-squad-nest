@@ -57,6 +57,7 @@ export class AuthService {
   }
 
   /**
+   * [사용안함!]
    * 쿠키에 JWT토큰을 담는다
    */
   public getCookieWithJwtToken(userId: string, email: string) {

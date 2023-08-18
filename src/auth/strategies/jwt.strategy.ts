@@ -1,12 +1,12 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { AuthService } from 'auth/auth.service';
-import { ValidateUserRequestDto } from 'auth/dtos/requests/validate-user-request.dto';
+import { Request } from 'express';
 import { Strategy, ExtractJwt } from 'passport-jwt';
+import { UsersService } from 'users/users.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly authService: AuthService) {
+  constructor(private readonly usersService: UsersService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -14,11 +14,19 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(dto: ValidateUserRequestDto) {
-    const user = await this.authService.validateUser(dto);
-    if (!user) {
-      throw new UnauthorizedException('유저 인증에 실패하였습니다.');
-    }
+  async validate(payload: TokenPayload) {
+    // payload가 유효한지 확인한다.
+    const { userId, email } = payload;
+    const user = await this.usersService.findOneUser({
+      userId: userId,
+      email: email,
+    });
+
     return user;
+  }
+
+  private extractTokenFromHeader(request: Request) {
+    const [type, token] = request.headers.authorization?.split(' ') ?? [];
+    return type === 'Bearer' ? token : undefined;
   }
 }
