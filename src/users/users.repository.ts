@@ -34,8 +34,9 @@ export class UsersRepository {
       const { allowPassword, userId, email, phone } = dto;
 
       // password 옵션이 false라면, 비밀번호 제외하여 리턴한다.
-      const withoutPassword = allowPassword
-        ? {
+      const selectQuery = allowPassword
+        ? undefined
+        : {
             id: true,
             email: true,
             name: true,
@@ -47,11 +48,9 @@ export class UsersRepository {
             intro: true,
             skills: true,
             likes: true,
-          }
-        : undefined;
-
+          };
       const user = await this.repo.findOne({
-        select: withoutPassword,
+        select: selectQuery,
         where: {
           id: userId ?? undefined,
           email: email ?? undefined,

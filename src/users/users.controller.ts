@@ -93,6 +93,7 @@ export class UsersController {
   /**
    * 유저 상세 페이지
    * URL: /api/users/:id/detail/
+   * - 비밀번호 포함
    */
   @Get('/:id/detail')
   @ApiOperation({
