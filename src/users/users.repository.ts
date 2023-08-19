@@ -86,19 +86,6 @@ export class UsersRepository {
         .getMany();
 
       const userList: PublicUserInfo[] = _userList;
-      // .map((userInfo) =>
-      // {
-      // const {
-      // password,
-      // kakaoAuthId,
-      // googleAuthId,
-      // createdAt,
-      // deletedAt,
-      // ...realInfo
-      // } = userInfo;
-      // return realInfo;
-      // }
-      // );
 
       return userList;
     } catch (error) {
