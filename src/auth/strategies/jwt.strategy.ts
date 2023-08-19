@@ -1,4 +1,5 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { ContextIdFactory, ModuleRef } from '@nestjs/core';
 import { PassportStrategy } from '@nestjs/passport';
 import { Request } from 'express';
 import { Strategy, ExtractJwt } from 'passport-jwt';
@@ -14,15 +15,16 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: TokenPayload) {
+  async validate(request: Request, payload: TokenPayload) {
     // payload가 유효한지 확인한다.
+    console.log(request.user);
+
     const { userId, email } = payload;
-    const user = await this.usersService.findOneUser({
+    const signInUser = await this.usersService.findOneUser({
       userId: userId,
       email: email,
     });
-
-    return user;
+    return signInUser;
   }
 
   private extractTokenFromHeader(request: Request) {

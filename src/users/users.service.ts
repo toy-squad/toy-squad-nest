@@ -60,7 +60,7 @@ export class UsersService {
 
   async createUser(dto: CreateUserRequestDto) {
     try {
-      const { positionCategory, position, password, email } = dto;
+      const { position_category, position, password, email } = dto;
 
       // 이미 존재하는 아이디인지 확인
       const user = await this.usersRepository.findOneUser({
@@ -77,18 +77,23 @@ export class UsersService {
       // 포지션 유효성 검사
       const checkAvailablePosition = await this.checkAllowedDetailPosition(
         position,
-        positionCategory,
+        position_category,
       );
 
       if (!checkAvailablePosition) {
         throw new BadRequestException('존재하지 않은 포지션 입니다');
       }
 
-      const newUser = this.usersRepository.createNewUser({
+      const newUser = await this.usersRepository.createNewUser({
         ...dto,
         password: hashedPassword,
       });
-      return newUser;
+
+      // 새로운 유저 생성했을 때, 중요정보를 리턴하지 않도록 한다.
+      const newUserPublicInfo = await this.findOneUser({
+        userId: newUser.id,
+      });
+      return newUserPublicInfo;
     } catch (error) {
       this.logger.error(error.message);
       throw error;

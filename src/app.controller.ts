@@ -30,6 +30,7 @@ export class AppController {
     private readonly userService: UsersService,
   ) {}
   private readonly logger = new Logger(AppController.name);
+  @Public()
   @Get()
   getHello(): string {
     // return this.appService.getHello();
@@ -40,7 +41,7 @@ export class AppController {
    * 회원가입 API
    * URL: /api/join
    */
-
+  @Public()
   @Post('/join')
   @ApiOperation({
     summary: '회원가입 API',
@@ -56,6 +57,7 @@ export class AppController {
    * 일반: 로그인
    * URL: /api/sign-in
    */
+  @Public()
   @Post('/sign-in')
   @UseGuards(LocalAuthGuard)
   async signIn(@Req() request: RequestWithUser, @Res() response: Response) {
@@ -69,14 +71,14 @@ export class AppController {
     // 2. 헤더에 Bearer Token 형태로 응답
     const access_token = await this.authService.signIn(user.id, user.email);
     response.setHeader('Authorization', `Bearer ${access_token}`);
+
     return response.json(access_token);
   }
 
   /** 로그아웃 */
   @Get('log-out')
-  @UseGuards(JwtAuthGuard)
   async logOut(@Req() request: Request, @Res() response: Response) {
-    // 헤더에 토큰을 없앤다?
+    return;
   }
 
   /**
@@ -92,7 +94,6 @@ export class AppController {
    *
    */
   @Get('/mypage')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: '마이페이지 API',
     description: '로그인 유저 마이페이지',

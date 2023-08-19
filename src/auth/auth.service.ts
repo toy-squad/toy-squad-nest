@@ -47,9 +47,17 @@ export class AuthService {
       // Payload:  JWT Payload 에는 토큰에 담을 정보가 들어있다.
       const payload: TokenPayload = { userId: userId, email: email };
 
+      // 액세스토큰을 생성한다
+      const accessToken = this.jwtService.sign(payload);
+
+      // 생성된 액세스토큰을 레디스에 셋한다.
+      // 키: 유저아이디
+      // 값: 액세스토큰
+      // 유효기간: 토큰 유효기간(.env에 정의된 값)
+
       //JWT토큰을 리턴
       return {
-        access_token: this.jwtService.sign(payload),
+        access_token: accessToken,
       };
     } catch (error) {
       throw error;

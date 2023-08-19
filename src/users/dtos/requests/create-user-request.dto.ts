@@ -30,7 +30,7 @@ export class CreateUserRequestDto {
   fields: string[];
 
   @IsString()
-  positionCategory: positionCategory;
+  position_category: positionCategory;
 
   @IsString()
   position: string; // 세부포지션선택
