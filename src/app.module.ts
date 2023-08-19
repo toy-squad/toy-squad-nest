@@ -8,14 +8,11 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/entities/user.entity';
-import { RedisModule } from './redis/redis.module';
-
 import { ProjectModule } from './projects/project.module';
 import { Project } from './projects/entities/project.entity';
 import { EmailModule } from './email/email.module';
 import { HealthModule } from './health/health.module';
 import { PassportModule } from '@nestjs/passport';
-import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -52,17 +49,9 @@ import { JwtModule } from '@nestjs/jwt';
       logging: process.env.NODE_ENV !== 'production',
       charset: 'utf8mb4',
     }),
-    // JwtModule.register({
-    //   secret: process.env.JWT_SECRET,
-    //   signOptions: {
-    //     expiresIn: process.env.JWT_EXPIRATION,
-    //   },
-    // }),
-
     LoggersModule,
     AuthModule,
     UsersModule,
-    RedisModule,
     ProjectModule,
     EmailModule,
     HealthModule,
