@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Inject,
   Injectable,
   UnauthorizedException,
@@ -13,10 +14,12 @@ import { JwtService } from '@nestjs/jwt';
 import { Cache } from 'cache-manager';
 import { ConfigService } from '@nestjs/config';
 import { CACHE_MANAGER, CacheInterceptor } from '@nestjs/cache-manager';
+import TokenPayload from './interfaces/token-payload.interface';
 
 @Injectable()
 export class AuthService {
-  private TOKEN_EXPIRATION: number;
+  private ACCESS_TOKEN_EXPIRATION: number;
+  private REFRESH_TOKEN_EXPIRATION: number;
   constructor(
     private readonly userService: UsersService,
     private readonly emailService: EmailService,
@@ -24,7 +27,12 @@ export class AuthService {
     private readonly configService: ConfigService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {
-    this.TOKEN_EXPIRATION = +this.configService.get('ACCESS_TOKEN_EXPIRATION');
+    this.ACCESS_TOKEN_EXPIRATION = this.configService.get(
+      'ACCESS_TOKEN_EXPIRATION',
+    );
+    this.REFRESH_TOKEN_EXPIRATION = this.configService.get(
+      'REFRESH_TOKEN_EXPIRATION',
+    );
   }
 
   // 유저 검증
@@ -58,19 +66,17 @@ export class AuthService {
     try {
       // Payload:  JWT Payload 에는 토큰에 담을 정보가 들어있다.
       const payload: TokenPayload = { userId: userId, email: email };
+      if (!userId || !email) {
+        throw new BadRequestException('잘못된 요청입니다.');
+      }
 
-      // 액세스토큰을 생성한다
-      const accessToken = this.jwtService.sign(payload);
+      const accessToken = await this.generateAccessToken(payload);
+      const refreshToken = await this.generateRefreshToken(payload);
 
-      // 생성된 액세스토큰을 레디스에 저장한다
-      // 키: 유저아이디
-      // 값: 액세스토큰
-      // 유효기간: 토큰 유효기간(.env에 정의된 값)
-      await this.cacheManager.set(userId, accessToken, this.TOKEN_EXPIRATION);
-
-      //JWT토큰을 리턴
+      //JWT토큰과 리프패시 토큰을 리턴
       return {
         access_token: accessToken,
+        refresh_token: refreshToken,
       };
     } catch (error) {
       throw error;
@@ -81,17 +87,77 @@ export class AuthService {
     try {
       // userId가 undefined가 아닌 유효한값인지 확인한다.
       // 캐시에 userId인 키가 있는지 확인한다.
-      const accessToken = await this.cacheManager.get(userId);
+      const accessToken = await this.cacheManager.get(`access-${userId}`);
       const isUnvalidUser = !userId || !accessToken;
       if (isUnvalidUser) {
-        throw new UnauthorizedException('유효하지 않은 회원입니다.');
+        throw new UnauthorizedException('인증이 만료되었습니다.');
       }
 
-      // 캐시히트가 된다면, 레디스에 있는 값을 지운다.
-      await this.cacheManager.del(userId);
+      // 캐시히트가 된다면, 레디스에 있는 accessToken/refreshToken을 지운다.
+      await this.cacheManager.del(`access-${userId}`);
+      await this.cacheManager.del(`refresh-${userId}`);
     } catch (error) {
       throw error;
     }
+  }
+
+  async refreshAccessToken(payload: TokenPayload) {
+    try {
+      const { userId } = payload;
+
+      // 리프래시토큰이 있는지 확인한다
+      const refreshToken = await this.cacheManager.get(`refresh-${userId}`);
+      if (!refreshToken) {
+        throw new UnauthorizedException('인증이 만료되었습니다.');
+      }
+
+      // 액세스토큰을  갱신한다
+      const newAccessToken = await this.generateAccessToken(payload);
+
+      return {
+        access_token: newAccessToken,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  private async generateAccessToken(payload: TokenPayload) {
+    const { userId } = payload;
+
+    // 액세스토큰을 생성한다
+    const accessToken = this.jwtService.sign(payload);
+
+    /* 생성된 액세스토큰을 캐시에 저장한다
+     * 키: 유저아이디
+     * 값: 액세스토큰
+     * 유효기간: 토큰 유효기간(.env에 정의된 값)
+     */
+    await this.cacheManager.set(
+      `access-${userId}`,
+      accessToken,
+      this.ACCESS_TOKEN_EXPIRATION,
+    );
+
+    return accessToken;
+  }
+
+  private async generateRefreshToken(payload: TokenPayload) {
+    const { userId } = payload;
+
+    // 리프래시토큰을 생성한다
+    const refreshToken = this.jwtService.sign(payload, {
+      secret: this.configService.get('JWT_REFRESH_SECRET'),
+      expiresIn: this.configService.get('JWT_REFRESH_EXPIRATION'),
+    });
+
+    // 캐시에 저장
+    await this.cacheManager.set(
+      `refresh-${userId}`,
+      refreshToken,
+      this.REFRESH_TOKEN_EXPIRATION,
+    );
+    return refreshToken;
   }
 
   /**
@@ -101,6 +167,6 @@ export class AuthService {
   public getCookieWithJwtToken(userId: string, email: string) {
     const payload: TokenPayload = { userId: userId, email: email };
     const token = this.jwtService.sign(payload);
-    return `access_token=${token}; HttpOnly; Path=/; Max-Age=${this.TOKEN_EXPIRATION}`;
+    return `access_token=${token}; HttpOnly; Path=/; Max-Age=${this.ACCESS_TOKEN_EXPIRATION}`;
   }
 }

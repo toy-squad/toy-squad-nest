@@ -14,14 +14,13 @@ import {
 import { AuthService } from 'auth/auth.service';
 import { EmailService } from 'email/email.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { SignInRequestDto } from 'auth/dtos/requests/sign-in-user-request.dto';
 import { Public } from 'auth/decorators/public.decorator';
 import { CreateUserRequestDto } from 'users/dtos/requests/create-user-request.dto';
 import { UsersService } from 'users/users.service';
 import { LocalAuthGuard } from 'auth/guards/local-auth/local-auth.guard';
-import { JwtAuthGuard } from 'auth/guards/jwt-auth/jwt-auth.guard';
 import RequestWithUser from 'auth/interfaces/request-with-user.interface';
-import { Request, Response } from 'express';
+import { Response } from 'express';
+import TokenPayload from 'auth/interfaces/token-payload.interface';
 
 @Controller()
 export class AppController {
@@ -33,7 +32,6 @@ export class AppController {
   @Public()
   @Get()
   getHello(): string {
-    // return this.appService.getHello();
     return 'hello';
   }
 
@@ -69,16 +67,35 @@ export class AppController {
     // return response.send(user);
 
     // 2. 헤더에 Bearer Token 형태로 응답
-    const access_token = await this.authService.signIn(user.id, user.email);
+    const tokens = await this.authService.signIn(user.userId, user.email);
+    const { access_token } = tokens;
     response.setHeader('Authorization', `Bearer ${access_token}`);
 
-    return response.json(access_token);
+    return response.json(tokens);
   }
 
   /** 로그아웃 */
   @Get('log-out')
-  async logOut(@Req() request: Request, @Res() response: Response) {
-    return;
+  async logOut(@Req() request: RequestWithUser, @Res() response: Response) {
+    const { userId } = request.user;
+
+    await this.authService.logOut(userId);
+    return response.json();
+  }
+
+  /**
+   * refresh 토큰으로 액세스토큰 재발급
+   * - 토큰이 존재하면, key값에 대한 액세스 토큰을 재발급하여 레디스에 저장...
+   */
+  @Get('refresh')
+  async refreshAccessToken(
+    @Req() request: RequestWithUser,
+    @Res() response: Response,
+  ) {
+    const { userId, email } = request.user;
+    const payload: TokenPayload = { userId: userId, email: email };
+    const tokens = await this.authService.refreshAccessToken(payload);
+    return response.json(tokens);
   }
 
   /**
@@ -107,6 +124,7 @@ export class AppController {
    * sns: 카카오 연동 로그인
    * URL: /api/kakao
    */
+  @Public()
   @Post('/kakao')
   async signInByKakao() {}
   /**
@@ -114,6 +132,7 @@ export class AppController {
    * sns: gmail 연동 로그인
    * URL: /api/google
    */
+  @Public()
   @Post('/google')
   async signInByGoogle() {}
 

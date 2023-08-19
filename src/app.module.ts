@@ -33,8 +33,13 @@ import { PassportModule } from '@nestjs/passport';
         MAILER_USER: Joi.string(),
         MAILER_PASSWORD: Joi.string(),
         /** JWT */
-        JWT_SECRET: Joi.string(),
-        JWT_EXPIRATION: Joi.string(),
+        JWT_SECRET: Joi.string().required(),
+        JWT_EXPIRATION: Joi.string().required(),
+        ACCESS_TOKEN_EXPIRATION: Joi.number().required(),
+        /** REFRESH TOKEN */
+        JWT_REFRESH_SECRET: Joi.string().required(),
+        JWT_REFRESH_EXPIRATION: Joi.string().required(),
+        REFRESH_TOKEN_EXPIRATION: Joi.number().required(),
       }),
     }),
     TypeOrmModule.forRoot({
