@@ -96,6 +96,8 @@ export class AppController {
     const payload: TokenPayload = { userId: userId, email: email };
     const tokens = await this.authService.refreshAccessToken(payload);
 
+    // 헤더에 업데이트된 토큰으로 응답
+    response.setHeader('Authorization', `Bearer ${tokens.access_token}`);
     return response.json(tokens);
   }
 
