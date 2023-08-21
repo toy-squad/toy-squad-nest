@@ -1126,7 +1126,7 @@
     "@types/cache-manager" "*"
     "@types/redis" "^2.8.0"
 
-"@types/cache-manager@*":
+"@types/cache-manager@*", "@types/cache-manager@^4.0.2":
   "integrity" "sha512-fT5FMdzsiSX0AbgnS5gDvHl2Nco0h5zYyjwDQy4yPC7Ww6DeGMVKPRqIZtg9HOXDV2kkc18SL1B0N8f0BecrCA=="
   "resolved" "https://registry.npmjs.org/@types/cache-manager/-/cache-manager-4.0.2.tgz"
   "version" "4.0.2"
@@ -1322,6 +1322,13 @@
   "version" "2.8.32"
   dependencies:
     "@types/node" "*"
+
+"@types/redis@^4.0.11":
+  "integrity" "sha512-bI+gth8La8Wg/QCR1+V1fhrL9+LZUSWfcqpOj2Kc80ZQ4ffbdL173vQd5wovmoV9i071FU9oP2g6etLuEwb6Rg=="
+  "resolved" "https://registry.npmjs.org/@types/redis/-/redis-4.0.11.tgz"
+  "version" "4.0.11"
+  dependencies:
+    "redis" "*"
 
 "@types/semver@^7.3.12":
   "integrity" "sha512-21cFJr9z3g5dW8B0CVI9g2O9beqaThGQ6ZFBqHfwhzLDKUxaqTIy3vnfah/UPkfOiF2pLq+tGz+W8RyCskuslw=="
@@ -6248,17 +6255,7 @@
   dependencies:
     "redis-errors" "^1.0.0"
 
-"redis@^3.0.2":
-  "integrity" "sha512-grn5KoZLr/qrRQVwoSkmzdbw6pwF+/rwODtrOr6vuBRiR/f3rjSTGupbF90Zpqm2oenix8Do6RV7pYEkGwlKkw=="
-  "resolved" "https://registry.npmjs.org/redis/-/redis-3.1.2.tgz"
-  "version" "3.1.2"
-  dependencies:
-    "denque" "^1.5.0"
-    "redis-commands" "^1.7.0"
-    "redis-errors" "^1.2.0"
-    "redis-parser" "^3.0.0"
-
-"redis@^3.1.1 || ^4.0.0", "redis@^4.6.7":
+"redis@*", "redis@^3.1.1 || ^4.0.0", "redis@^4.6.7":
   "integrity" "sha512-KrkuNJNpCwRm5vFJh0tteMxW8SaUzkm5fBH7eL5hd/D0fAkzvapxbfGPP/r+4JAXdQuX7nebsBkBqA2RHB7Usw=="
   "resolved" "https://registry.npmjs.org/redis/-/redis-4.6.7.tgz"
   "version" "4.6.7"
@@ -6269,6 +6266,16 @@
     "@redis/json" "1.0.4"
     "@redis/search" "1.1.3"
     "@redis/time-series" "1.0.4"
+
+"redis@^3.0.2":
+  "integrity" "sha512-grn5KoZLr/qrRQVwoSkmzdbw6pwF+/rwODtrOr6vuBRiR/f3rjSTGupbF90Zpqm2oenix8Do6RV7pYEkGwlKkw=="
+  "resolved" "https://registry.npmjs.org/redis/-/redis-3.1.2.tgz"
+  "version" "3.1.2"
+  dependencies:
+    "denque" "^1.5.0"
+    "redis-commands" "^1.7.0"
+    "redis-errors" "^1.2.0"
+    "redis-parser" "^3.0.0"
 
 "reflect-metadata@^0.1.12", "reflect-metadata@^0.1.13", "reflect-metadata@0.1.x":
   "integrity" "sha512-Ts1Y/anZELhSsjMcU605fU9RE4Oi3p5ORujwbIKXfWa+0Zxs510Qrmrce5/Jowq3cHSZSJqBjypxmHarc+vEWg=="

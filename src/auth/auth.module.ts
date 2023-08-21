@@ -12,6 +12,7 @@ import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-redis-store';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import type { RedisClientOptions } from 'redis';
+import { RedisModule } from 'redis/redis.module';
 
 @Module({
   imports: [
@@ -28,6 +29,8 @@ import type { RedisClientOptions } from 'redis';
       }),
       inject: [ConfigService],
     }),
+
+    // 캐시 매니저 - 토큰이 고정될때
     CacheModule.registerAsync<RedisClientOptions>({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -39,6 +42,8 @@ import type { RedisClientOptions } from 'redis';
       }),
       inject: [ConfigService],
     }),
+    // ioRedis
+    RedisModule,
   ],
   providers: [
     AuthService,
@@ -47,10 +52,6 @@ import type { RedisClientOptions } from 'redis';
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
-    },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: CacheInterceptor,
     },
   ],
   exports: [AuthService],

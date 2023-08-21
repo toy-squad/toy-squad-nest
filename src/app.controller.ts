@@ -55,8 +55,8 @@ export class AppController {
    * 일반: 로그인
    * URL: /api/sign-in
    */
-  @Public()
   @Post('/sign-in')
+  @Public()
   @UseGuards(LocalAuthGuard)
   async signIn(@Req() request: RequestWithUser, @Res() response: Response) {
     const { user } = request;
@@ -95,6 +95,7 @@ export class AppController {
     const { userId, email } = request.user;
     const payload: TokenPayload = { userId: userId, email: email };
     const tokens = await this.authService.refreshAccessToken(payload);
+
     return response.json(tokens);
   }
 

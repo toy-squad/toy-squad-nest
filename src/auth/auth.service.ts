@@ -15,17 +15,19 @@ import { Cache } from 'cache-manager';
 import { ConfigService } from '@nestjs/config';
 import { CACHE_MANAGER, CacheInterceptor } from '@nestjs/cache-manager';
 import TokenPayload from './interfaces/token-payload.interface';
+import { RedisService } from 'redis/redis.service';
 
 @Injectable()
 export class AuthService {
   private ACCESS_TOKEN_EXPIRATION: number;
   private REFRESH_TOKEN_EXPIRATION: number;
   constructor(
-    private readonly userService: UsersService,
+    private redisService: RedisService,
+    // @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly emailService: EmailService,
+    private readonly userService: UsersService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {
     this.ACCESS_TOKEN_EXPIRATION = this.configService.get(
       'ACCESS_TOKEN_EXPIRATION',
@@ -87,15 +89,15 @@ export class AuthService {
     try {
       // userId가 undefined가 아닌 유효한값인지 확인한다.
       // 캐시에 userId인 키가 있는지 확인한다.
-      const accessToken = await this.cacheManager.get(`access-${userId}`);
+      const accessToken = await this.redisService.get(`access-${userId}`);
       const isUnvalidUser = !userId || !accessToken;
       if (isUnvalidUser) {
         throw new UnauthorizedException('인증이 만료되었습니다.');
       }
 
       // 캐시히트가 된다면, 레디스에 있는 accessToken/refreshToken을 지운다.
-      await this.cacheManager.del(`access-${userId}`);
-      await this.cacheManager.del(`refresh-${userId}`);
+      await this.redisService.del(`access-${userId}`);
+      await this.redisService.del(`refresh-${userId}`);
     } catch (error) {
       throw error;
     }
@@ -106,7 +108,7 @@ export class AuthService {
       const { userId } = payload;
 
       // 리프래시토큰이 있는지 확인한다
-      const refreshToken = await this.cacheManager.get(`refresh-${userId}`);
+      const refreshToken = await this.redisService.get(`refresh-${userId}`);
       if (!refreshToken) {
         throw new UnauthorizedException('인증이 만료되었습니다.');
       }
@@ -133,7 +135,7 @@ export class AuthService {
      * 값: 액세스토큰
      * 유효기간: 토큰 유효기간(.env에 정의된 값)
      */
-    await this.cacheManager.set(
+    await this.redisService.set(
       `access-${userId}`,
       accessToken,
       this.ACCESS_TOKEN_EXPIRATION,
@@ -152,7 +154,7 @@ export class AuthService {
     });
 
     // 캐시에 저장
-    await this.cacheManager.set(
+    await this.redisService.set(
       `refresh-${userId}`,
       refreshToken,
       this.REFRESH_TOKEN_EXPIRATION,

@@ -13,6 +13,7 @@ import { Project } from './projects/entities/project.entity';
 import { EmailModule } from './email/email.module';
 import { HealthModule } from './health/health.module';
 import { PassportModule } from '@nestjs/passport';
+import { RedisModule } from 'redis/redis.module';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { PassportModule } from '@nestjs/passport';
     EmailModule,
     HealthModule,
     PassportModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [],
