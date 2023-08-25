@@ -1272,6 +1272,14 @@
     "@types/jsonwebtoken" "*"
     "@types/passport-strategy" "*"
 
+"@types/passport-kakao@^1.0.0":
+  "integrity" "sha512-wxBJdc4ThRTPrCN3JvnwnV+6PJJjso2WjcWuAgIghZtLmK8F/qfgAIKtWKeDoRYTPbZ0MSsjuCQhlXmDqrNicA=="
+  "resolved" "https://registry.npmjs.org/@types/passport-kakao/-/passport-kakao-1.0.0.tgz"
+  "version" "1.0.0"
+  dependencies:
+    "@types/express" "*"
+    "@types/passport" "*"
+
 "@types/passport-local@^1.0.35":
   "integrity" "sha512-K4eLTJ8R0yYW8TvCqkjB0pTKoqfUSdl5PfZdidTjV2ETV3604fQxtY6BHKjQWAx50WUS0lqzBvKv3LoI1ZBPeA=="
   "resolved" "https://registry.npmjs.org/@types/passport-local/-/passport-local-1.0.35.tgz"

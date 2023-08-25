@@ -70,6 +70,7 @@
     "@types/jest": "29.2.4",
     "@types/node": "18.11.18",
     "@types/passport-jwt": "^3.0.9",
+    "@types/passport-kakao": "^1.0.0",
     "@types/passport-local": "^1.0.35",
     "@types/redis": "^4.0.11",
     "@types/supertest": "^2.0.11",

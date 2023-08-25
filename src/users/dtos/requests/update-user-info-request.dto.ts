@@ -27,10 +27,10 @@ export class UpdateUserInfoRequestDto {
   tendency?: string[];
 
   @IsOptional()
-  skills: string[];
+  skills?: string[];
 
   @IsOptional()
-  fields: string[];
+  fields?: string[];
 
   @IsOptional()
   @IsString()
@@ -43,4 +43,8 @@ export class UpdateUserInfoRequestDto {
   @IsOptional()
   @IsString()
   intro?: string;
+
+  // 카카오 아이디
+  @IsOptional()
+  kakaoAuthId?: any;
 }

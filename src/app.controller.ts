@@ -21,6 +21,7 @@ import { LocalAuthGuard } from 'auth/guards/local-auth/local-auth.guard';
 import RequestWithUser from 'auth/interfaces/request-with-user.interface';
 import { Response } from 'express';
 import TokenPayload from 'auth/interfaces/token-payload.interface';
+import { KakaoGuard } from 'auth/guards/kakao/kakao.guard';
 
 @Controller()
 export class AppController {
@@ -129,7 +130,15 @@ export class AppController {
    */
   @Public()
   @Post('/kakao')
-  async signInByKakao() {}
+  @UseGuards(KakaoGuard)
+  async signInByKakao() {
+    return; // 리다이렉션
+  }
+
+  // 카카오로그인 리다이랙트
+  @Get('/oauth/kakao')
+  async redirectKakao() {}
+
   /**
    *
    * sns: gmail 연동 로그인
@@ -138,6 +147,10 @@ export class AppController {
   @Public()
   @Post('/google')
   async signInByGoogle() {}
+
+  // 구글로그인 리다이렉트
+  @Get('oauth/google')
+  async redirectGoogle() {}
 
   /**
    * 이메일 인증

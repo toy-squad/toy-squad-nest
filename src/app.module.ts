@@ -41,6 +41,10 @@ import { RedisModule } from 'redis/redis.module';
         JWT_REFRESH_SECRET: Joi.string().required(),
         JWT_REFRESH_EXPIRATION: Joi.string().required(),
         REFRESH_TOKEN_EXPIRATION: Joi.number().required(),
+        /** KAKAO OAUTH */
+        KAKAO_CLIENT_ID: Joi.string().required(),
+        KAKAO_SECRET_KEY: Joi.string().required(),
+        KAKAO_DEV_CALLBACK_URL: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRoot({
