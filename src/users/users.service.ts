@@ -25,7 +25,7 @@ export class UsersService {
   /**
    * 카테고리에 매핑되는 포지션 조회
    */
-  async getDetailPositions(positionCategory: string) {
+  async getDetailPositions(positionCategory: string): Promise<string[]> {
     // 선택한 포지션 카테고리
     const category = positionCategory.toUpperCase();
 
@@ -60,7 +60,7 @@ export class UsersService {
 
   async createUser(dto: CreateUserRequestDto) {
     try {
-      const { positionCategory, position, password, email } = dto;
+      const { position_category, position, password, email } = dto;
 
       // 이미 존재하는 아이디인지 확인
       const user = await this.usersRepository.findOneUser({
@@ -77,18 +77,23 @@ export class UsersService {
       // 포지션 유효성 검사
       const checkAvailablePosition = await this.checkAllowedDetailPosition(
         position,
-        positionCategory,
+        position_category,
       );
 
       if (!checkAvailablePosition) {
         throw new BadRequestException('존재하지 않은 포지션 입니다');
       }
 
-      const newUser = this.usersRepository.createNewUser({
+      const newUser = await this.usersRepository.createNewUser({
         ...dto,
         password: hashedPassword,
       });
-      return newUser;
+
+      // 새로운 유저 생성했을 때, 중요정보를 리턴하지 않도록 한다.
+      const newUserPublicInfo = await this.findOneUser({
+        userId: newUser.id,
+      });
+      return newUserPublicInfo;
     } catch (error) {
       this.logger.error(error.message);
       throw error;
@@ -99,7 +104,8 @@ export class UsersService {
    * 단일 유저 검색
    */
   async findOneUser(dto: FindUserRequestDto) {
-    return await this.usersRepository.findOneUser(dto);
+    const user = await this.usersRepository.findOneUser(dto);
+    return user;
   }
 
   /**
@@ -126,15 +132,27 @@ export class UsersService {
 
   /**
    * 비밀번호 확인
-   * - 회원탈퇴 할때
+   * 1) 인자정보
+   * - 첫번째인자: plainTextPassword  / 입력 비밀번호
+   * - 두번째인자: savedPassword      / DB에 저장된 비밀번호
+   *
+   * 2) 사용
    * - 로그인 할때
+   * - 회원탈퇴 할때
    * - 유저정보 수정할때
    */
   async confirmPassword(dto: ConfirmPasswordRequestDto) {
     try {
       // email에 해당하는 계정정보를 불러온다.
       const { email, plainTextPassword } = dto;
-      const userInfo = await this.usersRepository.findOneUser({ email: email });
+      const userInfo = await this.usersRepository.findOneUser({
+        email: email,
+        allowPassword: true,
+      });
+
+      if (!userInfo) {
+        throw new NotFoundException('유저가 존재하지 않습니다.');
+      }
 
       const isMatched = await bcrypt.compare(
         plainTextPassword,
@@ -145,7 +163,7 @@ export class UsersService {
         throw new BadRequestException('이메일과 비밀번호가 올바르지 않습니다.');
       }
 
-      return;
+      return isMatched;
     } catch (error) {
       throw error;
     }

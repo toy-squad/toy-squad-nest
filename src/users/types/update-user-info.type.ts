@@ -1,4 +1,4 @@
-import { Users } from 'users/entities/user.entity';
+import { User } from 'users/entities/user.entity';
 
 type OptionalColumnKeys =
   | 'password'
@@ -17,4 +17,4 @@ type OptionalColumnKeys =
  * - userId를 제외한 나머지 컬럼이 undefined일 경우, 기존값으로 매핑하기 위해서이다.
  * - positionCategory 는 Users.entity에 존재하는 컬럼이 아니므로 제외한다.
  */
-export type UpdatedUserInfoType = Pick<Users, OptionalColumnKeys>;
+export type UpdatedUserInfoType = Pick<User, OptionalColumnKeys>;

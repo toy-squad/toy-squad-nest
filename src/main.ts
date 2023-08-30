@@ -2,6 +2,7 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -28,6 +29,9 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+  // cookie-parser 사용
+  app.use(cookieParser());
 
   // swagger을 제외한 모든 API는 맨앞에 '/api'를 붙인다.
   app.setGlobalPrefix('/api');
