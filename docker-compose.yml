@@ -2,24 +2,33 @@ version: '3'
 services:
   db:
     image: mysql:8.0
-    container_name: ${DB_NAME}
+    container_name: toy_squad_db_local
     restart: always
     ports:
       - ${DB_PORT}:3306
     environment:
+      MYSQL_HOST: localhost
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_ROOT_PASSWORD: ${DB_PWD}
+      TZ: Asia/Seoul
+  develop-db:
+    image: mariadb:10.5
+    container_name: toy_squad_db_develop
+    restart: always
+    ports:
+      - ${DEV_DB_PORT}:3306
+    environment:
+      MYSQL_HOST: ${DEV_DB_HOST}
       MYSQL_DATABASE: ${DB_NAME}
       MYSQL_ROOT_PASSWORD: ${DB_PWD}
       TZ: Asia/Seoul
 
   redis:
     image: redis:latest
-    container_name: toysquad_redis
+    container_name: toy_squad_redis_local
     ports:
       - ${REDIS_PORT}:6379
     command: redis-server --port 6379
     labels:
-      - "name=redis"
-      - "mode=standalone" 
-
-
-  
+      - 'name=redis'
+      - 'mode=standalone'
