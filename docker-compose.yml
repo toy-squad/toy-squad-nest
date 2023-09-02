@@ -32,3 +32,12 @@ services:
     labels:
       - 'name=redis'
       - 'mode=standalone'
+  redis-develop:
+    image: redis:latest
+    container_name: toy_squad_redis_develop
+    ports:
+      - ${DEV_REDIS_PORT}:6379
+    command: redis-server --port 6379
+    labels:
+      - 'name=redis-dev'
+      - 'mode=standalone'
