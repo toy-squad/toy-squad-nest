@@ -158,12 +158,13 @@ export class AppController {
    * sns: gmail 연동 로그인
    * URL: /api/sign-in/google
    */
-  @Public()
   @Get('/sign-in/google')
+  @Public()
   async signInByGoogle() {}
 
   // 구글로그인 리다이렉트
   @Get('oauth/google')
+  @Public()
   async redirectGoogle() {}
 
   /**
