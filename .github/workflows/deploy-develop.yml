@@ -11,6 +11,7 @@ env:
   SPACE_NAME: dmsrkd1216
   PROJECT_NAME: toy-squads
   REPOSITORY_NAME: toy-squad-container
+  NODE_REPOSITORY_NAME: toy-squad-nest
 
 jobs:
   build-and-push-image:
