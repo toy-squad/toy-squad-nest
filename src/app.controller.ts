@@ -22,6 +22,7 @@ import RequestWithUser from 'auth/interfaces/request-with-user.interface';
 import { Response } from 'express';
 import TokenPayload from 'auth/interfaces/token-payload.interface';
 import { KakaoGuard } from 'auth/guards/kakao/kakao.guard';
+import { JwtAuthGuard } from 'auth/guards/jwt-auth/jwt-auth.guard';
 
 @Controller()
 export class AppController {
@@ -126,26 +127,39 @@ export class AppController {
   /**
    *
    * sns: 카카오 연동 로그인
-   * URL: /api/kakao
+   * URL: /api/sign-in/kakao
    */
+  @Get('/sign-in/kakao')
   @Public()
-  @Post('/kakao')
   @UseGuards(KakaoGuard)
   async signInByKakao() {
-    return; // 리다이렉션
+    return;
   }
 
   // 카카오로그인 리다이랙트
   @Get('/oauth/kakao')
-  async redirectKakao() {}
+  @Public()
+  @UseGuards(KakaoGuard)
+  async redirectKakao(
+    @Req() request: RequestWithUser,
+    @Res() response: Response,
+  ) {
+    const { user } = request;
+    this.logger.log(user);
+
+    const tokens = await this.authService.signIn(user.userId, user.email);
+    const { access_token } = tokens;
+    response.setHeader('Authorization', `Bearer ${access_token}`);
+    return response.json(tokens);
+  }
 
   /**
    *
    * sns: gmail 연동 로그인
-   * URL: /api/google
+   * URL: /api/sign-in/google
    */
   @Public()
-  @Post('/google')
+  @Get('/sign-in/google')
   async signInByGoogle() {}
 
   // 구글로그인 리다이렉트

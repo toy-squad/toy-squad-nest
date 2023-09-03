@@ -14,6 +14,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import type { RedisClientOptions } from 'redis';
 import { RedisModule } from 'redis/redis.module';
 import { KakaoStrategy } from './strategies/kakao.strategy';
+import { KakaoGuard } from './guards/kakao/kakao.guard';
 
 @Module({
   imports: [
@@ -51,10 +52,15 @@ import { KakaoStrategy } from './strategies/kakao.strategy';
     LocalStrategy,
     JwtStrategy,
     KakaoStrategy,
+
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: KakaoGuard,
+    // },
   ],
   exports: [AuthService],
 })
