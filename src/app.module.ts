@@ -48,7 +48,7 @@ import { RedisModule } from 'redis/redis.module';
         /** GOOGLE OAUTH */
         GOOGLE_CLIENT_ID: Joi.string().required(),
         GOOGLE_CLIENT_SECRET: Joi.string().required(),
-        GOOGLE_LOCAL_CALLBACK_URL: Joi.string().required(),
+        GOOGLE_CALLBACK_URL: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRoot({
