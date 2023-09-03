@@ -44,7 +44,7 @@ import { RedisModule } from 'redis/redis.module';
         /** KAKAO OAUTH */
         KAKAO_CLIENT_ID: Joi.string().required(),
         KAKAO_SECRET_KEY: Joi.string().required(),
-        KAKAO_DEV_CALLBACK_URL: Joi.string().required(),
+        KAKAO_LOCAL_CALLBACK_URL: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRoot({
