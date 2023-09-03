@@ -59,3 +59,62 @@ jobs:
             options:
               ports: 8080
               image: ${{ steps.meta.outputs.tags }}
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Connect deploy key
+        uses: cloudtype-github-actions/connect@v1
+        with:
+          token: ${{ secrets.CLOUDTYPE_TOKEN }}
+          ghtoken: ${{ secrets.GHP_TOKEN }}
+      - name: Deploy
+        uses: cloudtype-github-actions/deploy@v1
+        with:
+          token: ${{ secrets.CLOUDTYPE_TOKEN }}
+          project: dmsrkd1216/toy-squads
+          stage: develop
+          yaml: |
+            name: toy-squad-nest
+            app: node@16
+            options:
+              env:
+                - name: NODE_ENV
+                  var: NODE_ENV
+                - name: SERVER_PORT
+                  var: SERVER_PORT
+                - name: DB_HOST
+                  secret: DB_HOST
+                - name: DB_PORT
+                  secret: DB_PORT
+                - name: DB_USER
+                  secret: DB_USER
+                - name: DB_PWD
+                  secret: DB_PWD
+                - name: DB_NAME
+                  secret: DB_NAME
+              ports: "3001"
+              healthz: /health_check
+              install: npm install
+              build: npm run build
+              start: npm run start:prod
+              buildenv:
+                - name: NODE_ENV
+                  value: production
+                - name: PORT
+                  var: SERVER_PORT
+                - name: DB_HOST
+                  secret: DB_HOST
+                - name: DB_PORT
+                  secret: DB_PORT
+                - name: DB_NAME
+                  secret: DB_NAME
+                - name: DB_USER
+                  secret: DB_USER
+                - name: DB_PWD
+                  secret: DB_PWD
+            context:
+              git:
+                url: git@github.com:${{ github.repository }}.git
+                ref: ${{ github.ref }}
