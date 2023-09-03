@@ -48,6 +48,8 @@ export class UsersRepository {
             intro: true,
             skills: true,
             likes: true,
+            kakaoAuthId: true,
+            googleAuthId: true,
           };
       const user = await this.repo.findOne({
         select: selectQuery,
