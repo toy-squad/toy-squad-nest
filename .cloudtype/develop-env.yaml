@@ -137,5 +137,5 @@ options:
   start: npm run start:prod
 context:
   git:
-    url: https://github.com/toy-squad/toy-squad-nest.git
-    ref: develop
+    url: git@github.com:${{ github.repository }}.git
+    ref: ${{ github.ref }}
