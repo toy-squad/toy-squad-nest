@@ -138,5 +138,5 @@ options:
       secret: GOOGLE_CALLBACK_URL
 context:
   git:
-    url: git@github.com:${{ github.repository }}.git
-    ref: ${{ github.ref }}
+    url: https://github.com/toy-squad/toy-squad-nest.git
+    ref: develop
