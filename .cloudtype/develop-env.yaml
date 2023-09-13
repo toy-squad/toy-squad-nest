@@ -66,11 +66,6 @@ options:
       secret: GOOGLE_CLIENT_SECRET
     - name: GOOGLE_CALLBACK_URL
       secret: GOOGLE_CALLBACK_URL
-  ports: '3001'
-  healthz: /health_check
-  install: npm install
-  build: npm run build
-  start: npm run start:prod
   buildenv:
     - name: NODE_ENV
       var: production
@@ -136,6 +131,10 @@ options:
       secret: GOOGLE_CLIENT_SECRET
     - name: GOOGLE_CALLBACK_URL
       secret: GOOGLE_CALLBACK_URL
+  ports: '3001'
+  install: npm install
+  build: npm run build
+  start: npm run start:prod
 context:
   git:
     url: https://github.com/toy-squad/toy-squad-nest.git
