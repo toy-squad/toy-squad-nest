@@ -6,8 +6,7 @@ options:
       var: NODE_ENV
     - name: SERVER_PORT
       var: SERVER_PORT
-
-    # 데이터 베이스 환경변수
+    # 데이터베이스 환경변수
     - name: DB_HOST
       secret: DB_HOST
     - name: DB_PORT
@@ -19,7 +18,7 @@ options:
     - name: DB_NAME
       secret: DB_NAME
 
-    # Redis 환경변수
+    # 레디스 환경변수
     - name: REDIS_URL
       secret: REDIS_URL
     - name: REDIS_PORT
@@ -72,7 +71,7 @@ options:
     - name: SERVER_PORT
       var: SERVER_PORT
 
-    # 데이터 베이스 환경변수
+    # 데이터베이스
     - name: DB_HOST
       secret: DB_HOST
     - name: DB_PORT
@@ -84,7 +83,7 @@ options:
     - name: DB_NAME
       secret: DB_NAME
 
-    # Redis 환경변수
+    # 레디스
     - name: REDIS_URL
       secret: REDIS_URL
     - name: REDIS_PORT
@@ -137,5 +136,5 @@ options:
   start: npm run start:prod
 context:
   git:
-    url: git@github.com:${{ github.repository }}.git
-    ref: ${{ github.ref }}
+    url: git@github.com:toy-squad/toy-squad-nest.git
+    ref: refs/heads/develop
