@@ -1,0 +1,142 @@
+name: toy-squad-nest
+app: node@16
+options:
+  env:
+    - name: NODE_ENV
+      var: NODE_ENV
+    - name: SERVER_PORT
+      var: SERVER_PORT
+
+    # 데이터 베이스 환경변수
+    - name: DB_HOST
+      secret: DB_HOST
+    - name: DB_PORT
+      secret: DB_PORT
+    - name: DB_USER
+      secret: DB_USER
+    - name: DB_PWD
+      secret: DB_PWD
+    - name: DB_NAME
+      secret: DB_NAME
+
+    # Redis 환경변수
+    - name: REDIS_URL
+      secret: REDIS_URL
+    - name: REDIS_PORT
+      secret: REDIS_PORT
+    - name: REDIS_PASSWORD
+      secret: REDIS_PASSWORD
+
+    # 이메일
+    - name: MAILER_HOST
+      var: MAILER_HOST
+    - name: MAILER_USER
+      var: MAILER_USER
+    - name: MAILER_PASSWORD
+      var: MAILER_PASSWORD
+
+    # JWT
+    - name: JWT_SECRET
+      secret: JWT_SECRET
+    - name: JWT_EXPIRATION
+      secret: JWT_EXPIRATION
+    - name: ACCESS_TOKEN_EXPIRATION
+      secret: ACCESS_TOKEN_EXPIRATION
+
+    # REFRESH TOKEN
+    - name: JWT_REFRESH_SECRET
+      secret: JWT_REFRESH_SECRET
+    - name: JWT_REFRESH_EXPIRATION
+      secret: JWT_REFRESH_EXPIRATION
+    - name: REFRESH_TOKEN_EXPIRATION
+      secret: REFRESH_TOKEN_EXPIRATION
+
+    # KAKAO OAUTH
+    - name: KAKAO_CLIENT_ID
+      secret: KAKAO_CLIENT_ID
+    - name: KAKAO_SECRET_KEY
+      secret: KAKAO_SECRET_KEY
+    - name: KAKAO_CALLBACK_URL
+      secret: KAKAO_CALLBACK_URL
+
+    # GOOGLE OAUTH
+    - name: GOOGLE_CLIENT_ID
+      secret: GOOGLE_CLIENT_ID
+    - name: GOOGLE_CLIENT_SECRET
+      secret: GOOGLE_CLIENT_SECRET
+    - name: GOOGLE_CALLBACK_URL
+      secret: GOOGLE_CALLBACK_URL
+  ports: '3001'
+  healthz: /health_check
+  install: npm install
+  build: npm run build
+  start: npm run start:prod
+  buildenv:
+    - name: NODE_ENV
+      var: production
+    - name: SERVER_PORT
+      var: SERVER_PORT
+
+    # 데이터 베이스 환경변수
+    - name: DB_HOST
+      secret: DB_HOST
+    - name: DB_PORT
+      secret: DB_PORT
+    - name: DB_USER
+      secret: DB_USER
+    - name: DB_PWD
+      secret: DB_PWD
+    - name: DB_NAME
+      secret: DB_NAME
+
+    # Redis 환경변수
+    - name: REDIS_URL
+      secret: REDIS_URL
+    - name: REDIS_PORT
+      secret: REDIS_PORT
+    - name: REDIS_PASSWORD
+      secret: REDIS_PASSWORD
+
+    # 이메일
+    - name: MAILER_HOST
+      var: MAILER_HOST
+    - name: MAILER_USER
+      var: MAILER_USER
+    - name: MAILER_PASSWORD
+      var: MAILER_PASSWORD
+
+    # JWT
+    - name: JWT_SECRET
+      secret: JWT_SECRET
+    - name: JWT_EXPIRATION
+      secret: JWT_EXPIRATION
+    - name: ACCESS_TOKEN_EXPIRATION
+      secret: ACCESS_TOKEN_EXPIRATION
+
+    # REFRESH TOKEN
+    - name: JWT_REFRESH_SECRET
+      secret: JWT_REFRESH_SECRET
+    - name: JWT_REFRESH_EXPIRATION
+      secret: JWT_REFRESH_EXPIRATION
+    - name: REFRESH_TOKEN_EXPIRATION
+      secret: REFRESH_TOKEN_EXPIRATION
+
+    # KAKAO OAUTH
+    - name: KAKAO_CLIENT_ID
+      secret: KAKAO_CLIENT_ID
+    - name: KAKAO_SECRET_KEY
+      secret: KAKAO_SECRET_KEY
+    - name: KAKAO_CALLBACK_URL
+      secret: KAKAO_CALLBACK_URL
+
+    # GOOGLE OAUTH
+    - name: GOOGLE_CLIENT_ID
+      secret: GOOGLE_CLIENT_ID
+    - name: GOOGLE_CLIENT_SECRET
+      secret: GOOGLE_CLIENT_SECRET
+    - name: GOOGLE_CALLBACK_URL
+      secret: GOOGLE_CALLBACK_URL
+context:
+  git:
+    url: git@github.com:${{ github.repository }}.git
+    ref: ${{ github.ref }}
