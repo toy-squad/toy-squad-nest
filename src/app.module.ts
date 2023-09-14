@@ -14,6 +14,8 @@ import { EmailModule } from './email/email.module';
 import { HealthModule } from './health/health.module';
 import { PassportModule } from '@nestjs/passport';
 import { RedisModule } from 'redis/redis.module';
+import { RoleController } from './role/role.controller';
+import { RoleModule } from './role/role.module';
 
 @Module({
   imports: [
@@ -71,8 +73,9 @@ import { RedisModule } from 'redis/redis.module';
     HealthModule,
     PassportModule,
     RedisModule,
+    RoleModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, RoleController],
   providers: [],
 })
 export class AppModule implements NestModule {

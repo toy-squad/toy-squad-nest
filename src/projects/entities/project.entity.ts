@@ -1,5 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { CoreEntity } from '../../commons/entities/core.entity';
+import { Role } from '../../role/entities/role.entity';
 
 @Entity({ schema: process.env.DB_NAME })
 export class Project extends CoreEntity {
@@ -162,11 +163,11 @@ export class Project extends CoreEntity {
    */
 
   /**
-   * 프로젝트 팀장(유저) : 프로젝트 = 1:N
+   * 프로젝트 : 권한 = 1:N
    */
-  // @ManyToOne(() => Users, (user) => user.project)
-  // @JoinColumn({ name: 'leader_id', referencedColumnName: 'id' })
-  // user: Users;
+  @OneToMany(() => Role, (role) => role.project)
+  @JoinColumn({ name: 'role_id', referencedColumnName: 'id' })
+  roles: Role[];
 
   // @OneToMany(() => Comments, (comments) => comments.project)
   // comments: Comments[];
