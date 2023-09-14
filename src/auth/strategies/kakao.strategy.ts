@@ -26,7 +26,9 @@ export class KakaoStrategy extends PassportStrategy(Strategy) {
     try {
       // 카카오톡에 계정이 존재하는지 확인
       if (!profile) {
-        throw new NotFoundException('해당 계정을 찾을 수 없습니다.');
+        throw new NotFoundException(
+          '해당 카카오 이메일을 계정을 찾을 수 없습니다.',
+        );
       }
 
       // 카카오 서버 유저구분자와 이메일정보
@@ -37,7 +39,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy) {
         throw new NotFoundException('해당 계정을 찾을 수 없습니다.');
       }
 
-      // 카카오톡에 계정이 존재하나, 토이스쿼드에 계정이 존재하지 않은 경우
+      // 카카오톡에 계정이 존재하나, 토이스쿼드 회원으로 등록 여부 확인
       const toySquadUser = await this.userService.findOneUser({
         email: email,
         allowPassword: false,

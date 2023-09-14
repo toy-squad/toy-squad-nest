@@ -47,4 +47,8 @@ export class UpdateUserInfoRequestDto {
   // 카카오 아이디
   @IsOptional()
   kakaoAuthId?: any;
+
+  // 구글 아이디
+  @IsOptional()
+  googleAuthId?: any;
 }

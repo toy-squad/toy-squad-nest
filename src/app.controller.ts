@@ -23,6 +23,7 @@ import { Response } from 'express';
 import TokenPayload from 'auth/interfaces/token-payload.interface';
 import { KakaoGuard } from 'auth/guards/kakao/kakao.guard';
 import { JwtAuthGuard } from 'auth/guards/jwt-auth/jwt-auth.guard';
+import { GoogleGuard } from 'auth/guards/google/google.guard';
 
 @Controller()
 export class AppController {
@@ -160,12 +161,26 @@ export class AppController {
    */
   @Get('/sign-in/google')
   @Public()
-  async signInByGoogle() {}
+  @UseGuards(GoogleGuard)
+  async signInByGoogle(@Req() request: RequestWithUser) {
+    return;
+  }
 
   // 구글로그인 리다이렉트
   @Get('oauth/google')
   @Public()
-  async redirectGoogle() {}
+  @UseGuards(GoogleGuard)
+  async redirectGoogle(
+    @Req() request: RequestWithUser,
+    @Res() response: Response,
+  ) {
+    const { user } = request;
+    const tokens = await this.authService.signIn(user.userId, user.email);
+    const { access_token } = tokens;
+
+    response.setHeader('Authorization', `Bearer ${access_token}`);
+    return response.json(tokens);
+  }
 
   /**
    * 이메일 인증
