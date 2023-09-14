@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CoreEntity } from '../../commons/entities/core.entity';
-import { Project } from '../../projects/entities/project.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 
 @Entity({ schema: process.env.DB_NAME })
@@ -109,6 +108,4 @@ export class User extends CoreEntity {
   @Column({ name: 'likes', default: 0, comment: '좋아요수' })
   likes: number;
 
-  // @OneToMany(() => Project, (project) => project.user, { onDelete: 'CASCADE' })
-  // project: Project[];
 }
