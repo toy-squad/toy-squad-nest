@@ -49,9 +49,9 @@ import { Role } from 'role/entities/role.entity';
         KAKAO_SECRET_KEY: Joi.string().required(),
         KAKAO_CALLBACK_URL: Joi.string().required(),
         /** GOOGLE OAUTH */
-        // GOOGLE_CLIENT_ID: Joi.string().required(),
-        // GOOGLE_CLIENT_SECRET: Joi.string().required(),
-        // GOOGLE_CALLBACK_URL: Joi.string().required(),
+        GOOGLE_CLIENT_ID: Joi.string().required(),
+        GOOGLE_CLIENT_SECRET: Joi.string().required(),
+        GOOGLE_CALLBACK_URL: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRoot({
@@ -62,7 +62,6 @@ import { Role } from 'role/entities/role.entity';
       password: process.env.DB_PWD,
       database: process.env.DB_NAME,
       entities: ['/src/**/entities/*.ts'],
-      // entities: [User, Project, Role],
       synchronize: process.env.NODE_ENV !== 'production',
       logging: process.env.NODE_ENV !== 'production',
       charset: 'utf8mb4',
