@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { CoreEntity } from '../../commons/entities/core.entity';
 import { Project } from '../../projects/entities/project.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity({ schema: process.env.DB_NAME })
 export class Role extends CoreEntity {
@@ -27,4 +28,12 @@ role: string;
 @JoinColumn({ name: 'project_id',  referencedColumnName: 'id' } )
 project: Project;
 
+/**
+ * 권한 : 유저 = N:1
+ * - 유저가 여러 프로젝트에 가입될 수 있음.
+ * - 유저가 가입한 프로젝트의 권한은 하나이다.
+ */
+@ManyToOne(() => User, (user) => user.roles)
+@JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
+user: User;
 }
