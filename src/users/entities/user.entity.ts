@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CoreEntity } from '../../commons/entities/core.entity';
-import { Project } from '../../projects/entities/project.entity';
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany } from 'typeorm';
+import { Role } from 'role/entities/role.entity';
 
 @Entity({ schema: process.env.DB_NAME })
 export class User extends CoreEntity {
@@ -109,6 +109,13 @@ export class User extends CoreEntity {
   @Column({ name: 'likes', default: 0, comment: '좋아요수' })
   likes: number;
 
-  // @OneToMany(() => Project, (project) => project.user, { onDelete: 'CASCADE' })
-  // project: Project[];
+  /**
+   * 유저 : 권한 = 1:N
+   * - 유저가 여러 프로젝트에 가입될 수 있음.
+   * - 유저가 가입한 프로젝트의 권한은 하나이다.
+   */
+  @OneToMany(() => Role, (role) => role.user)
+  @ApiProperty({ description: '유저가 가입한 프로젝트의 권한' })
+  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
+  roles: Role[];
 }
