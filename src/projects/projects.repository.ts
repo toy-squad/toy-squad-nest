@@ -34,12 +34,11 @@ export class ProjectsRepository {
     this.repo.save(requestDto);
   }
 
-  async updateProject(id: string, requestDto: UpdateProjectRequestDto ){
+  async updateProject(id: string, requestDto: UpdateProjectRequestDto) {
     this.repo.update(id, requestDto);
   }
-  
-  async softDeleteProject(id: string){
+
+  async softDeleteProject(id: string) {
     this.repo.softDelete(id);
   }
-
 }
