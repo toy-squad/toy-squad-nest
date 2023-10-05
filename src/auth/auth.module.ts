@@ -15,6 +15,7 @@ import type { RedisClientOptions } from 'redis';
 import { RedisModule } from 'redis/redis.module';
 import { KakaoStrategy } from './strategies/kakao.strategy';
 import { KakaoGuard } from './guards/kakao/kakao.guard';
+import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { KakaoGuard } from './guards/kakao/kakao.guard';
     LocalStrategy,
     JwtStrategy,
     KakaoStrategy,
+    GoogleStrategy,
 
     {
       provide: APP_GUARD,
