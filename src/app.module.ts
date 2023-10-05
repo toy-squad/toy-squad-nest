@@ -16,6 +16,7 @@ import { PassportModule } from '@nestjs/passport';
 import { RedisModule } from 'redis/redis.module';
 import { RoleController } from './role/role.controller';
 import { RoleModule } from './role/role.module';
+import { Role } from 'role/entities/role.entity';
 
 @Module({
   imports: [
@@ -60,7 +61,8 @@ import { RoleModule } from './role/role.module';
       username: process.env.DB_USER,
       password: process.env.DB_PWD,
       database: process.env.DB_NAME,
-      entities: [User, Project],
+      entities: ['/src/**/entities/*.ts'],
+      // entities: [User, Project, Role],
       synchronize: process.env.NODE_ENV !== 'production',
       logging: process.env.NODE_ENV !== 'production',
       charset: 'utf8mb4',
@@ -75,7 +77,7 @@ import { RoleModule } from './role/role.module';
     RedisModule,
     RoleModule,
   ],
-  controllers: [AppController, ],
+  controllers: [AppController],
   providers: [],
 })
 export class AppModule implements NestModule {

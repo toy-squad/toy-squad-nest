@@ -108,7 +108,7 @@ export class User extends CoreEntity {
   @ApiProperty({ description: '좋아요 수' })
   @Column({ name: 'likes', default: 0, comment: '좋아요수' })
   likes: number;
-  
+
   /**
    * 유저 : 권한 = 1:N
    * - 유저가 여러 프로젝트에 가입될 수 있음.
@@ -118,5 +118,4 @@ export class User extends CoreEntity {
   @ApiProperty({ description: '유저가 가입한 프로젝트의 권한' })
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   roles: Role[];
-
 }
