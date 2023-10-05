@@ -49,9 +49,9 @@ import { Role } from 'role/entities/role.entity';
         KAKAO_SECRET_KEY: Joi.string().required(),
         KAKAO_CALLBACK_URL: Joi.string().required(),
         /** GOOGLE OAUTH */
-        // GOOGLE_CLIENT_ID: Joi.string().required(),
-        // GOOGLE_CLIENT_SECRET: Joi.string().required(),
-        // GOOGLE_CALLBACK_URL: Joi.string().required(),
+        GOOGLE_CLIENT_ID: Joi.string().required(),
+        GOOGLE_CLIENT_SECRET: Joi.string().required(),
+        GOOGLE_CALLBACK_URL: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRoot({
