@@ -48,9 +48,9 @@ import { RoleModule } from './role/role.module';
         KAKAO_SECRET_KEY: Joi.string().required(),
         KAKAO_CALLBACK_URL: Joi.string().required(),
         /** GOOGLE OAUTH */
-        GOOGLE_CLIENT_ID: Joi.string().required(),
-        GOOGLE_CLIENT_SECRET: Joi.string().required(),
-        GOOGLE_CALLBACK_URL: Joi.string().required(),
+        // GOOGLE_CLIENT_ID: Joi.string().required(),
+        // GOOGLE_CLIENT_SECRET: Joi.string().required(),
+        // GOOGLE_CALLBACK_URL: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRoot({
@@ -75,7 +75,7 @@ import { RoleModule } from './role/role.module';
     RedisModule,
     RoleModule,
   ],
-  controllers: [AppController, RoleController],
+  controllers: [AppController, ],
   providers: [],
 })
 export class AppModule implements NestModule {
