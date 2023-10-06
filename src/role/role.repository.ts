@@ -9,4 +9,6 @@ export class RoleRepository {
     @InjectRepository(Role) private readonly repo: Repository<Role>,
     @InjectDataSource() private rawQueryDataSource: DataSource,
   ) {}
+
+  
 }

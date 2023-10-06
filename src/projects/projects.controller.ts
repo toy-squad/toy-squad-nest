@@ -6,10 +6,14 @@ import {
   Param,
   Patch,
   Post,
+  Req,
+  Res,
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateNewProjectRequestDto } from './dtos/requests/create-new-project-request.dto';
 import { UpdateProjectRequestDto } from './dtos/requests/update-project-request.dto';
+import RequestWithUser from 'auth/interfaces/request-with-user.interface';
+import { Response } from 'express';
 
 @Controller('project')
 export class ProjectsController {
@@ -27,9 +31,18 @@ export class ProjectsController {
     return await this.projectsService.findOneProject(id);
   }
 
+  /** /api/project */
   @Post()
-  async generateNewProject(@Body() requestDto: CreateNewProjectRequestDto) {
-    return await this.projectsService.createProject(requestDto);
+  async generateNewProject(
+    @Req() request: RequestWithUser,
+    @Res() response: Response,
+  ) {
+    const generateNewProjectDto = request.body;
+    const userInfo = request.user;
+    console.log(generateNewProjectDto);
+    console.log(userInfo);
+    
+    return await this.projectsService.createProject(generateNewProjectDto);
   }
 
   @Patch('/:id')
