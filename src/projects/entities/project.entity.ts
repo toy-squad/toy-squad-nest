@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { CoreEntity } from '../../commons/entities/core.entity';
 import { Role } from '../../role/entities/role.entity';
+import { contactType } from 'projects/enum/contactType.enum';
 
 @Entity({ schema: process.env.DB_NAME })
 export class Project extends CoreEntity {
@@ -103,10 +104,10 @@ export class Project extends CoreEntity {
   @Column({
     name: 'contact_type',
     nullable: false,
-    default: 'U',
+    default: contactType.UNTACT,
     comment: '프로젝트 대면/비대면 여부',
   })
-  contactType: string;
+  contactType: contactType;
 
   /**
    * 프로젝트 활동 장소

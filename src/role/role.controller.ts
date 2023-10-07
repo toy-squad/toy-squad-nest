@@ -21,11 +21,13 @@ export class RoleController {
   constructor(private readonly roleService: RoleService) {}
   private readonly logger = new Logger(RoleController.name);
 
+  //TODO 생성자 권한 role insert controller(userId, projectId, roleId)
+  
   @Post()
   async create(@Req() request: RequestWithUser, @Res() response: Response) {
     this.logger.log(request.body);
     this.logger.log(request.user);
-    await this.roleService.create({});
+    //await this.roleService.create(request.body, request.user.userId);
     return response.json();
   }
 

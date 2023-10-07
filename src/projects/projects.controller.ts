@@ -37,12 +37,11 @@ export class ProjectsController {
     @Req() request: RequestWithUser,
     @Res() response: Response,
   ) {
-    const generateNewProjectDto = request.body;
-    const userInfo = request.user;
-    console.log(generateNewProjectDto);
-    console.log(userInfo);
+    const bodyInfo = request.body;
+    const userId = request.user.userId;
     
-    return await this.projectsService.createProject(generateNewProjectDto);
+    await this.projectsService.createProject({...bodyInfo, userId});
+    return response.json();
   }
 
   @Patch('/:id')

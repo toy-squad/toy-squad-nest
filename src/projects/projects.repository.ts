@@ -31,7 +31,7 @@ export class ProjectsRepository {
   }
 
   async createProject(requestDto: CreateNewProjectRequestDto) {
-    this.repo.save(requestDto);
+    return this.repo.save(requestDto);
   }
 
   async updateProject(id: string, requestDto: UpdateProjectRequestDto) {

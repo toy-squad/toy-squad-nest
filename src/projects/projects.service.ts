@@ -13,10 +13,16 @@ export class ProjectsService {
 
   async createProject(requestDto: CreateNewProjectRequestDto) {
     try {
-      const newProject = await this.projectsRepository.createProject(
-        requestDto,
-      );
-    } catch (error) {}
+      const {userId} = requestDto;
+      const newProject = await this.projectsRepository.createProject(requestDto);
+      const { id } = newProject;
+      //const { userId } = requestDto.userId;
+      const role  = 'G';
+
+      await this.roleRepository.createGenerateRole({role, project_id: id, user_id: userId});
+    } catch (error) {
+      throw error;
+    }
   }
 
   async updateProject(id: string, requestDto: UpdateProjectRequestDto) {
