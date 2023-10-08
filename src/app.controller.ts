@@ -89,7 +89,9 @@ export class AppController {
     await this.authService.logOut(userId);
 
     // 쿠키삭제
-    response.clearCookie('userId');
+    const userIdCookie = `userId=; HttpOnly; Max-Age=0`;
+    const refreshTokenCookie = `refreshToken=; HttpOnly; Max-Age=0`;
+    response.setHeader('Set-Cookie', [userIdCookie, refreshTokenCookie]);
     return response.json();
   }
 
