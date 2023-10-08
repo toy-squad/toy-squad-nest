@@ -7,7 +7,7 @@ import TokenPayload from 'auth/interfaces/token-payload.interface';
 import { RedisService } from 'redis/redis.service';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     private readonly usersService: UsersService,
     private redisService: RedisService,
@@ -31,11 +31,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         '유저토큰의 유효기간이 지났습니다. 다시 로그인해주세요.',
       );
     }
-    // 로그인하려는 유저가 올바른 유저인지 확인한다.
-    // const user = await this.usersService.findOneUser({
-    //   userId: userId,
-    //   email: email,
-    // });
 
     return payload;
   }
