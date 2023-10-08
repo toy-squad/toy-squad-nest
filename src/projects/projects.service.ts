@@ -3,6 +3,7 @@ import { ProjectsRepository } from './projects.repository';
 import { CreateNewProjectRequestDto } from './dtos/requests/create-new-project-request.dto';
 import { UpdateProjectRequestDto } from './dtos/requests/update-project-request.dto';
 import { RoleRepository } from 'role/role.repository';
+import { User } from 'users/entities/user.entity';
 
 @Injectable()
 export class ProjectsService {
@@ -15,11 +16,12 @@ export class ProjectsService {
     try {
       const {userId} = requestDto;
       const newProject = await this.projectsRepository.createProject(requestDto);
-      const { id } = newProject;
-      //const { userId } = requestDto.userId;
       const role  = 'G';
 
-      await this.roleRepository.createGenerateRole({role, project_id: id, user_id: userId});
+      const user = new User();
+      user.id = userId;
+
+      await this.roleRepository.createGenerateRole({role, project: newProject, user});
     } catch (error) {
       throw error;
     }
