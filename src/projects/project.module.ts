@@ -10,6 +10,6 @@ import { RoleModule } from 'role/role.module';
   imports: [TypeOrmModule.forFeature([Project]), RoleModule],
   controllers: [ProjectsController],
   providers: [ProjectsService, ProjectsRepository],
-  exports: [ProjectsService],
+  exports: [ProjectsService, ProjectsRepository],
 })
 export class ProjectModule {}

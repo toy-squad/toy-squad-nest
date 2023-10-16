@@ -39,8 +39,8 @@ export class ProjectsController {
   ) {
     const bodyInfo = request.body;
     const userId = request.user.userId;
-    
-    await this.projectsService.createProject({...bodyInfo, userId});
+
+    await this.projectsService.createProject({ ...bodyInfo, userId });
     return response.json();
   }
 
