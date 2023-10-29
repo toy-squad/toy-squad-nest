@@ -1,21 +1,20 @@
-import { Type } from "class-transformer";
-import { IsNotEmpty, IsString } from "class-validator";
-import { Project } from "projects/entities/project.entity";
-import { User } from "users/entities/user.entity";
+import { Type } from 'class-transformer';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Project } from 'projects/entities/project.entity';
+import { RoleType } from 'role/entities/role.entity';
+import { User } from 'users/entities/user.entity';
 
 export class CreateRoleDto {
+  // 권한
+  @IsOptional()
+  @IsString()
+  role: RoleType;
 
-    @IsNotEmpty()
-    @IsString()
-    role: string;
-    
-    //todo: project id 유효성 검사
-    @Type(() => Project)
-    @IsNotEmpty()
-    project: Project;
+  @IsNotEmpty()
+  @Type(() => Project)
+  project: Project;
 
-    //todo: user id 유효성 검사
-    @Type(() => User)
-    @IsNotEmpty()
-    user: User;
+  @IsNotEmpty()
+  @Type(() => User)
+  user: User;
 }

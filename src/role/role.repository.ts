@@ -11,11 +11,7 @@ export class RoleRepository {
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
-  async createGenerateRole(requestDto: CreateRoleDto) {
-    try {
-      await this.repo.save(requestDto);
-    } catch (error) {
-      throw error;
-    }
+  async createRole(dto: CreateRoleDto) {
+    await this.repo.save(dto);
   }
 }
