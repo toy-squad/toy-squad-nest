@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
 import { Body, Controller, Post, Req, Res } from '@nestjs/common';
-import { SendEmailRequestDto } from './dtos/requests/send-email-request.dto';
 import { EmailService } from './email.service';
 import { ConfigService } from '@nestjs/config';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('이메일 API')
 @Controller('email')
 export class EmailController {
   constructor(
