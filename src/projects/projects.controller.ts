@@ -14,11 +14,26 @@ import { UpdateProjectRequestDto } from './dtos/requests/update-project-request.
 import RequestWithUser from 'auth/interfaces/request-with-user.interface';
 import { Response } from 'express';
 import { CreateNewProjectRequestDto } from './dtos/requests/create-new-project.dto';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('프로젝트 API')
 @Controller('project')
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
+  @ApiOperation({
+    summary: '복수 프로젝트 조회 API',
+    description: '복수 프로젝트 조회 API',
+  })
+  @Get()
+  async findMultipleProjects() {
+    return await this.projectsService.findMultipleProjects();
+  }
+
+  @ApiOperation({
+    summary: '단일 프로젝트 조회 API',
+    description: '단일 프로젝트 조회 API',
+  })
   @Get('/:id')
   async findOneProject(@Param('id') id: string) {
     return await this.projectsService.findOneProject(id);

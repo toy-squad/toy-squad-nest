@@ -63,4 +63,12 @@ export class ProjectsService {
       throw error;
     }
   }
+
+  async findMultipleProjects() {
+    try {
+      return await this.projectsRepository.findAll();
+    } catch (error) {
+      throw error;
+    }
+  }
 }
