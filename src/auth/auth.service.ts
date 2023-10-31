@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Inject,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
   UseInterceptors,
 } from '@nestjs/common';
@@ -16,6 +17,7 @@ import { ConfigService } from '@nestjs/config';
 import { CACHE_MANAGER, CacheInterceptor } from '@nestjs/cache-manager';
 import TokenPayload from './interfaces/token-payload.interface';
 import { RedisService } from 'redis/redis.service';
+import { RefreshAccessTokenRequestDto } from './dtos/requests/refresh-access-token-request.dto';
 
 @Injectable()
 export class AuthService {
@@ -103,21 +105,38 @@ export class AuthService {
     }
   }
 
-  async refreshAccessToken(payload: TokenPayload) {
+  async refreshAccessToken(dto: RefreshAccessTokenRequestDto) {
     try {
-      const { userId } = payload;
+      const { userId } = dto;
 
-      // 리프래시토큰이 있는지 확인한다
-      const refreshToken = await this.redisService.get(`refresh-${userId}`);
-      if (!refreshToken) {
+      // 레디스에 저장된 리프래시토큰을 찾는다.
+      const refreshTokenRedis = await this.redisService.get(
+        `refresh-${userId}`,
+      );
+      if (!refreshTokenRedis || !userId) {
         throw new UnauthorizedException('인증이 만료되었습니다.');
       }
 
+      const user = await this.userService.findOneUser({ userId: userId });
+      if (!user) {
+        throw new NotFoundException('존재하지 않은 유저입니다.');
+      }
+
       // 액세스토큰을  갱신한다
-      const newAccessToken = await this.generateAccessToken(payload);
+      const newAccessToken = await this.generateAccessToken({
+        userId: user.id,
+        email: user.email,
+      });
+
+      // 리프래시토큰을 갱신한다
+      const newRefreshToken = await this.generateRefreshToken({
+        userId: user.id,
+        email: user.email,
+      });
 
       return {
         access_token: newAccessToken,
+        refresh_token: newRefreshToken,
       };
     } catch (error) {
       throw error;
@@ -160,15 +179,5 @@ export class AuthService {
       this.REFRESH_TOKEN_EXPIRATION,
     );
     return refreshToken;
-  }
-
-  /**
-   * [사용안함!]
-   * 쿠키에 JWT토큰을 담는다
-   */
-  public getCookieWithJwtToken(userId: string, email: string) {
-    const payload: TokenPayload = { userId: userId, email: email };
-    const token = this.jwtService.sign(payload);
-    return `access_token=${token}; HttpOnly; Path=/; Max-Age=${this.ACCESS_TOKEN_EXPIRATION}`;
   }
 }

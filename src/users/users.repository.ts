@@ -20,9 +20,9 @@ export class UsersRepository {
     private readonly dataSource: DataSource,
   ) {}
 
-  async createNewUser(dto: any) {
+  async createNewUser(dto: CreateUserRequestDto) {
     try {
-      const { positionCategory, ...userInfo } = dto;
+      const { position_category, ...userInfo } = dto;
       return await this.repo.save(userInfo);
     } catch (error) {
       throw error;

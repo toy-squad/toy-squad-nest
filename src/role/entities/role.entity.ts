@@ -3,28 +3,29 @@ import { CoreEntity } from '../../commons/entities/core.entity';
 import { Project } from '../../projects/entities/project.entity';
 import { User } from '../../users/entities/user.entity';
 
+/**
+ * 권한 타입
+ * - M: 팀원
+ * - A: 관리자
+ * - G: 프로젝트 생성자
+ */
+export type RoleType = 'M' | 'A' | 'G';
+
 @Entity({ schema: process.env.DB_NAME })
 export class Role extends CoreEntity {
-  /**
-   *   권한
-   *       -설명: 프로젝트 가입된 멤버의 권한
-   *           M: 팀원
-   *           A : 관리자
-   *           G: 프로젝트 생성자 (팀장)
-   **/
   @Column({
     name: 'role',
     nullable: false,
     comment: '프로젝트 가입된 멤버의 권한',
     default: 'M',
   })
-  role: string;
+  role: RoleType;
 
   /**
    * 권한 : 프로젝트 = N:1
    */
   @ManyToOne(() => Project, (project) => project.roles)
-  @JoinColumn({ name: 'project_id', referencedColumnName: 'id' })
+  @JoinColumn({ name: 'project', referencedColumnName: 'id' })
   project: Project;
 
   /**
@@ -33,6 +34,6 @@ export class Role extends CoreEntity {
    * - 유저가 가입한 프로젝트의 권한은 하나이다.
    */
   @ManyToOne(() => User, (user) => user.roles)
-  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
+  @JoinColumn({ name: 'user', referencedColumnName: 'id' })
   user: User;
 }

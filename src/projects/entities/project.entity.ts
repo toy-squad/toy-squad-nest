@@ -1,6 +1,8 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { CoreEntity } from '../../commons/entities/core.entity';
 import { Role } from '../../role/entities/role.entity';
+import { contactType } from 'projects/enums/contactType.enum';
+import { User } from 'users/entities/user.entity';
 
 @Entity({ schema: process.env.DB_NAME })
 export class Project extends CoreEntity {
@@ -18,6 +20,14 @@ export class Project extends CoreEntity {
     comment: '프로젝트 소개',
   })
   intro: string;
+
+  @Column({
+    name: 'description',
+    nullable: true,
+    default: null,
+    comment: '프로젝트 설명',
+  })
+  description: string;
 
   @Column('simple-array', {
     name: 'skills',
@@ -48,8 +58,8 @@ export class Project extends CoreEntity {
 
   /**
    * 프로젝트 기간
-   * - 프로젝트 시작일자
-   * - 프로젝트 종료일자
+   * - 프로젝트 시작일자(YYYY년 MM월 DD일)
+   * - 프로젝트 종료일자(YYYY년 MM월 DD일)
    */
   @Column({
     name: 'start_date',
@@ -103,10 +113,10 @@ export class Project extends CoreEntity {
   @Column({
     name: 'contact_type',
     nullable: false,
-    default: 'U',
+    default: contactType.UNTACT,
     comment: '프로젝트 대면/비대면 여부',
   })
-  contactType: string;
+  contactType: contactType;
 
   /**
    * 프로젝트 활동 장소
@@ -121,17 +131,9 @@ export class Project extends CoreEntity {
   place: string;
 
   /** 프로젝트 모집
-   * - recruit_position      : 모집 포지션
    * - recruit_start_date    : 모집시작일자
    * - recruit_end_date      : 모집마감일자
    */
-  @Column('simple-array', {
-    name: 'recruit_position',
-    nullable: true,
-    default: null,
-    comment: '모집 포지션',
-  })
-  recruitPosition: object[];
 
   @Column({
     name: 'recruit_start_date',
@@ -157,18 +159,21 @@ export class Project extends CoreEntity {
    * MemberRoles   : 프로젝트 멤버역할
    *
    * 1. User(프로젝트 생성자=초기팀장)  : Project       = 1:N
-   * 2. Project                   : Comment       = 1:N
-   * 3. Project                   : MemberRoles   = 1:N
+   * 2. Project                   : MemberRoles   = 1:N
+   * 3. Project                   : Comment       = 1:N
    *
    */
+
+  /**
+   * 프로젝트 : 유저 = N:1
+   */
+  @ManyToOne(() => User, (user) => user.projects)
+  user: User;
 
   /**
    * 프로젝트 : 권한 = 1:N
    */
   @OneToMany(() => Role, (role) => role.project)
-  @JoinColumn({ name: 'role_id', referencedColumnName: 'id' })
+  @JoinColumn({ name: 'role', referencedColumnName: 'id' })
   roles: Role[];
-
-  // @OneToMany(() => Comments, (comments) => comments.project)
-  // comments: Comments[];
 }

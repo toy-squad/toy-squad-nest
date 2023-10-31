@@ -59,10 +59,6 @@ import { GoogleStrategy } from './strategies/google.strategy';
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: KakaoGuard,
-    // },
   ],
   exports: [AuthService],
 })

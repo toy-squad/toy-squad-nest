@@ -6,21 +6,18 @@ import {
   Param,
   Patch,
   Post,
+  Req,
+  Res,
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
-import { CreateNewProjectRequestDto } from './dtos/requests/create-new-project-request.dto';
 import { UpdateProjectRequestDto } from './dtos/requests/update-project-request.dto';
+import RequestWithUser from 'auth/interfaces/request-with-user.interface';
+import { Response } from 'express';
+import { CreateNewProjectRequestDto } from './dtos/requests/create-new-project.dto';
 
 @Controller('project')
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
-
-  /**
-   * 물리적으로 먼저 프로젝트 객체생성 확인후에
-   * 가드/미들웨어/인터셉터 넣기
-   * 프로젝트 리스트 조회
-   * 타입스크립트
-   * */
 
   @Get('/:id')
   async findOneProject(@Param('id') id: string) {
@@ -28,20 +25,45 @@ export class ProjectsController {
   }
 
   @Post()
-  async generateNewProject(@Body() requestDto: CreateNewProjectRequestDto) {
-    return await this.projectsService.createProject(requestDto);
+  async createNewProject(
+    @Req() request: RequestWithUser,
+    @Res() response: Response,
+  ) {
+    const bodyInfo = request.body;
+    const userId = request.user.userId;
+
+    const newProject = await this.projectsService.createNewProject({
+      userId: userId,
+      ...bodyInfo,
+    });
+    return response.json(newProject);
   }
 
   @Patch('/:id')
   async updateProject(
-    @Param('id') id: string,
-    @Body() requestDto: UpdateProjectRequestDto,
+    @Param('id') projectId: string,
+    @Req() request: RequestWithUser,
+    @Res() response: Response,
   ) {
-    return await this.projectsService.updateProject(id, requestDto);
+    const userId = request.user.userId;
+    const bodyInfo = request.body;
+
+    await this.projectsService.updateProject({
+      projectId: projectId,
+      userId: userId,
+      ...bodyInfo,
+    });
+
+    return response.json();
   }
 
   @Delete('/:id')
-  async deleteProject(@Param('id') id: string) {
-    return await this.projectsService.softDeleteProject(id);
+  async deleteProject(
+    @Param('id') id: string,
+    @Req() request: RequestWithUser,
+    @Res() response: Response,
+  ) {
+    await this.projectsService.softDeleteProject(id);
+    return response.json();
   }
 }

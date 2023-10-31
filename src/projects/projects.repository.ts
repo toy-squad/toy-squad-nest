@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from './entities/project.entity';
 import { Repository } from 'typeorm';
-import { CreateNewProjectRequestDto } from './dtos/requests/create-new-project-request.dto';
+import { CreateNewProjectDto } from './dtos/requests/create-new-project.dto';
 import { UpdateProjectRequestDto } from './dtos/requests/update-project-request.dto';
 
 @Injectable()
@@ -30,16 +30,15 @@ export class ProjectsRepository {
     }
   }
 
-  async createProject(requestDto: CreateNewProjectRequestDto) {
-    this.repo.save(requestDto);
+  async createNewProject(dto: CreateNewProjectDto) {
+    return await this.repo.save(dto);
   }
 
-  async updateProject(id: string, requestDto: UpdateProjectRequestDto ){
-    this.repo.update(id, requestDto);
-  }
-  
-  async softDeleteProject(id: string){
-    this.repo.softDelete(id);
+  async updateProject(dto: UpdateProjectRequestDto) {
+    await this.repo.save(dto);
   }
 
+  async softDeleteProject(id: string) {
+    await this.repo.softDelete(id);
+  }
 }
