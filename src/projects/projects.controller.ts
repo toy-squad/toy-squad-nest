@@ -32,13 +32,17 @@ export class ProjectsController {
 
   @ApiOperation({
     summary: '단일 프로젝트 조회 API',
-    description: '단일 프로젝트 조회 API',
+    description: '프로젝트 id로 단일 프로젝트 조회 API',
   })
   @Get('/:id')
   async findOneProject(@Param('id') id: string) {
     return await this.projectsService.findOneProject(id);
   }
 
+  @ApiOperation({
+    summary: '프로젝트 생성 API',
+    description: '프로젝트 생성 API',
+  })
   @Post()
   async createNewProject(
     @Req() request: RequestWithUser,
@@ -54,6 +58,10 @@ export class ProjectsController {
     return response.json(newProject);
   }
 
+  @ApiOperation({
+    summary: '프로젝트 수정 API',
+    description: '프로젝트 수정 API',
+  })
   @Patch('/:id')
   async updateProject(
     @Param('id') projectId: string,
@@ -72,6 +80,10 @@ export class ProjectsController {
     return response.json();
   }
 
+  @ApiOperation({
+    summary: '프로젝트 삭제 API',
+    description: '프로젝트 id로 해당 프로젝트 삭제 API',
+  })
   @Delete('/:id')
   async deleteProject(
     @Param('id') id: string,
