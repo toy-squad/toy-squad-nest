@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   Delete,
   Get,
@@ -10,10 +9,8 @@ import {
   Res,
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
-import { UpdateProjectRequestDto } from './dtos/requests/update-project-request.dto';
 import RequestWithUser from 'auth/interfaces/request-with-user.interface';
 import { Response } from 'express';
-import { CreateNewProjectRequestDto } from './dtos/requests/create-new-project.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('프로젝트 API')
