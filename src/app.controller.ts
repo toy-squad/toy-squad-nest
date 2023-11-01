@@ -241,8 +241,4 @@ export class AppController {
 
     return response.json(tokens);
   }
-
-  /**
-   * 이메일 인증
-   */
 }

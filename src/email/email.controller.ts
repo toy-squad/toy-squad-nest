@@ -17,4 +17,13 @@ export class EmailController {
     await this.emailService.sendEmail({ ...body });
     return res.status(201).json({ message: '이메일 전송 성공!' });
   }
+
+  /**
+   * 이메일 인증
+   * - 비밀번호 찾기
+   *
+   * - 이메일입력 -> 입력한 이메일에 비밀번호 찾기 template를 보내준다.
+   * - 유효시간 6시간짜리 비밀번호 찾기 토큰을 심어준다
+   * - 비밀번호 수정가능한 시간:
+   */
 }
