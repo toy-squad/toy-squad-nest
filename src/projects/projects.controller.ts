@@ -19,9 +19,14 @@ import { CreateNewProjectRequestDto } from './dtos/requests/create-new-project.d
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
-  @Get('/:id')
-  async findOneProject(@Param('id') id: string) {
-    return await this.projectsService.findOneProject(id);
+  @Get(':id')
+  async findOneProject(
+    @Param('id') id: string,
+    @Req() request: RequestWithUser,
+    @Res() response: Response,
+  ) {
+    const project = await this.projectsService.findOneProject(id);
+    return response.json(project);
   }
 
   @Post()
@@ -39,7 +44,7 @@ export class ProjectsController {
     return response.json(newProject);
   }
 
-  @Patch('/:id')
+  @Patch(':id')
   async updateProject(
     @Param('id') projectId: string,
     @Req() request: RequestWithUser,
@@ -48,13 +53,13 @@ export class ProjectsController {
     const userId = request.user.userId;
     const bodyInfo = request.body;
 
-    await this.projectsService.updateProject({
+    const updatedProject = await this.projectsService.updateProject({
       projectId: projectId,
       userId: userId,
       ...bodyInfo,
     });
 
-    return response.json();
+    return response.json(updatedProject);
   }
 
   @Delete('/:id')
