@@ -17,8 +17,9 @@ export class RoleRepository {
   }
 
   async findOneRole(dto: UpdateRoleDto) {
-    return await this.repo.find({
+    const result = await this.repo.find({
       relations: ['project', 'user'],
     });
+    return result[0].role;
   }
 }

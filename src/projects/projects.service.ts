@@ -46,6 +46,9 @@ export class ProjectsService {
         project: await this.projectsRepository.findOneProject(requestDto.projectId),
         user: await this.userRepository.findOneUser({ userId: requestDto.userId }),
       });
+      if (role === 'M') {
+        throw new Error('권한이 없습니다.');
+      }
       return await this.projectsRepository.updateProject(requestDto);
     } catch (error) {
       throw error;
