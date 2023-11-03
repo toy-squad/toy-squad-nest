@@ -1,6 +1,8 @@
+import { PartialType } from '@nestjs/mapped-types';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { CreateNewProjectDto } from './create-new-project.dto';
 
-export class UpdateProjectRequestDto {
+export class UpdateProjectRequestDto extends PartialType(CreateNewProjectDto){
   // 유저정보
   // 유저아이디
   @IsString()
