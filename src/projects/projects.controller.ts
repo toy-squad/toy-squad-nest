@@ -54,21 +54,28 @@ export class ProjectsController {
     const bodyInfo = request.body;
 
     const updatedProject = await this.projectsService.updateProject({
-      projectId: projectId,
-      userId: userId,
+      projectId,
+      userId,
       ...bodyInfo,
     });
 
     return response.json(updatedProject);
   }
 
-  @Delete('/:id')
+  @Delete(':id')
   async deleteProject(
-    @Param('id') id: string,
+    @Param('id') projectId: string,
     @Req() request: RequestWithUser,
     @Res() response: Response,
   ) {
-    await this.projectsService.softDeleteProject(id);
-    return response.json();
+    const userId = request.user.userId;
+    const bodyInfo = request.body;
+
+    const deleteProject = await this.projectsService.softDeleteProject({
+      projectId,
+      userId,
+      ...bodyInfo,
+    });
+    return response.json(deleteProject);
   }
 }
