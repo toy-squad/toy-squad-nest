@@ -3,9 +3,9 @@ app: node@16
 options:
   env:
     - name: NODE_ENV
-      var: NODE_ENV
+      secret: NODE_ENV
     - name: SERVER_PORT
-      var: SERVER_PORT
+      secret: SERVER_PORT
     # 데이터베이스 환경변수
     - name: DB_HOST
       secret: DB_HOST
@@ -28,11 +28,11 @@ options:
 
     # 이메일
     - name: MAILER_HOST
-      var: MAILER_HOST
+      secret: MAILER_HOST
     - name: MAILER_USER
-      var: MAILER_USER
+      secret: MAILER_USER
     - name: MAILER_PASSWORD
-      var: MAILER_PASSWORD
+      secret: MAILER_PASSWORD
 
     # JWT
     - name: JWT_SECRET
@@ -67,9 +67,9 @@ options:
       secret: GOOGLE_CALLBACK_URL
   buildenv:
     - name: NODE_ENV
-      var: production
+      secret: NODE_ENV
     - name: SERVER_PORT
-      var: SERVER_PORT
+      secret: SERVER_PORT
 
     # 데이터베이스
     - name: DB_HOST
@@ -93,11 +93,11 @@ options:
 
     # 이메일
     - name: MAILER_HOST
-      var: MAILER_HOST
+      secret: MAILER_HOST
     - name: MAILER_USER
-      var: MAILER_USER
+      secret: MAILER_USER
     - name: MAILER_PASSWORD
-      var: MAILER_PASSWORD
+      secret: MAILER_PASSWORD
 
     # JWT
     - name: JWT_SECRET
@@ -130,10 +130,9 @@ options:
       secret: GOOGLE_CLIENT_SECRET
     - name: GOOGLE_CALLBACK_URL
       secret: GOOGLE_CALLBACK_URL
-  ports: '3001'
   install: npm install
   build: npm run build
-  start: npm run start:prod
+  start: npm run start:dev
 context:
   git:
     url: git@github.com:toy-squad/toy-squad-nest.git
