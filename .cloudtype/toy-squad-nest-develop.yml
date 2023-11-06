@@ -28,11 +28,11 @@ options:
 
     # 이메일
     - name: MAILER_HOST
-      var: MAILER_HOST
+      secret: MAILER_HOST
     - name: MAILER_USER
-      var: MAILER_USER
+      secret: MAILER_USER
     - name: MAILER_PASSWORD
-      var: MAILER_PASSWORD
+      secret: MAILER_PASSWORD
 
     # JWT
     - name: JWT_SECRET
@@ -93,11 +93,11 @@ options:
 
     # 이메일
     - name: MAILER_HOST
-      var: MAILER_HOST
+      secret: MAILER_HOST
     - name: MAILER_USER
-      var: MAILER_USER
+      secret: MAILER_USER
     - name: MAILER_PASSWORD
-      var: MAILER_PASSWORD
+      secret: MAILER_PASSWORD
 
     # JWT
     - name: JWT_SECRET
