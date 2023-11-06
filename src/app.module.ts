@@ -21,10 +21,17 @@ import { Role } from 'role/entities/role.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: '.env',
+      envFilePath:
+        process.env.NODE_ENV === 'production'
+          ? '.production.env'
+          : process.env.NODE_ENV === 'development'
+          ? '.development.env'
+          : '.test.env',
       isGlobal: true,
       validationSchema: Joi.object({
-        NODE_ENV: Joi.string().valid('development', 'production').required(),
+        NODE_ENV: Joi.string()
+          .valid('production', 'development', 'test')
+          .required(),
         SERVER_PORT: Joi.number().default(3001).required(),
         /* DATABASE (RDBMS) */
         DB_HOST: Joi.string().required(),
