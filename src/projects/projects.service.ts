@@ -44,10 +44,14 @@ export class ProjectsService {
   async updateProject(requestDto: UpdateProjectRequestDto) {
     try {
       const role = await this.roleRepository.findOneRole({
-        project: await this.projectsRepository.findOneProject(requestDto.projectId),
-        user: await this.userRepository.findOneUser({ userId: requestDto.userId }),
+        project: await this.projectsRepository.findOneProject(
+          requestDto.projectId,
+        ),
+        user: await this.userRepository.findOneUser({
+          userId: requestDto.userId,
+        }),
       });
-      
+
       if (role === 'M') {
         throw new Error('권한이 없습니다.');
       }
@@ -61,10 +65,14 @@ export class ProjectsService {
   async softDeleteProject(requestDto: UpdateProjectRequestDto) {
     try {
       const role = await this.roleRepository.findOneRole({
-        project: await this.projectsRepository.findOneProject(requestDto.projectId),
-        user: await this.userRepository.findOneUser({ userId: requestDto.userId }),
+        project: await this.projectsRepository.findOneProject(
+          requestDto.projectId,
+        ),
+        user: await this.userRepository.findOneUser({
+          userId: requestDto.userId,
+        }),
       });
-      
+
       if (role === 'M') {
         throw new Error('권한이 없습니다.');
       }
@@ -85,21 +93,31 @@ export class ProjectsService {
     }
   }
 
-  async getProjects(reqDto: GetProjectsRequestDto): Promise<GetProjectsResponseDto>{
+  async findMultipleProjects() {
     try {
-      const {page, limit} = reqDto;
-      const [projects, total] = await this.projectsRepository.getProjects(reqDto);
-      
+      return await this.projectsRepository.findAll();
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getProjects(
+    reqDto: GetProjectsRequestDto,
+  ): Promise<GetProjectsResponseDto> {
+    try {
+      const { page, limit } = reqDto;
+      const [projects, total] = await this.projectsRepository.getProjects(
+        reqDto,
+      );
+
       return {
         data: projects,
         count: total,
         page,
         limit,
-      }
-
+      };
     } catch (error) {
       throw error;
     }
   }
-  
 }

@@ -16,6 +16,7 @@ import { UsersService } from './users.service';
 import { DEFAULT_PAGE, DEFAULT_TAKE } from 'commons/dtos/pagination-query-dto';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateUserRequestDto } from './dtos/requests/create-user-request.dto';
+import { Public } from 'auth/decorators/public.decorator';
 
 @ApiTags('유저 API')
 @Controller('users')
@@ -110,6 +111,21 @@ export class UsersController {
   async deleteUser(@Param('id') userId: string) {
     try {
       await this.userService.deleteUser(userId);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * 비밀번호 재설정
+   * - URL : /api/users/pwd
+   */
+  @Patch('pwd')
+  @Public()
+  async findAndUpdatePwd() {
+    try {
+      // 이메일 인증
+      // 비밀번호 수정
     } catch (error) {
       throw error;
     }

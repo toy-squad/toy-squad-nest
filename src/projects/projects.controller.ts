@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   Delete,
   Get,
@@ -12,16 +11,30 @@ import {
   Res,
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
-import { UpdateProjectRequestDto } from './dtos/requests/update-project-request.dto';
 import RequestWithUser from 'auth/interfaces/request-with-user.interface';
 import { Response } from 'express';
-import { CreateNewProjectRequestDto } from './dtos/requests/create-new-project.dto';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GetProjectsRequestDto } from './dtos/requests/get-projects-request.dto';
 
+@ApiTags('프로젝트 API')
 @Controller('project')
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
+  @ApiOperation({
+    summary: '복수 프로젝트 조회 API',
+    description: '복수 프로젝트 조회 API',
+  })
+  @Get()
+  async findMultipleProjects() {
+    return await this.projectsService.findMultipleProjects();
+  }
+
+  // 프로젝트 1개 조회
+  @ApiOperation({
+    summary: '단일 프로젝트 조회 API',
+    description: '프로젝트 id로 단일 프로젝트 조회 API',
+  })
   @Get(':id')
   async findOneProject(
     @Param('id') id: string,
@@ -32,6 +45,11 @@ export class ProjectsController {
     return response.json(project);
   }
 
+  // 프로젝트 리스트 조회
+  @ApiOperation({
+    summary: '프로젝트 리스트 조회 및 검색 API',
+    description: '프로젝트 리스트 조회 & 검색조건에 맞는 프로젝트 조회',
+  })
   @Get('list')
   async getProjects(
     @Query() reqDto: GetProjectsRequestDto,
@@ -49,7 +67,11 @@ export class ProjectsController {
     }
   }
 
-
+  // 프로젝트 생성
+  @ApiOperation({
+    summary: '프로젝트 생성 API',
+    description: '프로젝트 생성 API',
+  })
   @Post()
   async createNewProject(
     @Req() request: RequestWithUser,
@@ -65,6 +87,11 @@ export class ProjectsController {
     return response.json(newProject);
   }
 
+  // 프로젝트 수정
+  @ApiOperation({
+    summary: '프로젝트 수정 API',
+    description: '프로젝트 수정 API',
+  })
   @Patch(':id')
   async updateProject(
     @Param('id') projectId: string,
@@ -83,6 +110,11 @@ export class ProjectsController {
     return response.json(updatedProject);
   }
 
+  // 프로젝트 삭제
+  @ApiOperation({
+    summary: '프로젝트 삭제 API',
+    description: '프로젝트 id로 해당 프로젝트 삭제 API',
+  })
   @Delete(':id')
   async deleteProject(
     @Param('id') projectId: string,

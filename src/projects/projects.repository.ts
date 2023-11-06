@@ -20,13 +20,13 @@ export class ProjectsRepository {
   }
 
   async getProjects(dto: GetProjectsRequestDto): Promise<[Project[], number]> {
-    
     const { page, limit } = dto;
 
-    return await this.repo.createQueryBuilder('project')
-    .skip((page - 1) * limit)
-    .take(limit)
-    .getManyAndCount();
+    return await this.repo
+      .createQueryBuilder('project')
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
   }
 
   async findOneProject(id: string): Promise<Project> {
@@ -48,5 +48,8 @@ export class ProjectsRepository {
   async softDeleteProject(id: string) {
     await this.repo.softDelete(id);
   }
+
+  async findAll() {
+    await this.repo.find();
+  }
 }
-   
