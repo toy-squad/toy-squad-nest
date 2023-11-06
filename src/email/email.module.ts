@@ -6,10 +6,13 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { EmailController } from './email.controller';
 import { AuthService } from 'auth/auth.service';
 import { UsersService } from 'users/users.service';
+import { AuthModule } from 'auth/auth.module';
+import { UsersModule } from 'users/users.module';
 
 @Module({
   imports: [
     ConfigModule,
+    UsersModule,
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -37,7 +40,7 @@ import { UsersService } from 'users/users.service';
       }),
     }),
   ],
-  providers: [EmailService, AuthService, UsersService],
+  providers: [EmailService],
   exports: [EmailService],
   controllers: [EmailController],
 })

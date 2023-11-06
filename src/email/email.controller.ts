@@ -20,11 +20,8 @@ import { MailerService } from '@nestjs-modules/mailer';
 @Controller('email')
 export class EmailController {
   constructor(
-    private readonly configService: ConfigService,
     private readonly emailService: EmailService,
-    private readonly authService: AuthService,
     private readonly userService: UsersService,
-    private readonly mailerService: MailerService,
   ) {}
   @Post()
   async sendEmail(@Req() req: Request, @Res() res: Response) {

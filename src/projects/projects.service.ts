@@ -42,15 +42,35 @@ export class ProjectsService {
 
   async updateProject(requestDto: UpdateProjectRequestDto) {
     try {
+      const role = await this.roleRepository.findOneRole({
+        project: await this.projectsRepository.findOneProject(requestDto.projectId),
+        user: await this.userRepository.findOneUser({ userId: requestDto.userId }),
+      });
+      
+      if (role === 'M') {
+        throw new Error('권한이 없습니다.');
+      }
+
       return await this.projectsRepository.updateProject(requestDto);
     } catch (error) {
       throw error;
     }
   }
 
-  async softDeleteProject(id: string) {
+  async softDeleteProject(requestDto: UpdateProjectRequestDto) {
     try {
-      return await this.projectsRepository.softDeleteProject(id);
+      const role = await this.roleRepository.findOneRole({
+        project: await this.projectsRepository.findOneProject(requestDto.projectId),
+        user: await this.userRepository.findOneUser({ userId: requestDto.userId }),
+      });
+      
+      if (role === 'M') {
+        throw new Error('권한이 없습니다.');
+      }
+
+      const projectId = requestDto.projectId;
+      
+      return await this.projectsRepository.softDeleteProject(projectId);
     } catch (error) {
       throw error;
     }

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { EmailModule } from 'email/email.module';
 import { UsersModule } from 'users/users.module';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
@@ -40,7 +40,7 @@ import { GoogleStrategy } from './strategies/google.strategy';
         isGlobal: true,
         store: redisStore,
         host: configService.get<string>('REDIS_URL'),
-        port: configService.get<string>('REDIS_PORT'),
+        port: +configService.get<string>('REDIS_PORT'),
         password: configService.get<string>('REDIS_PASSWORD'),
       }),
       inject: [ConfigService],

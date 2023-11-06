@@ -31,9 +31,14 @@ export class ProjectsController {
     summary: '단일 프로젝트 조회 API',
     description: '프로젝트 id로 단일 프로젝트 조회 API',
   })
-  @Get('/:id')
-  async findOneProject(@Param('id') id: string) {
-    return await this.projectsService.findOneProject(id);
+  @Get(':id')
+  async findOneProject(
+    @Param('id') id: string,
+    @Req() request: RequestWithUser,
+    @Res() response: Response,
+  ) {
+    const project = await this.projectsService.findOneProject(id);
+    return response.json(project);
   }
 
   @ApiOperation({
@@ -59,7 +64,7 @@ export class ProjectsController {
     summary: '프로젝트 수정 API',
     description: '프로젝트 수정 API',
   })
-  @Patch('/:id')
+  @Patch(':id')
   async updateProject(
     @Param('id') projectId: string,
     @Req() request: RequestWithUser,
@@ -68,26 +73,33 @@ export class ProjectsController {
     const userId = request.user.userId;
     const bodyInfo = request.body;
 
-    await this.projectsService.updateProject({
-      projectId: projectId,
-      userId: userId,
+    const updatedProject = await this.projectsService.updateProject({
+      projectId,
+      userId,
       ...bodyInfo,
     });
 
-    return response.json();
+    return response.json(updatedProject);
   }
 
   @ApiOperation({
     summary: '프로젝트 삭제 API',
     description: '프로젝트 id로 해당 프로젝트 삭제 API',
   })
-  @Delete('/:id')
+  @Delete(':id')
   async deleteProject(
-    @Param('id') id: string,
+    @Param('id') projectId: string,
     @Req() request: RequestWithUser,
     @Res() response: Response,
   ) {
-    await this.projectsService.softDeleteProject(id);
-    return response.json();
+    const userId = request.user.userId;
+    const bodyInfo = request.body;
+
+    const deleteProject = await this.projectsService.softDeleteProject({
+      projectId,
+      userId,
+      ...bodyInfo,
+    });
+    return response.json(deleteProject);
   }
 }
