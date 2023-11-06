@@ -4,6 +4,7 @@ import { Project } from './entities/project.entity';
 import { Repository } from 'typeorm';
 import { CreateNewProjectDto } from './dtos/requests/create-new-project.dto';
 import { UpdateProjectRequestDto } from './dtos/requests/update-project-request.dto';
+import { GetProjectsRequestDto } from './dtos/requests/get-projects-request.dto';
 
 @Injectable()
 export class ProjectsRepository {
@@ -18,8 +19,14 @@ export class ProjectsRepository {
     this.entityManager = repo.manager;
   }
 
-  async findAll() {
-    this.repo.find();
+  async getProjects(dto: GetProjectsRequestDto): Promise<[Project[], number]> {
+    
+    const { page, limit } = dto;
+
+    return await this.repo.createQueryBuilder('project')
+    .skip((page - 1) * limit)
+    .take(limit)
+    .getManyAndCount();
   }
 
   async findOneProject(id: string): Promise<Project> {
@@ -42,3 +49,4 @@ export class ProjectsRepository {
     await this.repo.softDelete(id);
   }
 }
+   

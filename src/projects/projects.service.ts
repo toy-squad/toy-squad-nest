@@ -2,9 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { ProjectsRepository } from './projects.repository';
 import { CreateNewProjectRequestDto } from './dtos/requests/create-new-project.dto';
 import { UpdateProjectRequestDto } from './dtos/requests/update-project-request.dto';
-import { RoleRepository } from 'role/role.repository';
-import { User } from 'users/entities/user.entity';
-import { UsersRepository } from 'users/users.repository';
+import { RoleRepository } from '../role/role.repository';
+import { UsersRepository } from '../users/users.repository';
+import { GetProjectsRequestDto } from './dtos/requests/get-projects-request.dto';
+import { GetProjectsResponseDto } from './dtos/response/get-projects-response.dto';
 
 @Injectable()
 export class ProjectsService {
@@ -69,7 +70,7 @@ export class ProjectsService {
       }
 
       const projectId = requestDto.projectId;
-      
+
       return await this.projectsRepository.softDeleteProject(projectId);
     } catch (error) {
       throw error;
@@ -83,4 +84,22 @@ export class ProjectsService {
       throw error;
     }
   }
+
+  async getProjects(reqDto: GetProjectsRequestDto): Promise<GetProjectsResponseDto>{
+    try {
+      const {page, limit} = reqDto;
+      const [projects, total] = await this.projectsRepository.getProjects(reqDto);
+      
+      return {
+        data: projects,
+        count: total,
+        page,
+        limit,
+      }
+
+    } catch (error) {
+      throw error;
+    }
+  }
+  
 }

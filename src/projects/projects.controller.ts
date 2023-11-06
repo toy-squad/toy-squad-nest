@@ -3,9 +3,11 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
   Param,
   Patch,
   Post,
+  Query,
   Req,
   Res,
 } from '@nestjs/common';
@@ -14,6 +16,7 @@ import { UpdateProjectRequestDto } from './dtos/requests/update-project-request.
 import RequestWithUser from 'auth/interfaces/request-with-user.interface';
 import { Response } from 'express';
 import { CreateNewProjectRequestDto } from './dtos/requests/create-new-project.dto';
+import { GetProjectsRequestDto } from './dtos/requests/get-projects-request.dto';
 
 @Controller('project')
 export class ProjectsController {
@@ -28,6 +31,24 @@ export class ProjectsController {
     const project = await this.projectsService.findOneProject(id);
     return response.json(project);
   }
+
+  @Get('list')
+  async getProjects(
+    @Query() reqDto: GetProjectsRequestDto,
+    @Req() request: RequestWithUser,
+    @Res() response: Response,
+  ) {
+    try {
+      const projects = await this.projectsService.getProjects(reqDto);
+      response.status(HttpStatus.OK).json(projects);
+    } catch (error) {
+      response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: '프로젝트 목록 조회에 실패했습니다.',
+        error: error.message,
+      });
+    }
+  }
+
 
   @Post()
   async createNewProject(
