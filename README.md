@@ -3,7 +3,7 @@
 - [Notion 페이지](https://periodic-quokka-f6d.notion.site/Toy-Squad-c86cdb10cff44743829f0e2178416f75)
 
 - swagger 확인
-  - 로컬호스트: `localhost:PORT_NUMBER/api`
+  - 로컬호스트: `localhost:3001/swagger`
 
 ## 설치
 
