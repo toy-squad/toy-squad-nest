@@ -18,6 +18,7 @@ import { ApiBody, ApiOperation, ApiParam, ApiProperty, ApiQuery, ApiResponse, Ap
 import { Project } from './entities/project.entity';
 import { CreateNewProjectRequestDto } from './dtos/requests/create-new-project.dto';
 import { UpdateProjectRequestDto } from './dtos/requests/update-project-request.dto';
+import { GetProjectsResponseDto } from './dtos/response/get-projects-response.dto';
 
 
 @ApiTags('프로젝트 API')
@@ -64,7 +65,7 @@ export class ProjectsController {
     summary: '프로젝트 리스트 조회 및 검색 API',
     description: '프로젝트 리스트 조회 & 검색조건에 맞는 프로젝트 조회',
   })
-  @ApiResponse({status: 200, description: '프로젝트 목록 조회 성공.', type: [Project]})
+  @ApiResponse({status: 200, description: '프로젝트 목록 조회 성공.', type: GetProjectsResponseDto})
   @ApiQuery({ name: 'page', description: '페이지 번호',type: Number, required: false })
   @ApiQuery({ name: 'limit', description: '페이지당 데이터 갯수', type: Number, required: false })
   @Get('list')
@@ -84,7 +85,10 @@ export class ProjectsController {
     }
   }
 
-  @ApiProperty({ description: '프로젝트 생성' })
+  @ApiOperation({
+    summary: '프로젝트 생성 API',
+    description: '프로젝트 생성'
+  })
   @ApiResponse({ status: 201, description: '프로젝트 생성 성공.', type: Project })
   @ApiBody({ type: CreateNewProjectRequestDto })
   @Post()
