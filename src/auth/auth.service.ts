@@ -26,7 +26,6 @@ export class AuthService {
   constructor(
     private redisService: RedisService,
     // @Inject(CACHE_MANAGER) private cacheManager: Cache,
-    private readonly emailService: EmailService,
     private readonly userService: UsersService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,

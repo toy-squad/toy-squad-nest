@@ -15,18 +15,26 @@ import { AuthService } from 'auth/auth.service';
 import { UsersService } from 'users/users.service';
 import { SendEmailForResetPwdRequestDto } from './dtos/requests/send-email-for-reset-request.dto';
 import { MailerService } from '@nestjs-modules/mailer';
+import { SendEmailRequestDto } from './dtos/requests/send-email-request.dto';
 
 @ApiTags('이메일 API')
 @Controller('email')
 export class EmailController {
   constructor(
-    private readonly emailService: EmailService,
+    // private readonly emailService: EmailService,
     private readonly userService: UsersService,
+    private readonly configService: ConfigService,
+    private readonly mailService: MailerService,
   ) {}
+
+  @Public()
   @Post()
-  async sendEmail(@Req() req: Request, @Res() res: Response) {
-    const { body } = req;
-    await this.emailService.sendEmail({ ...body });
+  async sendEmail(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Body() dto: SendEmailRequestDto,
+  ) {
+    await this.mailService.sendMail({ ...dto });
     return res.status(201).json({ message: '이메일 전송 성공!' });
   }
 
@@ -36,14 +44,11 @@ export class EmailController {
    */
   @Public()
   @Post('pwd')
-  async sendEmailForResetPwd(
-    @Body() requestDto: SendEmailForResetPwdRequestDto,
-  ) {
-    const email = requestDto.inputEmail;
+  async sendEmailForResetPwd(@Body() dto: SendEmailForResetPwdRequestDto) {
     try {
       // 입력한 이메일에 대한 회원이 존재하는지 확인
       const isValidInputEmail = (await this.userService.findOneUser({
-        email: email,
+        email: dto.inputEmail,
         allowPassword: false,
       }))
         ? true
@@ -55,11 +60,11 @@ export class EmailController {
 
       // 레디스에 비밀번호재설정 토큰 등록
       // 이메일 전송
-      await this.emailService.sendEmail({
-        to: email,
-        from: '',
-        subject: '',
-        text: '',
+      await this.mailService.sendMail({
+        to: dto.inputEmail,
+        from: 'admin@toysquad.com',
+        subject: '비밀번호 재설정 안내',
+        template: './reset_password_info',
         html: '',
       });
     } catch (error) {
