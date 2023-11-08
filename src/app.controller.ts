@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 
 import { AuthService } from 'auth/auth.service';
-import { EmailService } from 'email/email.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Public } from 'auth/decorators/public.decorator';
 import { CreateUserRequestDto } from 'users/dtos/requests/create-user-request.dto';

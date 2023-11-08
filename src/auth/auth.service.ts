@@ -6,7 +6,6 @@ import {
   UnauthorizedException,
   UseInterceptors,
 } from '@nestjs/common';
-import { EmailService } from 'email/email.service';
 import { UsersService } from 'users/users.service';
 import { ValidateUserRequestDto } from './dtos/requests/validate-user-request.dto';
 import { ConfirmPasswordRequestDto } from 'users/dtos/requests/confirm-password-request.dto';

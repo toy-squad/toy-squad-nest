@@ -7,11 +7,9 @@ import {
   Req,
   Res,
 } from '@nestjs/common';
-import { EmailService } from './email.service';
 import { ConfigService } from '@nestjs/config';
 import { ApiTags } from '@nestjs/swagger';
 import { Public } from 'auth/decorators/public.decorator';
-import { AuthService } from 'auth/auth.service';
 import { UsersService } from 'users/users.service';
 import { SendEmailForResetPwdRequestDto } from './dtos/requests/send-email-for-reset-request.dto';
 import { MailerService } from '@nestjs-modules/mailer';
