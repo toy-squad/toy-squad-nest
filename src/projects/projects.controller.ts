@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   Delete,
   Get,
@@ -12,20 +11,34 @@ import {
   Res,
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
-import { UpdateProjectRequestDto } from './dtos/requests/update-project-request.dto';
 import RequestWithUser from 'auth/interfaces/request-with-user.interface';
 import { Response } from 'express';
-import { CreateNewProjectRequestDto } from './dtos/requests/create-new-project.dto';
 import { GetProjectsRequestDto } from './dtos/requests/get-projects-request.dto';
 import { ApiBody, ApiOperation, ApiParam, ApiProperty, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Project } from './entities/project.entity';
+import { CreateNewProjectRequestDto } from './dtos/requests/create-new-project.dto';
+import { UpdateProjectRequestDto } from './dtos/requests/update-project-request.dto';
 
-@ApiTags('project')
+
+@ApiTags('프로젝트 API')
 @Controller('project')
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
-  @ApiOperation({ summary: '프로젝트 단건 조회' })
+  @ApiOperation({
+    summary: '복수 프로젝트 조회 API',
+    description: '복수 프로젝트 조회 API',
+  })
+  @Get()
+  async findMultipleProjects() {
+    return await this.projectsService.findMultipleProjects();
+  }
+
+  // 프로젝트 1개 조회
+  @ApiOperation({
+    summary: '단일 프로젝트 조회 API',
+    description: '프로젝트 id로 단일 프로젝트 조회 API',
+  })
   @ApiResponse({  status: 200, description: '프로젝트 단건 조회 성공.', type: Project})
   @ApiParam({ name: 'id', description: '프로젝트 아이디', required: true })
   @Get(':id')
@@ -46,7 +59,11 @@ export class ProjectsController {
     }
   }
 
-  @ApiOperation({ summary: '프로젝트 목록 조회' })
+  // 프로젝트 리스트 조회
+  @ApiOperation({
+    summary: '프로젝트 리스트 조회 및 검색 API',
+    description: '프로젝트 리스트 조회 & 검색조건에 맞는 프로젝트 조회',
+  })
   @ApiResponse({status: 200, description: '프로젝트 목록 조회 성공.', type: [Project]})
   @ApiQuery({ name: 'page', description: '페이지 번호',type: Number, required: false })
   @ApiQuery({ name: 'limit', description: '페이지당 데이터 갯수', type: Number, required: false })
@@ -93,7 +110,11 @@ export class ProjectsController {
     }
   }
 
-  @ApiOperation({ summary: '프로젝트 수정' })
+  // 프로젝트 수정
+  @ApiOperation({
+    summary: '프로젝트 수정 API',
+    description: '프로젝트 수정 API',
+  })
   @ApiResponse({ status: 200, description: '프로젝트 수정 성공.', type: Project })
   @ApiBody({ type: UpdateProjectRequestDto })
   @Patch()
@@ -120,7 +141,11 @@ export class ProjectsController {
     }
   }
 
-  @ApiOperation({ summary: '프로젝트 삭제' })
+  // 프로젝트 삭제
+  @ApiOperation({
+    summary: '프로젝트 삭제 API',
+    description: '프로젝트 id로 해당 프로젝트 삭제 API',
+  })
   @ApiResponse({ status: 200, description: '프로젝트 삭제 성공.', type: Project })
   @ApiBody({ type: UpdateProjectRequestDto })
   @Delete()
