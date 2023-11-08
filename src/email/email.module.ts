@@ -4,10 +4,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { EmailController } from './email.controller';
-import { AuthService } from 'auth/auth.service';
-import { UsersService } from 'users/users.service';
-import { AuthModule } from 'auth/auth.module';
 import { UsersModule } from 'users/users.module';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -31,7 +29,7 @@ import { UsersModule } from 'users/users.module';
         },
         preview: false,
         template: {
-          dir: __dirname + '/templates',
+          dir: join(__dirname, '/templates'),
           adapter: new HandlebarsAdapter(),
           options: {
             strict: false,
@@ -40,8 +38,8 @@ import { UsersModule } from 'users/users.module';
       }),
     }),
   ],
-  providers: [EmailService],
-  exports: [EmailService],
+  providers: [],
+  exports: [],
   controllers: [EmailController],
 })
 export class EmailModule {}
