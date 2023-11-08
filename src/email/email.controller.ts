@@ -47,14 +47,12 @@ export class EmailController {
   async sendEmailForResetPwd(@Body() dto: SendEmailForResetPwdRequestDto) {
     try {
       // 입력한 이메일에 대한 회원이 존재하는지 확인
-      const isValidInputEmail = (await this.userService.findOneUser({
+      const user = await this.userService.findOneUser({
         email: dto.inputEmail,
         allowPassword: false,
-      }))
-        ? true
-        : false;
+      });
 
-      if (!isValidInputEmail) {
+      if (!user) {
         throw new NotFoundException('존재하지 않은 회원입니다.');
       }
 
@@ -65,7 +63,10 @@ export class EmailController {
         from: 'admin@toysquad.com',
         subject: '비밀번호 재설정 안내',
         template: './reset_password_info',
-        html: '',
+        context: {
+          userName: user.name,
+          resetPasswordBtnUrl: '',
+        },
       });
     } catch (error) {
       throw error;
