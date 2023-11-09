@@ -59,6 +59,10 @@ import { Role } from 'role/entities/role.entity';
         GOOGLE_CLIENT_ID: Joi.string().required(),
         GOOGLE_CLIENT_SECRET: Joi.string().required(),
         GOOGLE_CALLBACK_URL: Joi.string().required(),
+        /** REDIS */
+        REDIS_URL: Joi.string().required(),
+        REDIS_PORT: Joi.number().required(),
+        REDIS_PASSWORD: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRoot({
