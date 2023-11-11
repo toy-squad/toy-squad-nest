@@ -17,11 +17,18 @@ import { CACHE_MANAGER, CacheInterceptor } from '@nestjs/cache-manager';
 import TokenPayload from './interfaces/token-payload.interface';
 import { RedisService } from 'redis/redis.service';
 import { RefreshAccessTokenRequestDto } from './dtos/requests/refresh-access-token-request.dto';
+import { GenerateResetPasswordTokenRequestDto } from './dtos/requests/generate-reset-password-token-request.dto';
+import * as bcrypt from 'bcrypt';
+import { CheckResetPasswordTokenRequestDto } from './dtos/requests/check-reset-password-token-request.dto';
+import { UpdatePasswordRequestDto } from './dtos/requests/update-password-request.dto';
 
 @Injectable()
 export class AuthService {
   private ACCESS_TOKEN_EXPIRATION: number;
   private REFRESH_TOKEN_EXPIRATION: number;
+  private RESET_PASSWORD_TOKEN_SECRET: string;
+  private RESET_PASSWORD_TOKEN_EXPIRATION: number;
+
   constructor(
     private redisService: RedisService,
     // @Inject(CACHE_MANAGER) private cacheManager: Cache,
@@ -34,6 +41,13 @@ export class AuthService {
     );
     this.REFRESH_TOKEN_EXPIRATION = this.configService.get(
       'REFRESH_TOKEN_EXPIRATION',
+    );
+
+    this.RESET_PASSWORD_TOKEN_SECRET = this.configService.get(
+      'RESET_PASSWORD_TOKEN_SECRET',
+    );
+    this.RESET_PASSWORD_TOKEN_EXPIRATION = this.configService.get(
+      'RESET_PASSWORD_TOKEN_EXPIRATION',
     );
   }
 
@@ -180,9 +194,59 @@ export class AuthService {
     return refreshToken;
   }
 
-  async generateResetPasswordToken() {
+  async generateResetPasswordToken(dto: GenerateResetPasswordTokenRequestDto) {
     try {
-      // 비밀번호 재설정 토큰 만료여부 확인
+      const resetPasswordToken = `${this.RESET_PASSWORD_TOKEN_SECRET}-${dto.userId}-${dto.email}`;
+      const hashedResetPasswordToken = await bcrypt.hash(
+        resetPasswordToken,
+        10,
+      );
+      // 비밀번호 재설정 토큰 생성
+      await this.redisService.set(
+        'reset_password',
+        hashedResetPasswordToken,
+        this.RESET_PASSWORD_TOKEN_EXPIRATION,
+      );
+      return resetPasswordToken;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async checkResetPasswordToken(dto: CheckResetPasswordTokenRequestDto) {
+    try {
+      // 레디스에서 토큰을 갖고온다
+      const hashedResetPasswordToken = await this.redisService.get(
+        'reset_password',
+      );
+
+      if (!hashedResetPasswordToken) {
+        throw new UnauthorizedException(
+          '비밀번호 재설정 토큰이 만료되었습니다.',
+        );
+      }
+
+      // 비밀번호 재설정 토큰 만료 유무확인
+      const isMatched = await bcrypt.compare(
+        dto.resetPasswordToken,
+        hashedResetPasswordToken,
+      );
+
+      if (isMatched === false) {
+        throw new UnauthorizedException(
+          '비밀번호 재설정 토큰이 만료되었습니다.',
+        );
+      }
+
+      return hashedResetPasswordToken;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updatePassword(dto: UpdatePasswordRequestDto) {
+    try {
+      // 비밀번호 재설정
     } catch (error) {
       throw error;
     }

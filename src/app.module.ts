@@ -65,6 +65,9 @@ import { Role } from 'role/entities/role.entity';
         REDIS_PASSWORD: Joi.string().required(),
         /** SERVER URL */
         SERVER_URL: Joi.string().required(),
+        /** RESET_PASSWORD_TOKEN */
+        RESET_PASSWORD_TOKEN_SECRET: Joi.string().required(),
+        RESET_PASSWORD_TOKEN_EXPIRATION: Joi.number().required(),
       }),
     }),
     TypeOrmModule.forRoot({

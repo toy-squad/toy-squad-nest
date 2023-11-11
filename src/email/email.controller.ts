@@ -16,6 +16,7 @@ import { SendEmailForResetPwdRequestDto } from './dtos/requests/send-email-for-r
 import { MailerService } from '@nestjs-modules/mailer';
 import { SendEmailRequestDto } from './dtos/requests/send-email-request.dto';
 import { ResetPassword } from 'auth/decorators/reset-password.decorator';
+import { AuthService } from 'auth/auth.service';
 
 @ApiTags('이메일 API')
 @Controller('email')
@@ -23,18 +24,27 @@ export class EmailController {
   private RESET_PASSWORD_FORM_URL: string;
   private FRONTEND_URL: string;
   private SERVER_URL: string;
+  private RESET_PASSWORD_TOKEN_SECRET: string;
+  private RESET_PASSWORD_TOKEN_EXPIRATION: number;
 
   constructor(
     // private readonly emailService: EmailService,
     private readonly userService: UsersService,
     private readonly configService: ConfigService,
     private readonly mailService: MailerService,
+    private readonly authService: AuthService,
   ) {
     this.RESET_PASSWORD_FORM_URL = this.configService.get(
       'RESET_PASSWORD_FORM_URL',
     );
     this.FRONTEND_URL = this.configService.get('FRONTEND_URL');
     this.SERVER_URL = this.configService.get('SERVER_URL');
+    this.RESET_PASSWORD_TOKEN_SECRET = this.configService.get(
+      'RESET_PASSWORD_TOKEN_SECRET',
+    );
+    this.RESET_PASSWORD_TOKEN_EXPIRATION = this.configService.get(
+      'RESET_PASSWORD_TOKEN_EXPIRATION',
+    );
   }
 
   @Public()
@@ -54,7 +64,11 @@ export class EmailController {
    */
   @Public()
   @Post('pwd')
-  async sendEmailForResetPwd(@Body() dto: SendEmailForResetPwdRequestDto) {
+  async sendEmailForResetPwd(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Body() dto: SendEmailForResetPwdRequestDto,
+  ) {
     try {
       // 입력한 이메일에 대한 회원이 존재하는지 확인
       const user = await this.userService.findOneUser({
@@ -67,7 +81,11 @@ export class EmailController {
       }
 
       // 레디스에 비밀번호재설정 토큰 등록
-      // const resetPasswordToken =
+      const resetPasswordToken =
+        await this.authService.generateResetPasswordToken({
+          userId: user.id,
+          email: user.email,
+        });
 
       // 이메일 전송
       await this.mailService.sendMail({
@@ -81,6 +99,13 @@ export class EmailController {
           // 비밀번호재설정 토큰 유무확인 및 재설정UI폼으로 리다이렉션
           resetPasswordBtnUrl: `${this.SERVER_URL}/email/pwd`,
         },
+      });
+
+      // 비밀번호 재설정 토큰을 쿠키에 저장한다.
+      res.cookie('reset_password', resetPasswordToken, {
+        maxAge: this.RESET_PASSWORD_TOKEN_EXPIRATION,
+        httpOnly: true,
+        secure: true,
       });
     } catch (error) {
       throw error;

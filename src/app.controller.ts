@@ -7,6 +7,7 @@ import {
   Req,
   Logger,
   Res,
+  Patch,
 } from '@nestjs/common';
 
 import { AuthService } from 'auth/auth.service';
@@ -16,11 +17,13 @@ import { CreateUserRequestDto } from 'users/dtos/requests/create-user-request.dt
 import { UsersService } from 'users/users.service';
 import { LocalAuthGuard } from 'auth/guards/local-auth/local-auth.guard';
 import RequestWithUser from 'auth/interfaces/request-with-user.interface';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import TokenPayload from 'auth/interfaces/token-payload.interface';
 import { KakaoGuard } from 'auth/guards/kakao/kakao.guard';
 import { GoogleGuard } from 'auth/guards/google/google.guard';
 import { ConfigService } from '@nestjs/config';
+import { ResetPassword } from 'auth/decorators/reset-password.decorator';
+import { UpdatePasswordRequestDto } from 'auth/dtos/requests/update-password-request.dto';
 
 @ApiTags('공통 API')
 @Controller()
@@ -80,6 +83,7 @@ export class AppController {
     response.cookie('user_id', user.userId, {
       maxAge: this.REFRESH_TOKEN_EXPIRATION,
       httpOnly: true,
+      secure: true,
     });
     return response.json(tokens);
   }
@@ -98,6 +102,7 @@ export class AppController {
     response.cookie('user_id', null, {
       maxAge: 0,
       httpOnly: true,
+      secure: true,
     });
     return response.json();
   }
@@ -187,6 +192,7 @@ export class AppController {
     res.cookie('user_id', user.userId, {
       maxAge: this.REFRESH_TOKEN_EXPIRATION,
       httpOnly: true,
+      secure: true,
     });
     return res.json(tokens);
   }
@@ -226,8 +232,22 @@ export class AppController {
     response.cookie('user_id', user.userId, {
       maxAge: this.REFRESH_TOKEN_EXPIRATION,
       httpOnly: true,
+      secure: true,
     });
 
     return response.json(tokens);
+  }
+
+  @ResetPassword()
+  @Patch('password')
+  async updatePassword(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Body() dto: UpdatePasswordRequestDto,
+  ) {
+    // 패스워드를 변경한다.
+    await this.authService.updatePassword(dto);
+    // 메인화면으로 돌아간다
+    return res.status(302).redirect(``);
   }
 }
