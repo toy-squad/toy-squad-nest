@@ -1138,10 +1138,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/cookie-parser@^1.4.3":
-  version "1.4.3"
-  resolved "https://registry.npmjs.org/@types/cookie-parser/-/cookie-parser-1.4.3.tgz"
-  integrity sha512-CqSKwFwefj4PzZ5n/iwad/bow2hTCh0FlNAeWLtQM3JA/NX/iYagIpWG2cf1bQKQ2c9gU2log5VUCrn7LDOs0w==
+"@types/cookie-parser@^1.4.6":
+  version "1.4.6"
+  resolved "https://registry.npmjs.org/@types/cookie-parser/-/cookie-parser-1.4.6.tgz"
+  integrity sha512-KoooCrD56qlLskXPLGUiJxOMnv5l/8m7cQD2OxJ73NPMhuSz9PmvwRD6EpjDyKBVrdJDdQ4bQK7JFNHnNmax0w==
   dependencies:
     "@types/express" "*"
 

@@ -105,18 +105,19 @@ export class AuthService {
 
   async refreshAccessToken(dto: RefreshAccessTokenRequestDto) {
     try {
-      const { userId } = dto;
+      const { userId, refreshToken } = dto;
+
+      if (!userId) {
+        throw new UnauthorizedException('인증이 만료되었습니다.');
+      }
 
       // 레디스에 저장된 리프래시토큰을 찾는다.
       const refreshTokenRedis = await this.redisService.get(
         `refresh-${userId}`,
       );
-      if (!refreshTokenRedis || !userId) {
-        throw new UnauthorizedException('인증이 만료되었습니다.');
-      }
 
       const user = await this.userService.findOneUser({ userId: userId });
-      if (!user) {
+      if (!user && !refreshTokenRedis) {
         throw new NotFoundException('존재하지 않은 유저입니다.');
       }
 
@@ -177,5 +178,13 @@ export class AuthService {
       this.REFRESH_TOKEN_EXPIRATION,
     );
     return refreshToken;
+  }
+
+  async generateResetPasswordToken() {
+    try {
+      // 비밀번호 재설정 토큰 만료여부 확인
+    } catch (error) {
+      throw error;
+    }
   }
 }

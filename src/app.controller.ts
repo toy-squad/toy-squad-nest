@@ -75,14 +75,12 @@ export class AppController {
 
     // 헤더에 Bearer Token 형태로 응답
     const tokens = await this.authService.signIn(user.userId, user.email);
-    const { access_token, refresh_token } = tokens;
-    response.setHeader('Authorization', `Bearer ${access_token}`);
 
-    // 리프래시토큰과 유저아이디를 쿠키에 저장
-    const userIdCookie = `userId=${user.userId}; HttpOnly; Max-Age=${this.REFRESH_TOKEN_EXPIRATION}`;
-    const refreshTokenCookie = `refreshToken=${refresh_token}; HttpOnly; Max-Age=${this.REFRESH_TOKEN_EXPIRATION}`;
-    response.setHeader('Set-Cookie', [userIdCookie, refreshTokenCookie]);
-
+    // 유저아이디를 쿠키에 저장
+    response.cookie('user_id', user.userId, {
+      maxAge: this.REFRESH_TOKEN_EXPIRATION,
+      httpOnly: true,
+    });
     return response.json(tokens);
   }
 
@@ -97,9 +95,10 @@ export class AppController {
     await this.authService.logOut(userId);
 
     // 쿠키삭제
-    const userIdCookie = `userId=; HttpOnly; Max-Age=0`;
-    const refreshTokenCookie = `refreshToken=; HttpOnly; Max-Age=0`;
-    response.setHeader('Set-Cookie', [userIdCookie, refreshTokenCookie]);
+    response.cookie('user_id', null, {
+      maxAge: 0,
+      httpOnly: true,
+    });
     return response.json();
   }
 
@@ -118,20 +117,19 @@ export class AppController {
     @Res() response: Response,
   ) {
     // 쿠키에서 리프래시토큰과 유저아이디를 얻는다.
-    const { userId, refreshToken } = request.cookies;
+    const { user_id, refreshToken } = request.cookies;
 
     const tokens = await this.authService.refreshAccessToken({
-      userId,
+      userId: user_id,
       refreshToken,
     });
 
-    // 갱신된 리프래시토큰을 쿠키에 저장한다.
-    const userIdCookie = `userId=${userId}; HttpOnly; Max-Age=${this.REFRESH_TOKEN_EXPIRATION}`;
-    const refreshTokenCookie = `refreshToken=${tokens.refresh_token}; HttpOnly; Max-Age=${this.REFRESH_TOKEN_EXPIRATION}`;
-    response.setHeader('Set-Cookie', [userIdCookie, refreshTokenCookie]);
+    const user = await this.userService.findOneUser({
+      userId: user_id,
+      allowPassword: false,
+    });
+    this.logger.log(user.email);
 
-    // 헤더에 갱신된 액세스 토큰으로 응답
-    response.setHeader('Authorization', `Bearer ${tokens.access_token}`);
     return response.json(tokens);
   }
 
@@ -168,7 +166,7 @@ export class AppController {
   @Get('/sign-in/kakao')
   @Public()
   @UseGuards(KakaoGuard)
-  async signInByKakao() {
+  async signInByKakao(@Req() req: Request, @Res() res: Response) {
     return;
   }
 
@@ -180,23 +178,17 @@ export class AppController {
   @Get('/oauth/kakao')
   @Public()
   @UseGuards(KakaoGuard)
-  async redirectKakao(
-    @Req() request: RequestWithUser,
-    @Res() response: Response,
-  ) {
-    const { user } = request;
-    this.logger.log(user);
+  async redirectKakao(@Req() req: RequestWithUser, @Res() res: Response) {
+    const { user } = req;
 
     const tokens = await this.authService.signIn(user.userId, user.email);
-    const { access_token, refresh_token } = tokens;
-    response.setHeader('Authorization', `Bearer ${access_token}`);
 
     // 리프래시토큰과 유저아이디를 쿠키에 저장
-    const userIdCookie = `userId=${user.userId}; HttpOnly; Max-Age=${this.REFRESH_TOKEN_EXPIRATION}`;
-    const refreshTokenCookie = `refreshToken=${refresh_token}; HttpOnly; Max-Age=${this.REFRESH_TOKEN_EXPIRATION}`;
-    response.setHeader('Set-Cookie', [userIdCookie, refreshTokenCookie]);
-
-    return response.json(tokens);
+    res.cookie('user_id', user.userId, {
+      maxAge: this.REFRESH_TOKEN_EXPIRATION,
+      httpOnly: true,
+    });
+    return res.json(tokens);
   }
 
   /**
@@ -229,14 +221,12 @@ export class AppController {
   ) {
     const { user } = request;
     const tokens = await this.authService.signIn(user.userId, user.email);
-    const { access_token, refresh_token } = tokens;
-
-    response.setHeader('Authorization', `Bearer ${access_token}`);
 
     // 리프래시토큰과 유저아이디를 쿠키에 저장
-    const userIdCookie = `userId=${user.userId}; HttpOnly; Max-Age=${this.REFRESH_TOKEN_EXPIRATION}`;
-    const refreshTokenCookie = `refreshToken=${refresh_token}; HttpOnly; Max-Age=${this.REFRESH_TOKEN_EXPIRATION}`;
-    response.setHeader('Set-Cookie', [userIdCookie, refreshTokenCookie]);
+    response.cookie('user_id', user.userId, {
+      maxAge: this.REFRESH_TOKEN_EXPIRATION,
+      httpOnly: true,
+    });
 
     return response.json(tokens);
   }

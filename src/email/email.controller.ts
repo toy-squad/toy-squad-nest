@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import {
   Body,
   Controller,
+  Get,
   NotFoundException,
   Post,
   Req,
@@ -14,16 +15,27 @@ import { UsersService } from 'users/users.service';
 import { SendEmailForResetPwdRequestDto } from './dtos/requests/send-email-for-reset-request.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import { SendEmailRequestDto } from './dtos/requests/send-email-request.dto';
+import { ResetPassword } from 'auth/decorators/reset-password.decorator';
 
 @ApiTags('이메일 API')
 @Controller('email')
 export class EmailController {
+  private RESET_PASSWORD_FORM_URL: string;
+  private FRONTEND_URL: string;
+  private SERVER_URL: string;
+
   constructor(
     // private readonly emailService: EmailService,
     private readonly userService: UsersService,
     private readonly configService: ConfigService,
     private readonly mailService: MailerService,
-  ) {}
+  ) {
+    this.RESET_PASSWORD_FORM_URL = this.configService.get(
+      'RESET_PASSWORD_FORM_URL',
+    );
+    this.FRONTEND_URL = this.configService.get('FRONTEND_URL');
+    this.SERVER_URL = this.configService.get('SERVER_URL');
+  }
 
   @Public()
   @Post()
@@ -55,6 +67,8 @@ export class EmailController {
       }
 
       // 레디스에 비밀번호재설정 토큰 등록
+      // const resetPasswordToken =
+
       // 이메일 전송
       await this.mailService.sendMail({
         to: dto.inputEmail,
@@ -63,11 +77,25 @@ export class EmailController {
         template: './reset_password_info',
         context: {
           userName: user.name,
-          resetPasswordBtnUrl: '',
+
+          // 비밀번호재설정 토큰 유무확인 및 재설정UI폼으로 리다이렉션
+          resetPasswordBtnUrl: `${this.SERVER_URL}/email/pwd`,
         },
       });
     } catch (error) {
       throw error;
     }
+  }
+
+  @ResetPassword()
+  @Get('pwd')
+  async checkResetPasswordTokenAndRedirectResetUI(
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    // 비밀전호 재설정 UI폼으로 리다이렉트
+    res
+      .status(302)
+      .redirect(`${this.FRONTEND_URL}/${this.RESET_PASSWORD_FORM_URL}`);
   }
 }

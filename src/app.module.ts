@@ -63,6 +63,8 @@ import { Role } from 'role/entities/role.entity';
         REDIS_URL: Joi.string().required(),
         REDIS_PORT: Joi.number().required(),
         REDIS_PASSWORD: Joi.string().required(),
+        /** SERVER URL */
+        SERVER_URL: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRoot({
