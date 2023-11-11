@@ -20,7 +20,6 @@ import { RefreshAccessTokenRequestDto } from './dtos/requests/refresh-access-tok
 import { GenerateResetPasswordTokenRequestDto } from './dtos/requests/generate-reset-password-token-request.dto';
 import * as bcrypt from 'bcrypt';
 import { CheckResetPasswordTokenRequestDto } from './dtos/requests/check-reset-password-token-request.dto';
-import { UpdatePasswordRequestDto } from './dtos/requests/update-password-request.dto';
 
 @Injectable()
 export class AuthService {
@@ -238,15 +237,7 @@ export class AuthService {
         );
       }
 
-      return hashedResetPasswordToken;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async updatePassword(dto: UpdatePasswordRequestDto) {
-    try {
-      // 비밀번호 재설정
+      return isMatched;
     } catch (error) {
       throw error;
     }

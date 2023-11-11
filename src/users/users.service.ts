@@ -14,6 +14,7 @@ import { FindUserListRequestDto } from './dtos/requests/find-user-list-request.d
 import { GetUserDetailRequestDto } from './dtos/requests/get-user-detail-request.dto';
 import { UpdateUserInfoRequestDto } from './dtos/requests/update-user-info-request.dto';
 import { UpdatedUserInfoType } from './types/update-user-info.type';
+import { UpdatePasswordRequestDto } from 'auth/dtos/requests/update-password-request.dto';
 
 @Injectable()
 export class UsersService {
@@ -194,6 +195,16 @@ export class UsersService {
       //     dto[key] = defaultUserInfo[key];
       //   }
       // }
+      await this.usersRepository.updateUserInfo(dto);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // 비밀번호 재설정
+  async updatePassword(dto: UpdatePasswordRequestDto) {
+    try {
+      // 비밀번호 재설정
       await this.usersRepository.updateUserInfo(dto);
     } catch (error) {
       throw error;

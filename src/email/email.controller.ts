@@ -101,6 +101,20 @@ export class EmailController {
         },
       });
 
+      // 비밀번호 재설정 대상 유저아이디
+      res.cookie(
+        'reset_password_target_user',
+        {
+          user_id: user.id,
+          email: user.email,
+        },
+        {
+          maxAge: this.RESET_PASSWORD_TOKEN_EXPIRATION,
+          httpOnly: true,
+          secure: true,
+        },
+      );
+
       // 비밀번호 재설정 토큰을 쿠키에 저장한다.
       res.cookie('reset_password', resetPasswordToken, {
         maxAge: this.RESET_PASSWORD_TOKEN_EXPIRATION,
