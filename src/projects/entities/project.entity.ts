@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { CoreEntity } from '../../commons/entities/core.entity';
 import { Role } from '../../role/entities/role.entity';
-import { contactType } from '../enums/contactType.enum';
+import { contactType } from '../enums/projectType.enum';
 import { User } from '../../users/entities/user.entity';
 
 @Entity({ schema: process.env.DB_NAME })

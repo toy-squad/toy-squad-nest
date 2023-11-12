@@ -7,7 +7,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { contactType } from 'projects/enums/contactType.enum';
+import { contactType } from 'projects/enums/projectType.enum';
 import { RoleType } from 'role/entities/role.entity';
 import { User } from 'users/entities/user.entity';
 
