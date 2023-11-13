@@ -110,3 +110,21 @@ export enum FieldType {
   ARTIFICIAL_INTELLIGENCE = '인공지능',
   OTHER = '기타'
 }
+
+/**
+ * 프로젝트 플랫폼 종류
+ * - ANDROID_APP  : 안드로이드 앱
+ * - IOS_APP  : IOS 앱
+ * - RESPONSIVE_WEB  : 반응형 웹
+ * - INSTALLABLE_SOLUTION  : 설치형/솔루션
+ * - PC_PROGRAM  : PC 프로그램
+ * - GAME  : 게임
+ */
+export enum PlatformType {
+  ANDROID_APP = '안드로이드 앱',
+  IOS_APP = 'IOS 앱',
+  RESPONSIVE_WEB = '반응형 웹',
+  INSTALLABLE_SOLUTION = '설치형/솔루션',
+  PC_PROGRAM = 'PC 프로그램',
+  GAME = '게임'
+}
