@@ -14,7 +14,7 @@ import { FindUserListRequestDto } from './dtos/requests/find-user-list-request.d
 import { GetUserDetailRequestDto } from './dtos/requests/get-user-detail-request.dto';
 import { UpdateUserInfoRequestDto } from './dtos/requests/update-user-info-request.dto';
 import { UpdatedUserInfoType } from './types/update-user-info.type';
-import { UpdatePasswordRequestDto } from 'auth/dtos/requests/update-password-request.dto';
+import { UpdatePasswordRequestDto } from 'users/dtos/requests/update-password-request.dto';
 
 @Injectable()
 export class UsersService {

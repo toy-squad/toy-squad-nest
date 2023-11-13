@@ -26,7 +26,7 @@ import { ResetPassword } from 'auth/decorators/reset-password.decorator';
 import {
   UpdatePassword,
   UpdatePasswordRequestDto,
-} from 'auth/dtos/requests/update-password-request.dto';
+} from 'users/dtos/requests/update-password-request.dto';
 
 @ApiTags('공통 API')
 @Controller()

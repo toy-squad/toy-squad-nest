@@ -13,6 +13,8 @@ import type { RedisClientOptions } from 'redis';
 import { RedisModule } from 'redis/redis.module';
 import { KakaoStrategy } from './strategies/kakao.strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
+import { ResetPasswordGuard } from './guards/reset-password/reset-password.guard';
+import { RESET_PASSWORD_GUARD } from 'commons/constants';
 
 @Module({
   imports: [
@@ -50,7 +52,6 @@ import { GoogleStrategy } from './strategies/google.strategy';
     JwtStrategy,
     KakaoStrategy,
     GoogleStrategy,
-
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,

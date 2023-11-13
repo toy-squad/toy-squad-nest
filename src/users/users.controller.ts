@@ -4,6 +4,7 @@ import {
   DefaultValuePipe,
   Delete,
   Get,
+  Inject,
   Logger,
   Param,
   ParseIntPipe,
@@ -11,19 +12,25 @@ import {
   Post,
   Put,
   Query,
+  forwardRef,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { DEFAULT_PAGE, DEFAULT_TAKE } from 'commons/dtos/pagination-query-dto';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateUserRequestDto } from './dtos/requests/create-user-request.dto';
 import { Public } from 'auth/decorators/public.decorator';
+import { ResetPassword } from 'auth/decorators/reset-password.decorator';
+import { AuthService } from 'auth/auth.service';
 
 @ApiTags('유저 API')
 @Controller('users')
 export class UsersController {
   private readonly logger = new Logger(UsersController.name);
 
-  constructor(private readonly userService: UsersService) {}
+  constructor(
+    private readonly userService: UsersService,
+    private authService: AuthService,
+  ) {}
 
   /**
    * 상세 포지션 선택
@@ -120,8 +127,8 @@ export class UsersController {
    * 비밀번호 재설정
    * - URL : /api/users/pwd
    */
+  @ResetPassword()
   @Patch('pwd')
-  @Public()
   async findAndUpdatePwd() {
     try {
       // 이메일 인증

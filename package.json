@@ -22,7 +22,7 @@
   "dependencies": {
     "@liaoliaots/nestjs-redis": "^9.0.5",
     "@nestjs-modules/mailer": "^1.8.1",
-    "@nestjs/axios": "^3.0.0",
+    "@nestjs/axios": "^3.0.1",
     "@nestjs/cache-manager": "^2.1.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.3.1",
@@ -36,7 +36,7 @@
     "@nestjs/typeorm": "^9.0.1",
     "@types/bcrypt": "^5.0.0",
     "@types/cors": "^2.8.13",
-    "axios": "^1.4.0",
+    "axios": "^1.6.1",
     "bcrypt": "^5.1.0",
     "cache-manager": "^5.2.3",
     "cache-manager-redis-store": "^2.0.0",

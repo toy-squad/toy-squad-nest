@@ -17,6 +17,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { SendEmailRequestDto } from './dtos/requests/send-email-request.dto';
 import { ResetPassword } from 'auth/decorators/reset-password.decorator';
 import { AuthService } from 'auth/auth.service';
+import { HttpService } from '@nestjs/axios';
 
 @ApiTags('이메일 API')
 @Controller('email')
@@ -33,6 +34,7 @@ export class EmailController {
     private readonly configService: ConfigService,
     private readonly mailService: MailerService,
     private readonly authService: AuthService,
+    private readonly httpService: HttpService,
   ) {
     this.RESET_PASSWORD_FORM_URL = this.configService.get(
       'RESET_PASSWORD_FORM_URL',
@@ -96,30 +98,22 @@ export class EmailController {
         context: {
           userName: user.name,
 
-          // 비밀번호재설정 토큰 유무확인 및 재설정UI폼으로 리다이렉션
+          // 비밀번호 토큰 유효성 확인
           resetPasswordBtnUrl: `${this.SERVER_URL}/email/pwd`,
         },
       });
 
-      // 비밀번호 재설정 대상 유저아이디
-      res.cookie(
-        'reset_password_target_user',
-        {
-          user_id: user.id,
-          email: user.email,
-        },
-        {
-          maxAge: this.RESET_PASSWORD_TOKEN_EXPIRATION,
-          httpOnly: true,
-          secure: true,
-        },
-      );
-
       // 비밀번호 재설정 토큰을 쿠키에 저장한다.
-      res.cookie('reset_password', resetPasswordToken, {
+      // email: 토큰값
+      res.cookie('reset_password_target_email', dto.inputEmail);
+      res.cookie(`reset_password`, resetPasswordToken, {
         maxAge: this.RESET_PASSWORD_TOKEN_EXPIRATION,
         httpOnly: true,
         secure: true,
+      });
+
+      return res.status(200).json({
+        message: '메일전송완료',
       });
     } catch (error) {
       throw error;
@@ -133,7 +127,7 @@ export class EmailController {
     @Res() res: Response,
   ) {
     // 비밀전호 재설정 UI폼으로 리다이렉트
-    res
+    return res
       .status(302)
       .redirect(`${this.FRONTEND_URL}/${this.RESET_PASSWORD_FORM_URL}`);
   }

@@ -5,6 +5,7 @@ import {
   NotFoundException,
   UnauthorizedException,
   UseInterceptors,
+  forwardRef,
 } from '@nestjs/common';
 import { UsersService } from 'users/users.service';
 import { ValidateUserRequestDto } from './dtos/requests/validate-user-request.dto';
@@ -31,6 +32,7 @@ export class AuthService {
   constructor(
     private redisService: RedisService,
     // @Inject(CACHE_MANAGER) private cacheManager: Cache,
+
     private readonly userService: UsersService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
@@ -202,7 +204,7 @@ export class AuthService {
       );
       // 비밀번호 재설정 토큰 생성
       await this.redisService.set(
-        'reset_password',
+        `reset-pwd-${dto.userId}`,
         hashedResetPasswordToken,
         this.RESET_PASSWORD_TOKEN_EXPIRATION,
       );
@@ -216,7 +218,7 @@ export class AuthService {
     try {
       // 레디스에서 토큰을 갖고온다
       const hashedResetPasswordToken = await this.redisService.get(
-        'reset_password',
+        `reset-pwd-${dto.userId}`,
       );
 
       if (!hashedResetPasswordToken) {
