@@ -18,8 +18,8 @@ export class DateRange {
      * 날짜 범위의 유효성을 검증
      * 시작 날짜가 종료 날짜보다 이전
      */
-    isValid(): boolean {
-      return this.startDate <= this.endDate;
+    static isValid(startDate: Date, endDate: Date): boolean {
+      return startDate <= endDate;
     }
   
     /**
