@@ -80,3 +80,33 @@ export enum SecondPositionType {
   GRAPHIC_DESIGNER = '그래픽 디자이너',
   D_DESIGNER = '3D 디자이너'
 }
+
+/**
+ * 프로젝트 분야 종류
+ * - HEALTH_FITNESS  : 건강 / 운동
+ * - BEAUTY_FASHION  : 뷰티 / 패션
+ * - ECOMMERCE  : 이커머스
+ * - FINANCE  : 금융
+ * - SPORTS  : 스포츠
+ * - MEDICAL  : 의료
+ * - MATCHING_SERVICE  : 매칭 서비스
+ * - NEWS  : 뉴스
+ * - CHILDREN  : 어린이
+ * - SOCIAL_NETWORK  : 소셜네트워크
+ * - ARTIFICIAL_INTELLIGENCE  : 인공지능
+ * - OTHER  : 기타
+ */
+export enum FieldType {
+  HEALTH_FITNESS = '건강 / 운동',
+  BEAUTY_FASHION = '뷰티 / 패션',
+  ECOMMERCE = '이커머스',
+  FINANCE = '금융',
+  SPORTS = '스포츠',
+  MEDICAL = '의료',
+  MATCHING_SERVICE = '매칭 서비스',
+  NEWS = '뉴스',
+  CHILDREN = '어린이',
+  SOCIAL_NETWORK = '소셜네트워크',
+  ARTIFICIAL_INTELLIGENCE = '인공지능',
+  OTHER = '기타'
+}
