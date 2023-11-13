@@ -7,7 +7,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { contactType } from 'projects/enums/projectType.enum';
+import { ContactType } from 'projects/enums/projectType.enum';
 import { RoleType } from 'role/entities/role.entity';
 import { User } from 'users/entities/user.entity';
 
@@ -21,7 +21,7 @@ export interface ICreateProjectDto {
   endDate?: string;
   productType?: string;
   fields?: string[];
-  contactType?: contactType;
+  contactType?: ContactType;
   place?: string;
   recruitStartDate?: string;
   recruitEndDate?: string;
@@ -106,8 +106,8 @@ export class CreateNewProjectRequestDto implements ICreateProjectDto {
   @ApiProperty({ description: '프로젝트 대면/비대면 여부' })
   @IsOptional()
   @IsString()
-  @IsEnum(contactType)
-  contactType: contactType;
+  @IsEnum(ContactType)
+  contactType: ContactType;
 
   //  프로젝트 활동 장소
   @ApiProperty({ description: '프로젝트 활동 장소' })
@@ -185,8 +185,8 @@ export class CreateNewProjectDto implements ICreateProjectDto {
   // 프로젝트 대면/비대면 여부
   @IsOptional()
   @IsString()
-  @IsEnum(contactType)
-  contactType: contactType;
+  @IsEnum(ContactType)
+  contactType: ContactType;
 
   //  프로젝트 활동 장소
   @IsOptional()

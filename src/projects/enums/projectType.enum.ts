@@ -4,7 +4,7 @@
  * - U  : 비대면(Untact)
  * - M  : 대면/비대면 혼합방식(Mix)
  */
-export enum contactType {
+export enum ContactType {
   CONTACT = 'C',
   UNTACT = 'U',
   MIX = 'M',
@@ -16,7 +16,7 @@ export enum contactType {
  * - DEVELOPER  : 개발자
  * - DESIGNER  : 디자이너
  */
-export enum firstPosition {
+export enum FirstPosition {
   MANAGER = 'MANAGER',
   DEVELOPER = 'DEVELOPER',
   DESIGNER = 'DESIGNER',

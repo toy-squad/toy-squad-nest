@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { CoreEntity } from '../../commons/entities/core.entity';
 import { Role } from '../../role/entities/role.entity';
-import { contactType } from '../enums/projectType.enum';
+import { ContactType } from '../enums/projectType.enum';
 import { User } from '../../users/entities/user.entity';
 
 @Entity({ schema: process.env.DB_NAME })
@@ -113,10 +113,10 @@ export class Project extends CoreEntity {
   @Column({
     name: 'contact_type',
     nullable: false,
-    default: contactType.UNTACT,
+    default: ContactType.UNTACT,
     comment: '프로젝트 대면/비대면 여부',
   })
-  contactType: contactType;
+  contactType: ContactType;
 
   /**
    * 프로젝트 활동 장소
