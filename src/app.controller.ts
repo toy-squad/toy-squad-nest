@@ -23,6 +23,7 @@ import { KakaoGuard } from 'auth/guards/kakao/kakao.guard';
 import { GoogleGuard } from 'auth/guards/google/google.guard';
 import { ConfigService } from '@nestjs/config';
 
+@ApiTags('공통 API')
 @Controller()
 export class AppController {
   private REFRESH_TOKEN_EXPIRATION: number;
@@ -63,6 +64,10 @@ export class AppController {
    * 일반: 로그인
    * URL: /api/sign-in
    */
+  @ApiOperation({
+    summary: '일반 로그인 API',
+    description: '일반 email/password 입력하여 로그인',
+  })
   @Post('/sign-in')
   @Public()
   @UseGuards(LocalAuthGuard)
@@ -83,6 +88,10 @@ export class AppController {
   }
 
   /** 로그아웃 */
+  @ApiOperation({
+    summary: '로그아웃 API',
+    description: '로그아웃 - 액세스토큰/리프래시토큰 모두 삭제됨',
+  })
   @Get('log-out')
   async logOut(@Req() request: RequestWithUser, @Res() response: Response) {
     const { userId } = request.user;
@@ -99,6 +108,10 @@ export class AppController {
    * refresh 토큰으로 액세스토큰 재발급
    * - 토큰이 존재하면, key값에 대한 액세스 토큰을 재발급하여 레디스에 저장...
    */
+  @ApiOperation({
+    summary: '리프래시 토큰 API',
+    description: '액세스 토큰 갱신',
+  })
   @Public()
   @Get('refresh')
   async refreshAccessToken(
@@ -149,6 +162,10 @@ export class AppController {
    * sns: 카카오 연동 로그인
    * URL: /api/sign-in/kakao
    */
+  @ApiOperation({
+    summary: '카카오 연동 로그인 API',
+    description: '카카오 연동 로그인',
+  })
   @Get('/sign-in/kakao')
   @Public()
   @UseGuards(KakaoGuard)
@@ -157,6 +174,10 @@ export class AppController {
   }
 
   // 카카오로그인 리다이랙트
+  @ApiOperation({
+    summary: '카카오 연동 로그인 리다이렉트',
+    description: '카카오 연동 로그인 리다이렉트',
+  })
   @Get('/oauth/kakao')
   @Public()
   @UseGuards(KakaoGuard)
@@ -184,6 +205,10 @@ export class AppController {
    * sns: gmail 연동 로그인
    * URL: /api/sign-in/google
    */
+  @ApiOperation({
+    summary: '구글 연동 로그인 API',
+    description: '구글 연동 로그인',
+  })
   @Get('/sign-in/google')
   @Public()
   @UseGuards(GoogleGuard)
@@ -192,6 +217,10 @@ export class AppController {
   }
 
   // 구글로그인 리다이렉트
+  @ApiOperation({
+    summary: '구글 연동 로그인 리다이렉트',
+    description: '구글 연동 로그인 리다이렉트',
+  })
   @Get('oauth/google')
   @Public()
   @UseGuards(GoogleGuard)
@@ -212,8 +241,4 @@ export class AppController {
 
     return response.json(tokens);
   }
-
-  /**
-   * 이메일 인증
-   */
 }

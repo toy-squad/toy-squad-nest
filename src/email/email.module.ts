@@ -4,10 +4,15 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { EmailController } from './email.controller';
+import { AuthService } from 'auth/auth.service';
+import { UsersService } from 'users/users.service';
+import { AuthModule } from 'auth/auth.module';
+import { UsersModule } from 'users/users.module';
 
 @Module({
   imports: [
     ConfigModule,
+    UsersModule,
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

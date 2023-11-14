@@ -12,17 +12,18 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { RoleService } from './role.service';
-import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import RequestWithUser from 'auth/interfaces/request-with-user.interface';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('권한 API')
 @Controller('role')
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
   private readonly logger = new Logger(RoleController.name);
 
   //TODO 생성자 권한 role insert controller(userId, projectId, roleId)
-  
+
   @Post()
   async create(@Req() request: RequestWithUser, @Res() response: Response) {
     this.logger.log(request.body);

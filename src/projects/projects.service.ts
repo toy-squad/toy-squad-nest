@@ -2,9 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { ProjectsRepository } from './projects.repository';
 import { CreateNewProjectRequestDto } from './dtos/requests/create-new-project.dto';
 import { UpdateProjectRequestDto } from './dtos/requests/update-project-request.dto';
-import { RoleRepository } from 'role/role.repository';
-import { User } from 'users/entities/user.entity';
-import { UsersRepository } from 'users/users.repository';
+import { RoleRepository } from '../role/role.repository';
+import { UsersRepository } from '../users/users.repository';
+import { GetProjectsRequestDto } from './dtos/requests/get-projects-request.dto';
+import { GetProjectsResponseDto } from './dtos/response/get-projects-response.dto';
 
 @Injectable()
 export class ProjectsService {
@@ -42,15 +43,43 @@ export class ProjectsService {
 
   async updateProject(requestDto: UpdateProjectRequestDto) {
     try {
+      const role = await this.roleRepository.findOneRole({
+        project: await this.projectsRepository.findOneProject(
+          requestDto.projectId,
+        ),
+        user: await this.userRepository.findOneUser({
+          userId: requestDto.userId,
+        }),
+      });
+
+      if (role === 'M') {
+        throw new Error('권한이 없습니다.');
+      }
+
       return await this.projectsRepository.updateProject(requestDto);
     } catch (error) {
       throw error;
     }
   }
 
-  async softDeleteProject(id: string) {
+  async softDeleteProject(requestDto: UpdateProjectRequestDto) {
     try {
-      return await this.projectsRepository.softDeleteProject(id);
+      const role = await this.roleRepository.findOneRole({
+        project: await this.projectsRepository.findOneProject(
+          requestDto.projectId,
+        ),
+        user: await this.userRepository.findOneUser({
+          userId: requestDto.userId,
+        }),
+      });
+
+      if (role === 'M') {
+        throw new Error('권한이 없습니다.');
+      }
+
+      const projectId = requestDto.projectId;
+
+      return await this.projectsRepository.softDeleteProject(projectId);
     } catch (error) {
       throw error;
     }
@@ -59,6 +88,34 @@ export class ProjectsService {
   async findOneProject(id: string) {
     try {
       return await this.projectsRepository.findOneProject(id);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async findMultipleProjects() {
+    try {
+      return await this.projectsRepository.findAll();
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getProjects(
+    reqDto: GetProjectsRequestDto,
+  ): Promise<GetProjectsResponseDto> {
+    try {
+      const { page, limit } = reqDto;
+      const [projects, total] = await this.projectsRepository.getProjects(
+        reqDto,
+      );
+
+      return {
+        data: projects,
+        count: total,
+        page,
+        limit,
+      };
     } catch (error) {
       throw error;
     }

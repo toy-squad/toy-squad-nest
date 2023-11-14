@@ -1,6 +1,4 @@
-import { EmailFormatInterface } from 'email/interfaces/email-format.interface';
-
-export class SendEmailRequestDto implements EmailFormatInterface {
+export interface EmailFormatInterface {
   to: string; // 이메일 받는사람
   from: string; // 이메일 보내는사람
   subject: string; // 이메일 제목
