@@ -195,18 +195,14 @@ export class AuthService {
     return refreshToken;
   }
 
+  // 비밀번호 재설정 토큰 생성
   async generateResetPasswordToken(dto: GenerateResetPasswordTokenRequestDto) {
     try {
-      const resetPasswordToken = `${this.RESET_PASSWORD_TOKEN_SECRET}-${dto.userId}-${dto.email}`;
-      const hashedResetPasswordToken = await bcrypt.hash(
-        resetPasswordToken,
-        10,
-      );
-      // 비밀번호 재설정 토큰 생성
+      const resetPasswordToken = new Date().getTime().toString();
       await this.redisService.set(
-        `reset-pwd-${dto.userId}`,
-        hashedResetPasswordToken,
-        this.RESET_PASSWORD_TOKEN_EXPIRATION,
+        `reset-pwd-${dto.userId}`, // key
+        resetPasswordToken, // value
+        this.RESET_PASSWORD_TOKEN_EXPIRATION, // ttl
       );
       return resetPasswordToken;
     } catch (error) {
@@ -217,21 +213,18 @@ export class AuthService {
   async checkResetPasswordToken(dto: CheckResetPasswordTokenRequestDto) {
     try {
       // 레디스에서 토큰을 갖고온다
-      const hashedResetPasswordToken = await this.redisService.get(
+      const resetPasswordTokenFromRedis = await this.redisService.get(
         `reset-pwd-${dto.userId}`,
       );
 
-      if (!hashedResetPasswordToken) {
+      if (!resetPasswordTokenFromRedis) {
         throw new UnauthorizedException(
           '비밀번호 재설정 토큰이 만료되었습니다.',
         );
       }
 
       // 비밀번호 재설정 토큰 만료 유무확인
-      const isMatched = await bcrypt.compare(
-        dto.resetPasswordToken,
-        hashedResetPasswordToken,
-      );
+      const isMatched = resetPasswordTokenFromRedis === dto.resetPasswordToken;
 
       if (isMatched === false) {
         throw new UnauthorizedException(

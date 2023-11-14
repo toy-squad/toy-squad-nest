@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   CanActivate,
   ExecutionContext,
   Injectable,
@@ -18,22 +19,28 @@ export class ResetPasswordGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const { reset_password_target_email, reset_password } = request.cookies;
+    console.log(request.Query);
+    console.log(request.query);
+    const { token, email } = request.query;
     try {
-      if (!reset_password && !reset_password_target_email) {
-        throw new UnauthorizedException(
-          '비밀번호 재설정 유효시간이 만료되었습니다.',
-        );
+      if (!token && !email) {
+        console.error('잘못된 요청입니다. 다시 비밀번호 재설정을 해주세요.');
+        return false;
       }
 
       const user = await this.userService.findOneUser({
         allowPassword: false,
-        email: reset_password_target_email,
+        email: email,
       });
+
+      if (!user) {
+        console.error('해당 이메일은 토이스쿼드 회원이 아닙니다.');
+        return false;
+      }
 
       // 패스워드 재설정 토큰을 확인한다.
       const isMatchedToken = await this.authService.checkResetPasswordToken({
-        resetPasswordToken: reset_password,
+        resetPasswordToken: token,
         userId: user.id,
       });
 

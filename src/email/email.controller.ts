@@ -5,6 +5,7 @@ import {
   Get,
   NotFoundException,
   Post,
+  Query,
   Req,
   Res,
 } from '@nestjs/common';
@@ -18,6 +19,7 @@ import { SendEmailRequestDto } from './dtos/requests/send-email-request.dto';
 import { ResetPassword } from 'auth/decorators/reset-password.decorator';
 import { AuthService } from 'auth/auth.service';
 import { HttpService } from '@nestjs/axios';
+import { CheckResetPasswordTokenAndRedirectResetUiRequestDto } from 'auth/dtos/requests/check-reset-password-token-request.dto';
 
 @ApiTags('이메일 API')
 @Controller('email')
@@ -83,10 +85,10 @@ export class EmailController {
       }
 
       // 레디스에 비밀번호재설정 토큰 등록
+      // 비밀번호 재설정토큰은 비밀번호재설정 당시 시각을 나타냈다.
       const resetPasswordToken =
         await this.authService.generateResetPasswordToken({
           userId: user.id,
-          email: user.email,
         });
 
       // 이메일 전송
@@ -99,17 +101,8 @@ export class EmailController {
           userName: user.name,
 
           // 비밀번호 토큰 유효성 확인
-          resetPasswordBtnUrl: `${this.SERVER_URL}/email/pwd`,
+          resetPasswordBtnUrl: `${this.SERVER_URL}/email/pwd?token=${resetPasswordToken}&email=${dto.inputEmail}`,
         },
-      });
-
-      // 비밀번호 재설정 토큰을 쿠키에 저장한다.
-      // email: 토큰값
-      res.cookie('reset_password_target_email', dto.inputEmail);
-      res.cookie(`reset_password`, resetPasswordToken, {
-        maxAge: this.RESET_PASSWORD_TOKEN_EXPIRATION,
-        httpOnly: true,
-        secure: true,
       });
 
       return res.status(200).json({
@@ -123,6 +116,7 @@ export class EmailController {
   @ResetPassword()
   @Get('pwd')
   async checkResetPasswordTokenAndRedirectResetUI(
+    @Query() token: CheckResetPasswordTokenAndRedirectResetUiRequestDto, // resetPasswordToken
     @Req() req: Request,
     @Res() res: Response,
   ) {
