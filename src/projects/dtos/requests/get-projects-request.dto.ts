@@ -1,7 +1,6 @@
 import { Transform, Type } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 import { ContactType, FirstPositionType, PlatformType, SecondPositionType } from 'projects/enums/projectType.enum';
-import { DateRange } from 'projects/types/data-range.type';
 import { isValidDate } from 'projects/utils/date.util';
 
 export class GetProjectsRequestDto {
