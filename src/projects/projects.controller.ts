@@ -42,9 +42,9 @@ export class ProjectsController {
   })
   @ApiResponse({  status: 200, description: '프로젝트 단건 조회 성공.', type: Project})
   @ApiParam({ name: 'id', description: '프로젝트 아이디', required: true })
-  @Get(':id')
+  @Get()
   async findOneProject(
-    @Param('id') id: string,
+    @Query('id') id: string,
     @Req() request: RequestWithUser,
     @Res() response: Response,
   ) {
@@ -66,8 +66,8 @@ export class ProjectsController {
     description: '프로젝트 리스트 조회 & 검색조건에 맞는 프로젝트 조회',
   })
   @ApiResponse({status: 200, description: '프로젝트 목록 조회 성공.', type: GetProjectsResponseDto})
-  @ApiQuery({ name: 'page', description: '페이지 번호',type: Number, required: false })
-  @ApiQuery({ name: 'limit', description: '페이지당 데이터 갯수', type: Number, required: false })
+  @ApiQuery({ name: 'page', description: '페이지 번호',type: Number, required: false, schema: { default: 1 } })
+  @ApiQuery({ name: 'limit', description: '페이지당 데이터 갯수', type: Number, required: false, schema: { default: 10 } })
   @Get('list')
   async getProjects(
     @Query() reqDto: GetProjectsRequestDto,
