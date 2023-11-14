@@ -20,7 +20,12 @@ export class ResetPasswordGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
 
-    const { token, email } = request.query;
+    let { token, email } = request.query;
+    if (!token && !email) {
+      token = request.body.token;
+      email = request.body.email;
+    }
+
     try {
       if (!token && !email) {
         console.error('잘못된 요청입니다. 다시 비밀번호 재설정을 해주세요.');
