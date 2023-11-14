@@ -1,11 +1,13 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { CoreEntity } from '../../commons/entities/core.entity';
 import { Role } from '../../role/entities/role.entity';
-import { ContactType } from '../enums/projectType.enum';
+import { ContactType, FirstPositionType, SecondPositionType } from '../enums/projectType.enum';
 import { User } from '../../users/entities/user.entity';
 
 @Entity({ schema: process.env.DB_NAME })
 export class Project extends CoreEntity {
+
+  @Index()
   @Column({
     name: 'name',
     nullable: false,
@@ -83,12 +85,12 @@ export class Project extends CoreEntity {
    * - 모바일, 앱(App), 데스크탑 앱, 프로그램, 웹, 게임
    */
   @Column({
-    name: 'product_type',
+    name: 'platform',
     nullable: true,
     default: null,
     comment: '프로젝트 완성품 타입',
   })
-  productType: string;
+  platform: string;
 
   /**
    * 프로젝트 분야
@@ -131,8 +133,12 @@ export class Project extends CoreEntity {
   place: string;
 
   /** 프로젝트 모집
+   * [추후] 테이블 분리 필요?
    * - recruit_start_date    : 모집시작일자
    * - recruit_end_date      : 모집마감일자
+   * - member_count          : 모집인원
+   * - first_position        : 모집 첫번째 포지션
+   * - second_position       : 모집 두번째 포지션
    */
 
   @Column({
@@ -150,6 +156,30 @@ export class Project extends CoreEntity {
     comment: '모집 마감일',
   })
   recruitEndDate: string;
+
+  @Column({
+    name: 'member_count',
+    nullable: true,
+    default: null,
+    comment: '프로젝트 모집 인원',
+  })
+  memberCount: number;
+
+  @Column({
+    name: 'first_position',
+    nullable: true,
+    default: null,
+    comment: '모집 첫번째 포지션',
+  })
+  firstPosition: FirstPositionType;
+
+  @Column({
+    name: 'second_position',
+    nullable: true,
+    default: null,
+    comment: '모집 두번째 포지션',
+  })
+  secondPosition: SecondPositionType;
 
   /**
    * 다른테이블과 연결관계
