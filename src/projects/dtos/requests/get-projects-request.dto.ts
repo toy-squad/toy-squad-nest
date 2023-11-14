@@ -2,6 +2,7 @@ import { Transform, Type } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 import { ContactType, FirstPositionType, PlatformType, SecondPositionType } from 'projects/enums/projectType.enum';
 import { DateRange } from 'projects/types/data-range.type';
+import { isValidDate } from 'projects/utils/date.util';
 
 export class GetProjectsRequestDto {
   @IsOptional()
@@ -35,33 +36,48 @@ export class GetProjectsRequestDto {
   memberCount?: number;
   
   @IsOptional()
+  @IsString()
   @Transform(({ value }) => {
-    if (value) {
-      const [start, end] = value.split(',');
-      if(DateRange.isValid(start, end)){
-        return new DateRange(start, end);
-      }
-    }
-    return undefined;
+    // 날짜 형식이 맞는지 검증
+    if(isValidDate(value))
+      return value;
+    throw new Error('날짜 형식이 맞지 않습니다.');
   })
-  recruitmentPeriod?: DateRange;
-  //@Type(() => DateRange)
-  
-  @IsOptional()
-  @Transform(({ value }) => {
-    if (value) {
-      const [start, end] = value.split(',');
-      if(DateRange.isValid(start, end)){
-        return new DateRange(start, end);
-      }
-    }
-    return undefined;
-  })
-  progressPeriod?: DateRange;
+  recruitStartDate: string;
 
   @IsOptional()
   @IsString()
-  location?: string;
+  @Transform(({ value }) => {
+    // 날짜 형식이 맞는지 검증
+    if(isValidDate(value))
+      return value;
+    throw new Error('날짜 형식이 맞지 않습니다.');
+  })
+  recruitEndDate: string;
+  
+  @IsOptional()
+  @IsString()
+  @Transform(({ value }) => {
+    // 날짜 형식이 맞는지 검증
+    if(isValidDate(value))
+      return value;
+    throw new Error('날짜 형식이 맞지 않습니다.');
+  })
+  startDate: string;
+
+  @IsOptional()
+  @IsString()
+  @Transform(({ value }) => {
+    // 날짜 형식이 맞는지 검증
+    if(isValidDate(value))
+      return value;
+    throw new Error('날짜 형식이 맞지 않습니다.');
+  })
+  endDate: string;
+
+  @IsOptional()
+  @IsString()
+  place?: string;
 
   @IsOptional()
   @IsEnum(FirstPositionType, { each: true })
