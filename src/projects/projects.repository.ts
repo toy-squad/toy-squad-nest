@@ -20,13 +20,60 @@ export class ProjectsRepository {
   }
 
   async getProjects(dto: GetProjectsRequestDto): Promise<[Project[], number]> {
-    const { page, limit } = dto;
+    const { page, 
+            limit, 
+            firstPosition, 
+            secondPosition, 
+            contactType, 
+            memberCount, 
+            recruitStartDate,
+            recruitEndDate,
+            startDate,
+            endDate, 
+            place, field, platform } = dto;
 
-    return await this.repo
-      .createQueryBuilder('project')
-      .skip((page - 1) * limit)
-      .take(limit)
-      .getManyAndCount();
+    const query = this.repo.createQueryBuilder('project');
+
+    if (firstPosition) {
+      query.andWhere('project.firstPosition IN (:...firstPosition)', { firstPosition });
+    }
+
+    if (secondPosition) {
+      query.andWhere('project.secondPosition IN (:...secondPosition)', { secondPosition });
+    }
+
+    if (contactType) {
+      query.andWhere('project.contactType = :contactType', { contactType });
+    }
+
+    if (memberCount) {
+      query.andWhere('project.memberCount = :memberCount', { memberCount });
+    }
+
+    if (recruitStartDate && recruitEndDate) {
+      query.andWhere('Date(project.recruitStartDate) <= Date(:recruitEndDate) AND Date(project.recruitEndDate) >= Date(:recruitStartDate)', { recruitStartDate, recruitEndDate });
+    }
+
+    if (startDate && endDate) {
+      query.andWhere('Date(project.start_date) <= Date(:endDate) AND Date(project.end_date) >= Date(:startDate)', { startDate, endDate });
+    }
+
+    if (place) {
+      query.andWhere('project.place = :place', { place });
+    }
+
+    if (field) {
+      query.andWhere('project.field IN (:...field)', { field });
+    }
+
+    if (platform) {
+      query.andWhere('project.platform IN (:...platform)', { platform });
+    }
+
+    query.skip((page - 1) * limit);
+    query.take(limit);
+
+    return await query.getManyAndCount();
   }
 
   async findOneProject(id: string): Promise<Project> {
