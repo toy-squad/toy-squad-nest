@@ -19,8 +19,7 @@ export class ResetPasswordGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    console.log(request.Query);
-    console.log(request.query);
+
     const { token, email } = request.query;
     try {
       if (!token && !email) {

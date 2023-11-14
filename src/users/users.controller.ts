@@ -125,7 +125,7 @@ export class UsersController {
 
   /**
    * 비밀번호 재설정
-   * - URL : /api/users/pwd
+   * - URL : /api/users/pwd?token={비밀번호재설정토큰}&email={이메일}
    */
   @ResetPassword()
   @Patch('pwd')

@@ -116,13 +116,16 @@ export class EmailController {
   @ResetPassword()
   @Get('pwd')
   async checkResetPasswordTokenAndRedirectResetUI(
-    @Query() token: CheckResetPasswordTokenAndRedirectResetUiRequestDto, // resetPasswordToken
+    @Query() dto: CheckResetPasswordTokenAndRedirectResetUiRequestDto, // resetPasswordToken
     @Req() req: Request,
     @Res() res: Response,
   ) {
     // 비밀전호 재설정 UI폼으로 리다이렉트
+    const { token, email } = req.query;
     return res
       .status(302)
-      .redirect(`${this.FRONTEND_URL}/${this.RESET_PASSWORD_FORM_URL}`);
+      .redirect(
+        `${this.FRONTEND_URL}/${this.RESET_PASSWORD_FORM_URL}?token=${token}&email=${email}`,
+      );
   }
 }
