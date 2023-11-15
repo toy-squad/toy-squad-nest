@@ -5,8 +5,8 @@ import {
   NotFoundException,
   UnauthorizedException,
   UseInterceptors,
+  forwardRef,
 } from '@nestjs/common';
-import { EmailService } from 'email/email.service';
 import { UsersService } from 'users/users.service';
 import { ValidateUserRequestDto } from './dtos/requests/validate-user-request.dto';
 import { ConfirmPasswordRequestDto } from 'users/dtos/requests/confirm-password-request.dto';
@@ -18,15 +18,20 @@ import { CACHE_MANAGER, CacheInterceptor } from '@nestjs/cache-manager';
 import TokenPayload from './interfaces/token-payload.interface';
 import { RedisService } from 'redis/redis.service';
 import { RefreshAccessTokenRequestDto } from './dtos/requests/refresh-access-token-request.dto';
+import { GenerateResetPasswordTokenRequestDto } from './dtos/requests/generate-reset-password-token-request.dto';
+import * as bcrypt from 'bcrypt';
+import { CheckResetPasswordTokenRequestDto } from './dtos/requests/check-reset-password-token-request.dto';
 
 @Injectable()
 export class AuthService {
   private ACCESS_TOKEN_EXPIRATION: number;
   private REFRESH_TOKEN_EXPIRATION: number;
+  private RESET_PASSWORD_TOKEN_EXPIRATION: number;
+
   constructor(
     private redisService: RedisService,
     // @Inject(CACHE_MANAGER) private cacheManager: Cache,
-    private readonly emailService: EmailService,
+
     private readonly userService: UsersService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
@@ -36,6 +41,9 @@ export class AuthService {
     );
     this.REFRESH_TOKEN_EXPIRATION = this.configService.get(
       'REFRESH_TOKEN_EXPIRATION',
+    );
+    this.RESET_PASSWORD_TOKEN_EXPIRATION = this.configService.get(
+      'RESET_PASSWORD_TOKEN_EXPIRATION',
     );
   }
 
@@ -107,18 +115,19 @@ export class AuthService {
 
   async refreshAccessToken(dto: RefreshAccessTokenRequestDto) {
     try {
-      const { userId } = dto;
+      const { userId, refreshToken } = dto;
+
+      if (!userId) {
+        throw new UnauthorizedException('인증이 만료되었습니다.');
+      }
 
       // 레디스에 저장된 리프래시토큰을 찾는다.
       const refreshTokenRedis = await this.redisService.get(
         `refresh-${userId}`,
       );
-      if (!refreshTokenRedis || !userId) {
-        throw new UnauthorizedException('인증이 만료되었습니다.');
-      }
 
       const user = await this.userService.findOneUser({ userId: userId });
-      if (!user) {
+      if (!user && !refreshTokenRedis) {
         throw new NotFoundException('존재하지 않은 유저입니다.');
       }
 
@@ -179,5 +188,48 @@ export class AuthService {
       this.REFRESH_TOKEN_EXPIRATION,
     );
     return refreshToken;
+  }
+
+  // 비밀번호 재설정 토큰 생성
+  async generateResetPasswordToken(dto: GenerateResetPasswordTokenRequestDto) {
+    try {
+      const resetPasswordToken = new Date().getTime().toString();
+      await this.redisService.set(
+        `reset-pwd-${dto.userId}`, // key
+        resetPasswordToken, // value
+        this.RESET_PASSWORD_TOKEN_EXPIRATION, // ttl
+      );
+      return resetPasswordToken;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async checkResetPasswordToken(dto: CheckResetPasswordTokenRequestDto) {
+    try {
+      // 레디스에서 토큰을 갖고온다
+      const resetPasswordTokenFromRedis = await this.redisService.get(
+        `reset-pwd-${dto.userId}`,
+      );
+
+      if (!resetPasswordTokenFromRedis) {
+        throw new UnauthorizedException(
+          '비밀번호 재설정 토큰이 만료되었습니다.',
+        );
+      }
+
+      // 비밀번호 재설정 토큰 만료 유무확인
+      const isMatched = resetPasswordTokenFromRedis === dto.resetPasswordToken;
+
+      if (isMatched === false) {
+        throw new UnauthorizedException(
+          '비밀번호 재설정 토큰이 만료되었습니다.',
+        );
+      }
+
+      return isMatched;
+    } catch (error) {
+      throw error;
+    }
   }
 }

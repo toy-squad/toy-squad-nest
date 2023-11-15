@@ -6,7 +6,7 @@ import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
-  const PORT = process.env.SERVER_PORT || 3000;
+  const PORT = process.env.SERVER_PORT;
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Toy-Squad Server Swagger')
@@ -29,6 +29,8 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+  app.enableCors();
 
   // cookie-parser 사용
   app.use(cookieParser());
