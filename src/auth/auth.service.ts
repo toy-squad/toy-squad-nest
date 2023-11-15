@@ -26,7 +26,6 @@ import { CheckResetPasswordTokenRequestDto } from './dtos/requests/check-reset-p
 export class AuthService {
   private ACCESS_TOKEN_EXPIRATION: number;
   private REFRESH_TOKEN_EXPIRATION: number;
-  private RESET_PASSWORD_TOKEN_SECRET: string;
   private RESET_PASSWORD_TOKEN_EXPIRATION: number;
 
   constructor(
@@ -42,10 +41,6 @@ export class AuthService {
     );
     this.REFRESH_TOKEN_EXPIRATION = this.configService.get(
       'REFRESH_TOKEN_EXPIRATION',
-    );
-
-    this.RESET_PASSWORD_TOKEN_SECRET = this.configService.get(
-      'RESET_PASSWORD_TOKEN_SECRET',
     );
     this.RESET_PASSWORD_TOKEN_EXPIRATION = this.configService.get(
       'RESET_PASSWORD_TOKEN_EXPIRATION',

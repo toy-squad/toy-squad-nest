@@ -18,7 +18,6 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { SendEmailRequestDto } from './dtos/requests/send-email-request.dto';
 import { ResetPassword } from 'auth/decorators/reset-password.decorator';
 import { AuthService } from 'auth/auth.service';
-import { HttpService } from '@nestjs/axios';
 import { CheckResetPasswordTokenAndRedirectResetUiRequestDto } from 'auth/dtos/requests/check-reset-password-token-request.dto';
 
 @ApiTags('이메일 API')
@@ -27,8 +26,6 @@ export class EmailController {
   private RESET_PASSWORD_FORM_URL: string;
   private FRONTEND_URL: string;
   private SERVER_URL: string;
-  private RESET_PASSWORD_TOKEN_SECRET: string;
-  private RESET_PASSWORD_TOKEN_EXPIRATION: number;
 
   constructor(
     // private readonly emailService: EmailService,
@@ -36,19 +33,12 @@ export class EmailController {
     private readonly configService: ConfigService,
     private readonly mailService: MailerService,
     private readonly authService: AuthService,
-    private readonly httpService: HttpService,
   ) {
     this.RESET_PASSWORD_FORM_URL = this.configService.get(
       'RESET_PASSWORD_FORM_URL',
     );
     this.FRONTEND_URL = this.configService.get('FRONTEND_URL');
     this.SERVER_URL = this.configService.get('SERVER_URL');
-    this.RESET_PASSWORD_TOKEN_SECRET = this.configService.get(
-      'RESET_PASSWORD_TOKEN_SECRET',
-    );
-    this.RESET_PASSWORD_TOKEN_EXPIRATION = this.configService.get(
-      'RESET_PASSWORD_TOKEN_EXPIRATION',
-    );
   }
 
   @Public()

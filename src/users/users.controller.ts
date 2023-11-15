@@ -4,33 +4,36 @@ import {
   DefaultValuePipe,
   Delete,
   Get,
-  Inject,
   Logger,
+  NotFoundException,
   Param,
   ParseIntPipe,
   Patch,
-  Post,
-  Put,
   Query,
-  forwardRef,
+  Req,
+  Res,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { DEFAULT_PAGE, DEFAULT_TAKE } from 'commons/dtos/pagination-query-dto';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CreateUserRequestDto } from './dtos/requests/create-user-request.dto';
-import { Public } from 'auth/decorators/public.decorator';
 import { ResetPassword } from 'auth/decorators/reset-password.decorator';
 import { AuthService } from 'auth/auth.service';
+import { Request, Response } from 'express';
+import { FindAndUpdatePasswordRequestDto } from './dtos/requests/find-and-update-password-request.dto';
+import { ConfigService } from '@nestjs/config';
 
 @ApiTags('유저 API')
 @Controller('users')
 export class UsersController {
   private readonly logger = new Logger(UsersController.name);
+  private FRONTEND_URL;
 
   constructor(
     private readonly userService: UsersService,
-    private authService: AuthService,
-  ) {}
+    private configService: ConfigService,
+  ) {
+    this.FRONTEND_URL = this.configService.get('FRONTEND_URL');
+  }
 
   /**
    * 상세 포지션 선택
@@ -129,10 +132,30 @@ export class UsersController {
    */
   @ResetPassword()
   @Patch('pwd')
-  async findAndUpdatePwd() {
+  async findAndUpdatePwd(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Body() dto: FindAndUpdatePasswordRequestDto,
+  ) {
     try {
-      // 이메일 인증
+      // 유저 이메일
+      const user = await this.userService.findOneUser({
+        email: dto.email,
+        allowPassword: false,
+      });
+
+      if (!user) {
+        throw new NotFoundException('존재하지 않은 유저입니다.');
+      }
+
       // 비밀번호 수정
+      await this.userService.updateUserInfo({
+        userId: user.id,
+        password: dto.newPassword,
+      });
+
+      // 로그인페이지로 리다이렉트
+      return res.status(302).redirect(`${this.FRONTEND_URL}/login`);
     } catch (error) {
       throw error;
     }
