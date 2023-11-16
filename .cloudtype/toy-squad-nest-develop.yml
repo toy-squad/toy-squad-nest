@@ -72,9 +72,9 @@ options:
     # FRONTEND_URL
     - name: FRONTEND_URL
     - secret: FRONTEND_URL
-    # RESET_PASSWORD
-    - name: RESET_PASSWORD
-    - secret: RESET_PASSWORD
+    # RESET_PASSWORD_TOKEN_EXPIRATION
+    - name: RESET_PASSWORD_TOKEN_EXPIRATION
+    - secret: RESET_PASSWORD_TOKEN_EXPIRATION
 
   buildenv:
     - name: NODE_ENV
@@ -147,9 +147,9 @@ options:
     # FRONTEND_URL
     - name: FRONTEND_URL
     - secret: FRONTEND_URL
-    # RESET_PASSWORD
-    - name: RESET_PASSWORD
-    - secret: RESET_PASSWORD
+    # RESET_PASSWORD_TOKEN_EXPIRATION
+    - name: RESET_PASSWORD_TOKEN_EXPIRATION
+    - secret: RESET_PASSWORD_TOKEN_EXPIRATION
   install: npm install
   build: npm run build
   start: npm run start:dev
