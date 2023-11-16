@@ -65,6 +65,17 @@ options:
       secret: GOOGLE_CLIENT_SECRET
     - name: GOOGLE_CALLBACK_URL
       secret: GOOGLE_CALLBACK_URL
+
+    # SERVER_URL
+    - name: SERVER_URL
+    - secret: SERVER_URL
+    # FRONTEND_URL
+    - name: FRONTEND_URL
+    - secret: FRONTEND_URL
+    # RESET_PASSWORD_TOKEN_EXPIRATION
+    - name: RESET_PASSWORD_TOKEN_EXPIRATION
+    - secret: RESET_PASSWORD_TOKEN_EXPIRATION
+
   buildenv:
     - name: NODE_ENV
       secret: NODE_ENV
@@ -130,6 +141,15 @@ options:
       secret: GOOGLE_CLIENT_SECRET
     - name: GOOGLE_CALLBACK_URL
       secret: GOOGLE_CALLBACK_URL
+    # SERVER_URL
+    - name: SERVER_URL
+    - secret: SERVER_URL
+    # FRONTEND_URL
+    - name: FRONTEND_URL
+    - secret: FRONTEND_URL
+    # RESET_PASSWORD_TOKEN_EXPIRATION
+    - name: RESET_PASSWORD_TOKEN_EXPIRATION
+    - secret: RESET_PASSWORD_TOKEN_EXPIRATION
   install: npm install
   build: npm run build
   start: npm run start:dev
