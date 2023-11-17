@@ -1,4 +1,9 @@
+import { IsOptional } from 'class-validator';
+
 export class RefreshAccessTokenRequestDto {
-  userId: string;
-  refreshToken: string;
+  @IsOptional()
+  userId?: string;
+
+  @IsOptional()
+  refreshToken?: string;
 }

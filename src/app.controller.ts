@@ -7,26 +7,31 @@ import {
   Req,
   Logger,
   Res,
+  Patch,
 } from '@nestjs/common';
 
 import { AuthService } from 'auth/auth.service';
-import { EmailService } from 'email/email.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Public } from 'auth/decorators/public.decorator';
 import { CreateUserRequestDto } from 'users/dtos/requests/create-user-request.dto';
 import { UsersService } from 'users/users.service';
 import { LocalAuthGuard } from 'auth/guards/local-auth/local-auth.guard';
 import RequestWithUser from 'auth/interfaces/request-with-user.interface';
-import { Response } from 'express';
-import TokenPayload from 'auth/interfaces/token-payload.interface';
+import { Request, Response } from 'express';
 import { KakaoGuard } from 'auth/guards/kakao/kakao.guard';
 import { GoogleGuard } from 'auth/guards/google/google.guard';
 import { ConfigService } from '@nestjs/config';
+import { ResetPassword } from 'auth/decorators/reset-password.decorator';
+import { UpdatePassword } from 'users/dtos/requests/update-password-request.dto';
 
 @ApiTags('공통 API')
 @Controller()
 export class AppController {
   private REFRESH_TOKEN_EXPIRATION: number;
+  private FRONTEND_URL: string;
+  private static NODE_ENV: string;
+  private static COOKIE_SECURE_OPTION: boolean;
+
   constructor(
     private readonly configService: ConfigService,
     private readonly authService: AuthService,
@@ -35,6 +40,12 @@ export class AppController {
     this.REFRESH_TOKEN_EXPIRATION = this.configService.get(
       'REFRESH_TOKEN_EXPIRATION',
     );
+
+    this.FRONTEND_URL = this.configService.get('FRONTEND_URL');
+    AppController.NODE_ENV = this.configService.get('NODE_ENV') ?? 'test';
+
+    AppController.COOKIE_SECURE_OPTION =
+      AppController.NODE_ENV === 'test' ? false : true;
   }
 
   private readonly logger = new Logger(AppController.name);
@@ -76,15 +87,17 @@ export class AppController {
 
     // 헤더에 Bearer Token 형태로 응답
     const tokens = await this.authService.signIn(user.userId, user.email);
-    const { access_token, refresh_token } = tokens;
-    response.setHeader('Authorization', `Bearer ${access_token}`);
 
-    // 리프래시토큰과 유저아이디를 쿠키에 저장
-    const userIdCookie = `userId=${user.userId}; HttpOnly; Max-Age=${this.REFRESH_TOKEN_EXPIRATION}`;
-    const refreshTokenCookie = `refreshToken=${refresh_token}; HttpOnly; Max-Age=${this.REFRESH_TOKEN_EXPIRATION}`;
-    response.setHeader('Set-Cookie', [userIdCookie, refreshTokenCookie]);
-
-    return response.json(tokens);
+    // 유저아이디를 쿠키에 저장
+    response.cookie('user_id', user.userId, {
+      maxAge: this.REFRESH_TOKEN_EXPIRATION,
+      httpOnly: true,
+      secure: AppController.COOKIE_SECURE_OPTION,
+    });
+    return response.json({
+      ...tokens,
+      user_id: user.userId,
+    });
   }
 
   /** 로그아웃 */
@@ -98,9 +111,11 @@ export class AppController {
     await this.authService.logOut(userId);
 
     // 쿠키삭제
-    const userIdCookie = `userId=; HttpOnly; Max-Age=0`;
-    const refreshTokenCookie = `refreshToken=; HttpOnly; Max-Age=0`;
-    response.setHeader('Set-Cookie', [userIdCookie, refreshTokenCookie]);
+    response.cookie('user_id', null, {
+      maxAge: 0,
+      httpOnly: true,
+      secure: AppController.COOKIE_SECURE_OPTION,
+    });
     return response.json();
   }
 
@@ -119,21 +134,18 @@ export class AppController {
     @Res() response: Response,
   ) {
     // 쿠키에서 리프래시토큰과 유저아이디를 얻는다.
-    const { userId, refreshToken } = request.cookies;
+    const { user_id } = request.cookies;
 
     const tokens = await this.authService.refreshAccessToken({
-      userId,
-      refreshToken,
+      userId: user_id,
     });
 
-    // 갱신된 리프래시토큰을 쿠키에 저장한다.
-    const userIdCookie = `userId=${userId}; HttpOnly; Max-Age=${this.REFRESH_TOKEN_EXPIRATION}`;
-    const refreshTokenCookie = `refreshToken=${tokens.refresh_token}; HttpOnly; Max-Age=${this.REFRESH_TOKEN_EXPIRATION}`;
-    response.setHeader('Set-Cookie', [userIdCookie, refreshTokenCookie]);
+    const user = await this.userService.findOneUser({
+      userId: user_id,
+      allowPassword: false,
+    });
 
-    // 헤더에 갱신된 액세스 토큰으로 응답
-    response.setHeader('Authorization', `Bearer ${tokens.access_token}`);
-    return response.json(tokens);
+    return response.json({ ...tokens, user_id: user.id });
   }
 
   /**
@@ -169,7 +181,7 @@ export class AppController {
   @Get('/sign-in/kakao')
   @Public()
   @UseGuards(KakaoGuard)
-  async signInByKakao() {
+  async signInByKakao(@Req() req: Request, @Res() res: Response) {
     return;
   }
 
@@ -181,23 +193,21 @@ export class AppController {
   @Get('/oauth/kakao')
   @Public()
   @UseGuards(KakaoGuard)
-  async redirectKakao(
-    @Req() request: RequestWithUser,
-    @Res() response: Response,
-  ) {
-    const { user } = request;
-    this.logger.log(user);
+  async redirectKakao(@Req() req: RequestWithUser, @Res() res: Response) {
+    const { user } = req;
 
     const tokens = await this.authService.signIn(user.userId, user.email);
-    const { access_token, refresh_token } = tokens;
-    response.setHeader('Authorization', `Bearer ${access_token}`);
 
     // 리프래시토큰과 유저아이디를 쿠키에 저장
-    const userIdCookie = `userId=${user.userId}; HttpOnly; Max-Age=${this.REFRESH_TOKEN_EXPIRATION}`;
-    const refreshTokenCookie = `refreshToken=${refresh_token}; HttpOnly; Max-Age=${this.REFRESH_TOKEN_EXPIRATION}`;
-    response.setHeader('Set-Cookie', [userIdCookie, refreshTokenCookie]);
-
-    return response.json(tokens);
+    res.cookie('user_id', user.userId, {
+      maxAge: this.REFRESH_TOKEN_EXPIRATION,
+      httpOnly: true,
+      secure: AppController.COOKIE_SECURE_OPTION,
+    });
+    return res.status(200).json({
+      ...tokens,
+      user_id: user.userId,
+    });
   }
 
   /**
@@ -224,21 +234,44 @@ export class AppController {
   @Get('oauth/google')
   @Public()
   @UseGuards(GoogleGuard)
-  async redirectGoogle(
-    @Req() request: RequestWithUser,
-    @Res() response: Response,
-  ) {
-    const { user } = request;
+  async redirectGoogle(@Req() req: RequestWithUser, @Res() res: Response) {
+    const { user } = req;
     const tokens = await this.authService.signIn(user.userId, user.email);
-    const { access_token, refresh_token } = tokens;
-
-    response.setHeader('Authorization', `Bearer ${access_token}`);
 
     // 리프래시토큰과 유저아이디를 쿠키에 저장
-    const userIdCookie = `userId=${user.userId}; HttpOnly; Max-Age=${this.REFRESH_TOKEN_EXPIRATION}`;
-    const refreshTokenCookie = `refreshToken=${refresh_token}; HttpOnly; Max-Age=${this.REFRESH_TOKEN_EXPIRATION}`;
-    response.setHeader('Set-Cookie', [userIdCookie, refreshTokenCookie]);
+    res.cookie('user_id', user.userId, {
+      maxAge: this.REFRESH_TOKEN_EXPIRATION,
+      httpOnly: true,
+      secure: AppController.COOKIE_SECURE_OPTION,
+    });
 
-    return response.json(tokens);
+    return res.status(200).json({
+      ...tokens,
+      user_id: user.userId,
+    });
+  }
+
+  // 비밀번호 재설정
+  @ResetPassword()
+  @Patch('password')
+  async updatePassword(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Body() requestDto: UpdatePassword,
+  ) {
+    // 프론트단에서 입력패스워드와 확인패스워드 일치하면 실행하도록한다.
+    const { reset_password_target_user } = req.cookies;
+
+    // 패스워드를 변경한다.
+    await this.userService.updatePassword({
+      password: requestDto.password,
+      passwordConfirm: requestDto.passwordConfirm,
+      userId: reset_password_target_user.user_id,
+    });
+
+    this.logger.log('비밀번호 변경완료');
+
+    // 로그인화면으로 리다이렉트한다
+    return res.status(302).redirect(`${this.FRONTEND_URL}/login`);
   }
 }
