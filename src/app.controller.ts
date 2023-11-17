@@ -93,6 +93,7 @@ export class AppController {
       maxAge: this.REFRESH_TOKEN_EXPIRATION,
       httpOnly: true,
       secure: AppController.COOKIE_SECURE_OPTION,
+      sameSite: AppController.COOKIE_SECURE_OPTION ? 'none' : undefined,
     });
     return response.json({
       ...tokens,
@@ -115,6 +116,7 @@ export class AppController {
       maxAge: 0,
       httpOnly: true,
       secure: AppController.COOKIE_SECURE_OPTION,
+      sameSite: AppController.COOKIE_SECURE_OPTION ? 'none' : undefined,
     });
     return response.json();
   }
@@ -203,6 +205,7 @@ export class AppController {
       maxAge: this.REFRESH_TOKEN_EXPIRATION,
       httpOnly: true,
       secure: AppController.COOKIE_SECURE_OPTION,
+      sameSite: AppController.COOKIE_SECURE_OPTION ? 'none' : undefined,
     });
     return res.status(200).json({
       ...tokens,
@@ -243,6 +246,7 @@ export class AppController {
       maxAge: this.REFRESH_TOKEN_EXPIRATION,
       httpOnly: true,
       secure: AppController.COOKIE_SECURE_OPTION,
+      sameSite: AppController.COOKIE_SECURE_OPTION ? 'none' : undefined,
     });
 
     return res.status(200).json({
