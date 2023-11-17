@@ -29,6 +29,9 @@ import { UpdatePassword } from 'users/dtos/requests/update-password-request.dto'
 export class AppController {
   private REFRESH_TOKEN_EXPIRATION: number;
   private FRONTEND_URL: string;
+  private static NODE_ENV: string;
+  private static COOKIE_SECURE_OPTION: boolean;
+
   constructor(
     private readonly configService: ConfigService,
     private readonly authService: AuthService,
@@ -39,6 +42,10 @@ export class AppController {
     );
 
     this.FRONTEND_URL = this.configService.get('FRONTEND_URL');
+    AppController.NODE_ENV = this.configService.get('NODE_ENV') ?? 'test';
+
+    AppController.COOKIE_SECURE_OPTION =
+      AppController.NODE_ENV === 'test' ? false : true;
   }
 
   private readonly logger = new Logger(AppController.name);
@@ -85,7 +92,7 @@ export class AppController {
     response.cookie('user_id', user.userId, {
       maxAge: this.REFRESH_TOKEN_EXPIRATION,
       httpOnly: true,
-      secure: true,
+      secure: AppController.COOKIE_SECURE_OPTION,
     });
     return response.json({
       ...tokens,
@@ -107,7 +114,7 @@ export class AppController {
     response.cookie('user_id', null, {
       maxAge: 0,
       httpOnly: true,
-      secure: true,
+      secure: AppController.COOKIE_SECURE_OPTION,
     });
     return response.json();
   }
@@ -127,20 +134,18 @@ export class AppController {
     @Res() response: Response,
   ) {
     // 쿠키에서 리프래시토큰과 유저아이디를 얻는다.
-    const { user_id, refreshToken } = request.cookies;
+    const { user_id } = request.cookies;
 
     const tokens = await this.authService.refreshAccessToken({
       userId: user_id,
-      refreshToken,
     });
 
     const user = await this.userService.findOneUser({
       userId: user_id,
       allowPassword: false,
     });
-    this.logger.log(user.email);
 
-    return response.json(tokens);
+    return response.json({ ...tokens, user_id: user.id });
   }
 
   /**
@@ -197,7 +202,7 @@ export class AppController {
     res.cookie('user_id', user.userId, {
       maxAge: this.REFRESH_TOKEN_EXPIRATION,
       httpOnly: true,
-      secure: true,
+      secure: AppController.COOKIE_SECURE_OPTION,
     });
     return res.status(200).json({
       ...tokens,
@@ -237,7 +242,7 @@ export class AppController {
     res.cookie('user_id', user.userId, {
       maxAge: this.REFRESH_TOKEN_EXPIRATION,
       httpOnly: true,
-      secure: true,
+      secure: AppController.COOKIE_SECURE_OPTION,
     });
 
     return res.status(200).json({
