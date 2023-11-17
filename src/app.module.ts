@@ -1,22 +1,18 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
-import { LoggersModule } from './commons/middlewares/loggers.module';
 import * as Joi from 'joi';
 import { LoggersMiddleware } from './commons/middlewares/loggers.middleware';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './users/entities/user.entity';
 import { ProjectModule } from './projects/project.module';
-import { Project } from './projects/entities/project.entity';
 import { EmailModule } from './email/email.module';
 import { HealthModule } from './health/health.module';
 import { PassportModule } from '@nestjs/passport';
 import { RedisModule } from 'redis/redis.module';
-import { RoleController } from './role/role.controller';
 import { RoleModule } from './role/role.module';
-import { Role } from 'role/entities/role.entity';
+import { AccessControlAllowOriginMiddleware } from 'commons/middlewares/access-control-allow-origin.middleware';
 
 @Module({
   imports: [
@@ -83,7 +79,6 @@ import { Role } from 'role/entities/role.entity';
       logging: process.env.NODE_ENV !== 'production',
       charset: 'utf8mb4',
     }),
-    LoggersModule,
     AuthModule,
     UsersModule,
     ProjectModule,
@@ -101,7 +96,8 @@ export class AppModule implements NestModule {
     if (process.env.NODE_ENV !== 'production') {
       consumer.apply(LoggersMiddleware).forRoutes('*');
 
-      // 회원가입, 로그인을 제외한, 나머지 API에서는 accessToken 검증이 필요하다.
+      // 응답헤더에 access-control-allow-origin을 부여한다.
+      consumer.apply(AccessControlAllowOriginMiddleware).forRoutes('*');
     }
   }
 }

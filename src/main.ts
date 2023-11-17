@@ -3,6 +3,8 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
+import { ConfigService } from '@nestjs/config';
+import { NextFunction } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
@@ -30,13 +32,18 @@ async function bootstrap() {
     }),
   );
 
-  app.enableCors();
-
   // cookie-parser 사용
   app.use(cookieParser());
 
   // swagger을 제외한 모든 API는 맨앞에 '/api'를 붙인다.
   app.setGlobalPrefix('/api');
+
+
+  // cors 설정
+  const configService = app.get(ConfigService);
+  app.enableCors({
+    origin: configService.get('FRONTEND_URL'),
+  });
 
   await app.listen(PORT, () => {
     new Logger(`MODE ${process.env.NODE_ENV.toUpperCase()}`).localInstance.log(
