@@ -18,21 +18,20 @@ import { UsersService } from 'users/users.service';
 import { LocalAuthGuard } from 'auth/guards/local-auth/local-auth.guard';
 import RequestWithUser from 'auth/interfaces/request-with-user.interface';
 import { Request, Response } from 'express';
-import TokenPayload from 'auth/interfaces/token-payload.interface';
 import { KakaoGuard } from 'auth/guards/kakao/kakao.guard';
 import { GoogleGuard } from 'auth/guards/google/google.guard';
 import { ConfigService } from '@nestjs/config';
 import { ResetPassword } from 'auth/decorators/reset-password.decorator';
-import {
-  UpdatePassword,
-  UpdatePasswordRequestDto,
-} from 'users/dtos/requests/update-password-request.dto';
+import { UpdatePassword } from 'users/dtos/requests/update-password-request.dto';
 
 @ApiTags('공통 API')
 @Controller()
 export class AppController {
   private REFRESH_TOKEN_EXPIRATION: number;
   private FRONTEND_URL: string;
+  private static NODE_ENV: string;
+  private static COOKIE_SECURE_OPTION: boolean;
+
   constructor(
     private readonly configService: ConfigService,
     private readonly authService: AuthService,
@@ -43,6 +42,10 @@ export class AppController {
     );
 
     this.FRONTEND_URL = this.configService.get('FRONTEND_URL');
+    AppController.NODE_ENV = this.configService.get('NODE_ENV') ?? 'test';
+
+    AppController.COOKIE_SECURE_OPTION =
+      AppController.NODE_ENV === 'test' ? false : true;
   }
 
   private readonly logger = new Logger(AppController.name);
@@ -89,9 +92,12 @@ export class AppController {
     response.cookie('user_id', user.userId, {
       maxAge: this.REFRESH_TOKEN_EXPIRATION,
       httpOnly: true,
-      secure: true,
+      secure: AppController.COOKIE_SECURE_OPTION,
     });
-    return response.json(tokens);
+    return response.json({
+      ...tokens,
+      user_id: user.userId,
+    });
   }
 
   /** 로그아웃 */
@@ -108,7 +114,7 @@ export class AppController {
     response.cookie('user_id', null, {
       maxAge: 0,
       httpOnly: true,
-      secure: true,
+      secure: AppController.COOKIE_SECURE_OPTION,
     });
     return response.json();
   }
@@ -128,20 +134,18 @@ export class AppController {
     @Res() response: Response,
   ) {
     // 쿠키에서 리프래시토큰과 유저아이디를 얻는다.
-    const { user_id, refreshToken } = request.cookies;
+    const { user_id } = request.cookies;
 
     const tokens = await this.authService.refreshAccessToken({
       userId: user_id,
-      refreshToken,
     });
 
     const user = await this.userService.findOneUser({
       userId: user_id,
       allowPassword: false,
     });
-    this.logger.log(user.email);
 
-    return response.json(tokens);
+    return response.json({ ...tokens, user_id: user.id });
   }
 
   /**
@@ -198,9 +202,12 @@ export class AppController {
     res.cookie('user_id', user.userId, {
       maxAge: this.REFRESH_TOKEN_EXPIRATION,
       httpOnly: true,
-      secure: true,
+      secure: AppController.COOKIE_SECURE_OPTION,
     });
-    return res.json(tokens);
+    return res.status(200).json({
+      ...tokens,
+      user_id: user.userId,
+    });
   }
 
   /**
@@ -227,21 +234,21 @@ export class AppController {
   @Get('oauth/google')
   @Public()
   @UseGuards(GoogleGuard)
-  async redirectGoogle(
-    @Req() request: RequestWithUser,
-    @Res() response: Response,
-  ) {
-    const { user } = request;
+  async redirectGoogle(@Req() req: RequestWithUser, @Res() res: Response) {
+    const { user } = req;
     const tokens = await this.authService.signIn(user.userId, user.email);
 
     // 리프래시토큰과 유저아이디를 쿠키에 저장
-    response.cookie('user_id', user.userId, {
+    res.cookie('user_id', user.userId, {
       maxAge: this.REFRESH_TOKEN_EXPIRATION,
       httpOnly: true,
-      secure: true,
+      secure: AppController.COOKIE_SECURE_OPTION,
     });
 
-    return response.json(tokens);
+    return res.status(200).json({
+      ...tokens,
+      user_id: user.userId,
+    });
   }
 
   // 비밀번호 재설정

@@ -115,7 +115,7 @@ export class AuthService {
 
   async refreshAccessToken(dto: RefreshAccessTokenRequestDto) {
     try {
-      const { userId, refreshToken } = dto;
+      const { userId } = dto;
 
       if (!userId) {
         throw new UnauthorizedException('인증이 만료되었습니다.');
