@@ -8,6 +8,7 @@ import {
   Logger,
   Res,
   Patch,
+  Put,
 } from '@nestjs/common';
 
 import { AuthService } from 'auth/auth.service';
@@ -23,6 +24,7 @@ import { GoogleGuard } from 'auth/guards/google/google.guard';
 import { ConfigService } from '@nestjs/config';
 import { ResetPassword } from 'auth/decorators/reset-password.decorator';
 import { UpdatePassword } from 'users/dtos/requests/update-password-request.dto';
+import { RefreshAccessTokenRequestDto } from 'auth/dtos/requests/refresh-access-token-request.dto';
 
 @ApiTags('공통 API')
 @Controller()
@@ -130,24 +132,14 @@ export class AppController {
     description: '액세스 토큰 갱신',
   })
   @Public()
-  @Get('refresh')
+  @Put('refresh')
   async refreshAccessToken(
     @Req() request: RequestWithUser,
     @Res() response: Response,
+    @Body() dto: RefreshAccessTokenRequestDto,
   ) {
-    // 쿠키에서 리프래시토큰과 유저아이디를 얻는다.
-    const { user_id } = request.cookies;
-
-    const tokens = await this.authService.refreshAccessToken({
-      userId: user_id,
-    });
-
-    const user = await this.userService.findOneUser({
-      userId: user_id,
-      allowPassword: false,
-    });
-
-    return response.json({ ...tokens, user_id: user.id });
+    const tokens = await this.authService.refreshAccessToken(dto);
+    return response.json({ ...tokens, user_id: dto.user_id });
   }
 
   /**
