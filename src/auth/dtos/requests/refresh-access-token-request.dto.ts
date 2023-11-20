@@ -1,9 +1,9 @@
-import { IsOptional } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 
 export class RefreshAccessTokenRequestDto {
-  @IsOptional()
-  userId?: string;
+  @IsNotEmpty({ message: 'user_id이 존재하지 않습니다.' })
+  user_id: string;
 
-  @IsOptional()
-  refreshToken?: string;
+  @IsNotEmpty({ message: 'refresh_token이 존재하지 않습니다.' })
+  refresh_token: string;
 }
