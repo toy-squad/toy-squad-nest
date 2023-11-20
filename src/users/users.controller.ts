@@ -21,6 +21,7 @@ import { AuthService } from 'auth/auth.service';
 import { Request, Response } from 'express';
 import { FindAndUpdatePasswordRequestDto } from './dtos/requests/find-and-update-password-request.dto';
 import { ConfigService } from '@nestjs/config';
+import { Public } from 'auth/decorators/public.decorator';
 
 @ApiTags('유저 API')
 @Controller('users')
@@ -42,7 +43,7 @@ export class UsersController {
    * -          category: 개발자/기획자/디자이너 포지션
    * - response: map[category]
    */
-
+  @Public()
   @Get('/position')
   @ApiOperation({
     summary: '회원가입 포지션 선택 API',
@@ -65,6 +66,7 @@ export class UsersController {
    * 유저목록 조회 API
    * URL: /api/users/list
    */
+  @Public()
   @Get('/list')
   @ApiOperation({
     summary: '유저 목록 API',
@@ -87,7 +89,8 @@ export class UsersController {
    * URL: /api/users/:id/detail/
    * - 비밀번호 포함
    */
-  @Get('/:id/detail')
+  @Public()
+  @Get(':id/detail')
   @ApiOperation({
     summary: '유저 상세페이지 API',
     description: '유저 상세정보',
