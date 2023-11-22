@@ -6,13 +6,7 @@ import { ConfigService } from '@nestjs/config';
 export class AccessControlAllowOriginMiddleware implements NestMiddleware {
   constructor(private readonly configService: ConfigService) {}
   use(req: Request, res: Response, next: NextFunction) {
-    const allowOriginUrls = [
-      this.configService.get('FRONTEND_URL'),
-      'http://localhost:3000',
-      'https://accounts.google.com',
-      'https://accounts.kakao.com',
-    ];
-    res.setHeader('Access-Control-Allow-Origin', allowOriginUrls);
+    res.setHeader('Access-Control-Allow-Origin', '*');
     res.header(
       'Access-Control-Allow-Headers',
       'Origin, X-Requested-With, Content-Type, Accept',
