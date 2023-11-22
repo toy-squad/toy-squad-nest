@@ -40,8 +40,11 @@ async function bootstrap() {
 
   // cors 설정
   const configService = new ConfigService();
+  const originUrls = [configService.get('FRONTEND_URL')];
   app.enableCors({
-    origin: configService.get('FRONTEND_URL'),
+    origin: originUrls,
+    preflightContinue: true,
+    optionsSuccessStatus: 204,
   });
 
   await app.listen(PORT, () => {
