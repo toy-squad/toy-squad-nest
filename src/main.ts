@@ -38,11 +38,15 @@ async function bootstrap() {
   // swagger을 제외한 모든 API는 맨앞에 '/api'를 붙인다.
   app.setGlobalPrefix('/api');
 
-
   // cors 설정
   const configService = app.get(ConfigService);
+  const corsOriginURLs = [
+    configService.get('FRONTEND_URL'),
+    'https://accounts.google.com',
+    'https://accounts.kakao.com',
+  ];
   app.enableCors({
-    origin: configService.get('FRONTEND_URL'),
+    origin: corsOriginURLs,
   });
 
   await app.listen(PORT, () => {
