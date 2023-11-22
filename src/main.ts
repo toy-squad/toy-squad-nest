@@ -40,7 +40,10 @@ async function bootstrap() {
 
   // cors 설정
   const configService = new ConfigService();
-  const originUrls = [configService.get('FRONTEND_URL')];
+  const originUrls = [
+    configService.get('FRONTEND_URL'),
+    'http://localhost:3000',
+  ];
   app.enableCors({
     origin: originUrls,
     preflightContinue: true,
