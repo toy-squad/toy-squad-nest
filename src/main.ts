@@ -39,15 +39,7 @@ async function bootstrap() {
   app.setGlobalPrefix('/api');
 
   // cors 설정
-  const configService = app.get(ConfigService);
-  const corsOriginURLs = [
-    configService.get('FRONTEND_URL'),
-    'https://accounts.google.com',
-    'https://accounts.kakao.com',
-  ];
-  app.enableCors({
-    origin: corsOriginURLs,
-  });
+  app.enableCors();
 
   await app.listen(PORT, () => {
     new Logger(`MODE ${process.env.NODE_ENV.toUpperCase()}`).localInstance.log(
