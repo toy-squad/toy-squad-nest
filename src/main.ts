@@ -43,6 +43,8 @@ async function bootstrap() {
   const originUrls = [
     configService.get('FRONTEND_URL'),
     'http://localhost:3000',
+    'https://accounts.google.com/o/oauth2/v2/auth',
+    'https://accounts.kakao.com/login',
   ];
   app.enableCors({
     origin: originUrls,
