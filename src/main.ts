@@ -41,7 +41,7 @@ async function bootstrap() {
   // cors 설정
   const configService = new ConfigService();
   app.enableCors({
-    origin: [configService.get('FRONTEND_URL'), 'https://localhost:3000'],
+    origin: configService.get('FRONTEND_URL'),
   });
 
   await app.listen(PORT, () => {

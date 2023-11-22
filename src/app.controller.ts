@@ -200,7 +200,7 @@ export class AppController {
       sameSite: AppController.COOKIE_SECURE_OPTION ? 'none' : undefined,
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       ...tokens,
       user_id: user.userId,
     });
@@ -242,7 +242,7 @@ export class AppController {
       sameSite: AppController.COOKIE_SECURE_OPTION ? 'none' : undefined,
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       ...tokens,
       user_id: user.userId,
     });
