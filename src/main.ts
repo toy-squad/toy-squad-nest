@@ -39,7 +39,10 @@ async function bootstrap() {
   app.setGlobalPrefix('/api');
 
   // cors 설정
-  app.enableCors();
+  const configService = new ConfigService();
+  app.enableCors({
+    origin: [configService.get('FRONTEND_URL'), 'https://localhost:3000'],
+  });
 
   await app.listen(PORT, () => {
     new Logger(`MODE ${process.env.NODE_ENV.toUpperCase()}`).localInstance.log(
