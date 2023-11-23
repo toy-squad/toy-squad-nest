@@ -4,10 +4,10 @@ import { Role } from '../../role/entities/role.entity';
 import { ContactType, FirstPositionType, SecondPositionType } from '../enums/projectType.enum';
 import { User } from '../../users/entities/user.entity';
 
+@Index(['name','intro','description'])
 @Entity({ schema: process.env.DB_NAME })
 export class Project extends CoreEntity {
 
-  @Index()
   @Column({
     name: 'name',
     nullable: false,
