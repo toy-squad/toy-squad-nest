@@ -13,6 +13,7 @@ import { PassportModule } from '@nestjs/passport';
 import { RedisModule } from 'redis/redis.module';
 import { RoleModule } from './role/role.module';
 import { AccessControlAllowOriginMiddleware } from 'commons/middlewares/access-control-allow-origin.middleware';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -87,6 +88,7 @@ import { AccessControlAllowOriginMiddleware } from 'commons/middlewares/access-c
     PassportModule,
     RedisModule,
     RoleModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [],
