@@ -18,6 +18,10 @@ export class GetProjectsRequestDto {
   limit = 10;
 
   @IsOptional()
+  @IsString()
+  keyword?: string;
+
+  @IsOptional()
   @IsEnum(FirstPositionType, { each: true })
   firstPosition?: FirstPositionType[];
 
