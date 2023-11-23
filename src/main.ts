@@ -39,18 +39,18 @@ async function bootstrap() {
   app.setGlobalPrefix('/api');
 
   // cors 설정
-  const configService = new ConfigService();
-  const originUrls = [
-    configService.get('FRONTEND_URL'),
-    'http://localhost:3000',
-    'https://accounts.google.com/o/oauth2/v2/auth',
-    'https://accounts.kakao.com/login',
-  ];
-  app.enableCors({
-    origin: originUrls,
-    preflightContinue: true,
-    optionsSuccessStatus: 204,
-  });
+  const corsOptions = {
+    allowedHeaders: ['content-type', 'authorization'],
+    origin: [
+      // FE
+      'http://localhost:3000',
+      'https://web-toy-squad-client-20zynm2mljtlwyix.sel4.cloudtype.app',
+    ],
+    // methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT', 'OPTION', 'head'],
+    credentials: true,
+  };
+
+  app.enableCors(corsOptions);
 
   await app.listen(PORT, () => {
     new Logger(`MODE ${process.env.NODE_ENV.toUpperCase()}`).localInstance.log(
