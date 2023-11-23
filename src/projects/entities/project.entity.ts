@@ -3,6 +3,7 @@ import { CoreEntity } from '../../commons/entities/core.entity';
 import { Role } from '../../role/entities/role.entity';
 import { ContactType, FirstPositionType, SecondPositionType } from '../enums/projectType.enum';
 import { User } from '../../users/entities/user.entity';
+import { Comment } from '../../comment/entities/comment.entity';
 
 @Index(['name','intro','description'])
 @Entity({ schema: process.env.DB_NAME })
@@ -206,4 +207,10 @@ export class Project extends CoreEntity {
   @OneToMany(() => Role, (role) => role.project)
   @JoinColumn({ name: 'role', referencedColumnName: 'id' })
   roles: Role[];
+
+  /**
+   * 프로젝트 : 댓글 = 1:N
+   */
+  @OneToMany(() => Comment, (comment) => comment.project)
+  comments: Comment[];
 }
