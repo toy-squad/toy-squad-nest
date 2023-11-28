@@ -9,6 +9,7 @@ import {
   Res,
   Patch,
   Put,
+  Query,
 } from '@nestjs/common';
 
 import { AuthService } from 'auth/auth.service';
@@ -169,27 +170,36 @@ export class AppController {
    * URL: /api/sign-in/kakao
    */
   @ApiOperation({
-    summary: '카카오 연동 로그인 API',
-    description: '카카오 연동 로그인',
+    summary: '카카오 연동 로그인 API - 인가코드 요청',
+    description: '카카오 인증서버로 인가코드 받기 요청',
   })
   @Get('/sign-in/kakao')
   @Public()
   @UseGuards(KakaoGuard)
-  async signInByKakao(@Req() req: Request, @Res() res: Response) {
-    return;
-  }
+  async signInByKakaoOnlyBE(@Req() req: Request, @Res() res: Response) {}
 
-  // 카카오로그인 리다이랙트
+  /**
+   * 구글로그인 리다이렉트
+   * URL: /api/oauth/kakao
+   * @param code
+   * @param req
+   * @param res
+   * @returns
+   */
   @ApiOperation({
-    summary: '카카오 연동 로그인 리다이렉트',
-    description: '카카오 연동 로그인 리다이렉트',
+    summary: '카카오 연동 로그인 API - 인가코드로 액세스토큰 요청',
+    description:
+      '인가코드를 발급받은 후, 카카오 내부서버에 로그인하여 카카오 유저정보 조회 및 토이스쿼드 유저정보조회',
   })
   @Get('/oauth/kakao')
   @Public()
   @UseGuards(KakaoGuard)
-  async redirectKakao(@Req() req: RequestWithUser, @Res() res: Response) {
+  async redirectKakao(
+    @Query() code: string,
+    @Req() req: RequestWithUser,
+    @Res() res: Response,
+  ) {
     const { user } = req;
-
     const tokens = await this.authService.signIn(user.userId, user.email);
 
     // 리프래시토큰과 유저아이디를 쿠키에 저장
