@@ -3,11 +3,9 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
-import { ConfigService } from '@nestjs/config';
-import { NextFunction } from 'express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
+  const app = await NestFactory.create(AppModule);
   const PORT = process.env.SERVER_PORT;
 
   const swaggerConfig = new DocumentBuilder()
@@ -35,9 +33,6 @@ async function bootstrap() {
   // cookie-parser 사용
   app.use(cookieParser());
 
-  // swagger을 제외한 모든 API는 맨앞에 '/api'를 붙인다.
-  app.setGlobalPrefix('/api');
-
   // cors 설정
   const corsOptions = {
     allowedHeaders: ['content-type', 'authorization'],
@@ -46,11 +41,13 @@ async function bootstrap() {
       'http://localhost:3000',
       'https://web-toy-squad-client-20zynm2mljtlwyix.sel4.cloudtype.app',
     ],
-    // methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT', 'OPTION', 'head'],
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT', 'OPTION', 'head'],
     credentials: true,
   };
-
   app.enableCors(corsOptions);
+
+  // swagger을 제외한 모든 API는 맨앞에 '/api'를 붙인다.
+  app.setGlobalPrefix('/api');
 
   await app.listen(PORT, () => {
     new Logger(`MODE ${process.env.NODE_ENV.toUpperCase()}`).localInstance.log(
