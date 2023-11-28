@@ -13,16 +13,19 @@ export class AccessControlAllowOriginMiddleware implements NestMiddleware {
     ];
 
     // 쿠키 허용
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader(
-      'Content-Type',
-      'application/x-www-form-urlencoded;charset=utf-8',
-    );
     res.setHeader('Access-Control-Allow-Origin', originURLs);
-    // res.header(
-    //   'Access-Control-Allow-Headers',
-    //   'Origin, X-Requested-With, Content-Type, Accept',
-    // );
+
+    // Access-Control-Allow-Credentials
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Headers', 'content-type');
+    res.setHeader(
+      'Access-Control-Allow-Headers',
+      'Origin, X-Requested-With, Accept, Content-Type',
+    );
+    res.setHeader(
+      'Access-Control-Allow-Methods',
+      'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+    );
 
     next();
   }
