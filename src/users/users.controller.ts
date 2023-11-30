@@ -15,13 +15,17 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { DEFAULT_PAGE, DEFAULT_TAKE } from 'commons/dtos/pagination-query-dto';
-import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiCreatedResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ResetPassword } from 'auth/decorators/reset-password.decorator';
-import { AuthService } from 'auth/auth.service';
 import { Request, Response } from 'express';
-import { FindAndUpdatePasswordRequestDto } from './dtos/requests/find-and-update-password-request.dto';
 import { ConfigService } from '@nestjs/config';
 import { Public } from 'auth/decorators/public.decorator';
+import { FindAndUpdatePasswordRequestDto } from './dtos/requests/find-and-update-password-request.dto';
 
 @ApiTags('유저 API')
 @Controller('users')
@@ -85,6 +89,48 @@ export class UsersController {
   }
 
   /**
+   * 비밀번호 변경
+   * - URL : /api/users/pwd
+   */
+  @Patch('pwd')
+  @ApiOperation({
+    summary: '비밀번호 변경',
+    description:
+      '비밀번호 재설정 폼에서 "비밀번호 변경" 버튼을 클릭하면 비밀번호변경 api를 호출합니다.',
+  })
+  @ResetPassword()
+  async findAndUpdatePwd(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Body() dto: FindAndUpdatePasswordRequestDto,
+  ) {
+    try {
+      const { email, newPassword } = req.body;
+      // 유저 이메일
+      const user = await this.userService.findOneUser({
+        email: email,
+        allowPassword: false,
+      });
+
+      if (!user) {
+        throw new NotFoundException('존재하지 않은 유저입니다.');
+      }
+
+      // 비밀번호 수정
+      await this.userService.updateUserInfo({
+        userId: user.id,
+        password: newPassword,
+      });
+
+      // 로그인페이지로 리다이렉트(프론트)
+      return res.status(200).json('비밀번호 재설정 완료');
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * TODO
    * 유저 상세 페이지
    * URL: /api/users/:id/detail/
    * - 비밀번호 포함
@@ -124,41 +170,6 @@ export class UsersController {
   async deleteUser(@Param('id') userId: string) {
     try {
       await this.userService.deleteUser(userId);
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  /**
-   * 비밀번호 재설정
-   * - URL : /api/users/pwd?token={비밀번호재설정토큰}&email={이메일}
-   */
-  @ResetPassword()
-  @Patch('pwd')
-  async findAndUpdatePwd(
-    @Req() req: Request,
-    @Res() res: Response,
-    @Body() dto: FindAndUpdatePasswordRequestDto,
-  ) {
-    try {
-      // 유저 이메일
-      const user = await this.userService.findOneUser({
-        email: dto.email,
-        allowPassword: false,
-      });
-
-      if (!user) {
-        throw new NotFoundException('존재하지 않은 유저입니다.');
-      }
-
-      // 비밀번호 수정
-      await this.userService.updateUserInfo({
-        userId: user.id,
-        password: dto.newPassword,
-      });
-
-      // 로그인페이지로 리다이렉트
-      return res.status(302).redirect(`${this.FRONTEND_URL}/login`);
     } catch (error) {
       throw error;
     }

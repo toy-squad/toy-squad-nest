@@ -10,7 +10,7 @@ import {
   Res,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Public } from 'auth/decorators/public.decorator';
 import { UsersService } from 'users/users.service';
 import { SendEmailForResetPwdRequestDto } from './dtos/requests/send-email-for-reset-request.dto';
@@ -56,8 +56,13 @@ export class EmailController {
    * - /api/email/pwd
    * 입력한 이메일에 비밀번호 재설정 이메일 탬플릿을 보내주는 API
    */
-  @Public()
   @Post('pwd')
+  @Public()
+  @ApiOperation({
+    summary: '비밀번호 재설정 요청 이메일 입력',
+    description:
+      '로그인 페이지에서 "비밀번호 찾기" 버튼 클릭 후에 비밀번호를 찾을 이메일을 입력합니다.',
+  })
   async sendEmailForResetPwd(
     @Req() req: Request,
     @Res() res: Response,
@@ -103,8 +108,16 @@ export class EmailController {
     }
   }
 
-  @ResetPassword()
   @Get('pwd')
+  @ApiOperation({
+    summary: '비밀번호 재설정 토큰 검사 및 새로운 비밀번호 입력폼',
+    description:
+      '이메일에서 "비밀번호 재설정" 버튼을 클릭하면 비밀번호 재설정 토큰이 유효성 검사에서 이상없으면 비밀번호 재설정 UI폼으로 리다이렉트합니다.',
+  })
+  @ApiQuery({
+    type: CheckResetPasswordTokenAndRedirectResetUiRequestDto,
+  })
+  @ResetPassword()
   async checkResetPasswordTokenAndRedirectResetUI(
     @Query() dto: CheckResetPasswordTokenAndRedirectResetUiRequestDto, // resetPasswordToken
     @Req() req: Request,
@@ -113,9 +126,7 @@ export class EmailController {
     // 비밀전호 재설정 UI폼으로 리다이렉트
     const { token, email } = req.query;
     return res
-      .status(302)
-      .redirect(
-        `${this.FRONTEND_URL}/${this.RESET_PASSWORD_FORM_URL}?token=${token}&email=${email}`,
-      );
+      .status(200)
+      .redirect(`${this.FRONTEND_URL}/updatePw?token=${token}&email=${email}`);
   }
 }

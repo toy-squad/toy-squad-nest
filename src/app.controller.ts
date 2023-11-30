@@ -140,10 +140,18 @@ export class AppController {
     @Body() dto: RefreshAccessTokenRequestDto,
   ) {
     const tokens = await this.authService.refreshAccessToken(dto);
+
+    response.cookie('user_id', dto.user_id, {
+      maxAge: this.REFRESH_TOKEN_EXPIRATION,
+      httpOnly: true,
+      secure: AppController.COOKIE_SECURE_OPTION,
+      sameSite: AppController.COOKIE_SECURE_OPTION ? 'none' : undefined,
+    });
     return response.json({ ...tokens, user_id: dto.user_id });
   }
 
   /**
+   * TODO
    * 마이페이지
    * URL: /api/mypage
    *
@@ -258,27 +266,5 @@ export class AppController {
     });
   }
 
-  // 비밀번호 재설정
-  @ResetPassword()
-  @Patch('password')
-  async updatePassword(
-    @Req() req: Request,
-    @Res() res: Response,
-    @Body() requestDto: UpdatePassword,
-  ) {
-    // 프론트단에서 입력패스워드와 확인패스워드 일치하면 실행하도록한다.
-    const { reset_password_target_user } = req.cookies;
 
-    // 패스워드를 변경한다.
-    await this.userService.updatePassword({
-      password: requestDto.password,
-      passwordConfirm: requestDto.passwordConfirm,
-      userId: reset_password_target_user.user_id,
-    });
-
-    this.logger.log('비밀번호 변경완료');
-
-    // 로그인화면으로 리다이렉트한다
-    return res.status(302).redirect(`${this.FRONTEND_URL}/login`);
-  }
 }
