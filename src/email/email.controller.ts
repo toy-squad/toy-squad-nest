@@ -114,8 +114,6 @@ export class EmailController {
     const { token, email } = req.query;
     return res
       .status(302)
-      .redirect(
-        `${this.FRONTEND_URL}/${this.RESET_PASSWORD_FORM_URL}?token=${token}&email=${email}`,
-      );
+      .redirect(`${this.FRONTEND_URL}/updatePw?token=${token}&email=${email}`);
   }
 }
