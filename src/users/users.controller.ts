@@ -95,7 +95,8 @@ export class UsersController {
   @Patch('pwd')
   @ApiOperation({
     summary: '비밀번호 변경',
-    description: '비밀번호 재설정 폼에서 비밀번호를 변경합니다.',
+    description:
+      '비밀번호 재설정 폼에서 "비밀번호 변경" 버튼을 클릭하면 비밀번호변경 api를 호출합니다.',
   })
   @ResetPassword()
   async findAndUpdatePwd(
