@@ -140,10 +140,18 @@ export class AppController {
     @Body() dto: RefreshAccessTokenRequestDto,
   ) {
     const tokens = await this.authService.refreshAccessToken(dto);
+
+    response.cookie('user_id', dto.user_id, {
+      maxAge: this.REFRESH_TOKEN_EXPIRATION,
+      httpOnly: true,
+      secure: AppController.COOKIE_SECURE_OPTION,
+      sameSite: AppController.COOKIE_SECURE_OPTION ? 'none' : undefined,
+    });
     return response.json({ ...tokens, user_id: dto.user_id });
   }
 
   /**
+   * TODO
    * 마이페이지
    * URL: /api/mypage
    *
