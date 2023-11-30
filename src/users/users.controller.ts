@@ -15,11 +15,17 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { DEFAULT_PAGE, DEFAULT_TAKE } from 'commons/dtos/pagination-query-dto';
-import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiCreatedResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ResetPassword } from 'auth/decorators/reset-password.decorator';
 import { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { Public } from 'auth/decorators/public.decorator';
+import { FindAndUpdatePasswordRequestDto } from './dtos/requests/find-and-update-password-request.dto';
 
 @ApiTags('유저 API')
 @Controller('users')
@@ -83,12 +89,20 @@ export class UsersController {
   }
 
   /**
-   * 비밀번호 재설정
+   * 비밀번호 변경
    * - URL : /api/users/pwd
    */
   @Patch('pwd')
+  @ApiOperation({
+    summary: '비밀번호 변경',
+    description: '비밀번호 재설정 폼에서 비밀번호를 변경합니다.',
+  })
   @ResetPassword()
-  async findAndUpdatePwd(@Req() req: Request, @Res() res: Response) {
+  async findAndUpdatePwd(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Body() dto: FindAndUpdatePasswordRequestDto,
+  ) {
     try {
       const { email, newPassword } = req.body;
       // 유저 이메일
@@ -115,6 +129,7 @@ export class UsersController {
   }
 
   /**
+   * TODO
    * 유저 상세 페이지
    * URL: /api/users/:id/detail/
    * - 비밀번호 포함
