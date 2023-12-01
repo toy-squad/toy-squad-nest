@@ -13,7 +13,13 @@ import {
 } from '@nestjs/common';
 
 import { AuthService } from 'auth/auth.service';
-import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Public } from 'auth/decorators/public.decorator';
 import { CreateUserRequestDto } from 'users/dtos/requests/create-user-request.dto';
 import { UsersService } from 'users/users.service';
@@ -26,6 +32,8 @@ import { ConfigService } from '@nestjs/config';
 import { RefreshAccessTokenRequestDto } from 'auth/dtos/requests/refresh-access-token-request.dto';
 import { SendEmailToNewUserEvent } from 'users/events/send-email-to-new-user.event';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { SignInRequestBody } from 'auth/dtos/requests/sign-in-user-request.dto';
+import { User } from 'users/entities/user.entity';
 
 @ApiTags('공통 API')
 @Controller()
@@ -66,12 +74,25 @@ export class AppController {
   @Public()
   @Post('/join')
   @ApiOperation({
-    summary: '회원가입 API',
+    summary: '[public] 회원가입 API',
     description:
-      '일반 회원가입  포지션 카테고리는 DEVELOPER / MANAGER / DESIGNER 중 1개 선택',
+      '[public] 일반 회원가입  포지션 카테고리는 DEVELOPER / MANAGER / DESIGNER 중 1개 선택',
   })
   @ApiBody({
     type: CreateUserRequestDto,
+  })
+  @ApiOkResponse({
+    description: 'Success - 회원가입 환영 이메일 발송됨.',
+    type: User,
+  })
+  @ApiResponse({
+    status: 400,
+    description:
+      '이미 존재하는 유저입니다 - 입력 이메일이 이미 회원으로 등록된 경우',
+  })
+  @ApiResponse({
+    status: 400,
+    description: '존재하지 않은 포지션입니다 - 포지션 유효성 검사 실패',
   })
   async generateNewUser(@Body() dto: CreateUserRequestDto) {
     const newUser = await this.userService.createUser(dto);
@@ -92,14 +113,32 @@ export class AppController {
    * 일반: 로그인
    * URL: /api/sign-in
    */
-  @ApiOperation({
-    summary: '일반 로그인 API',
-    description: '일반 email/password 입력하여 로그인',
-  })
   @Post('/sign-in')
+  @ApiOperation({
+    summary: '[public] 일반 로그인 API',
+    description: '[public] 일반 email/password 입력하여 로그인',
+  })
+  @ApiBody({
+    type: SignInRequestBody,
+  })
+  @ApiOkResponse({
+    description: 'Success',
+  })
+  @ApiResponse({
+    status: 400,
+    description: '잘못된 요청입니다. - 이메일과 유저아이디가 존재하지 않을 때',
+  })
+  @ApiResponse({
+    status: 401,
+    description: '유저인증에 실패하였습니다 - 이메일, 비밀번호 불일치',
+  })
   @Public()
   @UseGuards(LocalAuthGuard)
-  async signIn(@Req() request: RequestWithUser, @Res() response: Response) {
+  async signIn(
+    @Req() request: RequestWithUser,
+    @Res() response: Response,
+    @Body() dto: SignInRequestBody,
+  ) {
     const { user } = request;
 
     // 헤더에 Bearer Token 형태로 응답
@@ -123,6 +162,14 @@ export class AppController {
     summary: '로그아웃 API',
     description: '로그아웃 - 액세스토큰/리프래시토큰 모두 삭제됨',
   })
+  @ApiOkResponse({
+    description: 'Success',
+  })
+  @ApiResponse({
+    status: 401,
+    description:
+      '인증이 만료되었습니다 - 유저아이디, 액세스토큰 만료할때 발생합니다.',
+  })
   @Get('log-out')
   async logOut(@Req() request: RequestWithUser, @Res() response: Response) {
     const { userId } = request.user;
@@ -143,8 +190,23 @@ export class AppController {
    * - 토큰이 존재하면, key값에 대한 액세스 토큰을 재발급하여 레디스에 저장...
    */
   @ApiOperation({
-    summary: '리프래시 토큰 API',
-    description: '액세스 토큰 갱신',
+    summary: '[public] 리프래시 토큰 API',
+    description: '[public] 액세스 토큰 갱신',
+  })
+  @ApiBody({
+    type: RefreshAccessTokenRequestDto,
+  })
+  @ApiOkResponse({
+    description: 'Success',
+  })
+  @ApiResponse({
+    status: 400,
+    description: '존재하지 않은 유저입니다 - 유저아이디가 조회되지 않을 경우',
+  })
+  @ApiResponse({
+    status: 401,
+    description:
+      '인증이 만료되었습니다 - 리프래시토큰이 존재하지 않거나, 리프레시토큰과 레디스에 저장된 리프래시토큰이 일치하지 않을 때',
   })
   @Public()
   @Put('refresh')
