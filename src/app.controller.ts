@@ -23,9 +23,9 @@ import { Request, Response } from 'express';
 import { KakaoGuard } from 'auth/guards/kakao/kakao.guard';
 import { GoogleGuard } from 'auth/guards/google/google.guard';
 import { ConfigService } from '@nestjs/config';
-import { ResetPassword } from 'auth/decorators/reset-password.decorator';
-import { UpdatePassword } from 'users/dtos/requests/update-password-request.dto';
 import { RefreshAccessTokenRequestDto } from 'auth/dtos/requests/refresh-access-token-request.dto';
+import { SendEmailToNewUserEvent } from 'users/events/send-email-to-new-user.event';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @ApiTags('공통 API')
 @Controller()
@@ -39,6 +39,7 @@ export class AppController {
     private readonly configService: ConfigService,
     private readonly authService: AuthService,
     private readonly userService: UsersService,
+    private readonly eventEmitter: EventEmitter2,
   ) {
     this.REFRESH_TOKEN_EXPIRATION = this.configService.get(
       'REFRESH_TOKEN_EXPIRATION',
@@ -70,6 +71,15 @@ export class AppController {
   })
   async generateNewUser(@Body() dto: CreateUserRequestDto) {
     const newUser = await this.userService.createUser(dto);
+
+    // 회원가입 환영 이메일을 전송이벤트 핸들러를 호출한다.
+    const sendEmailToNewUserEvent: SendEmailToNewUserEvent = {
+      email: newUser.email,
+      name: newUser.name,
+    };
+
+    this.eventEmitter.emit('send.email.to.new.user', sendEmailToNewUserEvent);
+
     return newUser;
   }
 
@@ -265,6 +275,4 @@ export class AppController {
       user_id: user.userId,
     });
   }
-
-
 }
