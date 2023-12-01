@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 
 import { AuthService } from 'auth/auth.service';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Public } from 'auth/decorators/public.decorator';
 import { CreateUserRequestDto } from 'users/dtos/requests/create-user-request.dto';
 import { UsersService } from 'users/users.service';
@@ -67,7 +67,11 @@ export class AppController {
   @Post('/join')
   @ApiOperation({
     summary: '회원가입 API',
-    description: '일반 회원가입',
+    description:
+      '일반 회원가입  포지션 카테고리는 DEVELOPER / MANAGER / DESIGNER 중 1개 선택',
+  })
+  @ApiBody({
+    type: CreateUserRequestDto,
   })
   async generateNewUser(@Body() dto: CreateUserRequestDto) {
     const newUser = await this.userService.createUser(dto);
