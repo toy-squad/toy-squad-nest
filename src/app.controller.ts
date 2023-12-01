@@ -15,6 +15,7 @@ import {
 import { AuthService } from 'auth/auth.service';
 import {
   ApiBody,
+  ApiExcludeEndpoint,
   ApiOkResponse,
   ApiOperation,
   ApiResponse,
@@ -254,7 +255,7 @@ export class AppController {
    * URL: /api/sign-in/kakao
    */
   @ApiOperation({
-    summary: '카카오 연동 로그인 API - 인가코드 요청',
+    summary: '[public] 카카오 연동 로그인 API - 인가코드 요청',
     description: '카카오 인증서버로 인가코드 받기 요청',
   })
   @Get('/sign-in/kakao')
@@ -265,16 +266,13 @@ export class AppController {
   /**
    * 구글로그인 리다이렉트
    * URL: /api/oauth/kakao
+   * '인가코드를 발급받은 후, 카카오 내부서버에 로그인하여 카카오 유저정보 조회 및 토이스쿼드 유저정보조회
    * @param code
    * @param req
    * @param res
    * @returns
    */
-  @ApiOperation({
-    summary: '카카오 연동 로그인 API - 인가코드로 액세스토큰 요청',
-    description:
-      '인가코드를 발급받은 후, 카카오 내부서버에 로그인하여 카카오 유저정보 조회 및 토이스쿼드 유저정보조회',
-  })
+  @ApiExcludeEndpoint()
   @Get('/oauth/kakao')
   @Public()
   @UseGuards(KakaoGuard)
@@ -306,21 +304,16 @@ export class AppController {
    * URL: /api/sign-in/google
    */
   @ApiOperation({
-    summary: '구글 연동 로그인 API',
+    summary: '[public] 구글 연동 로그인 API',
     description: '구글 연동 로그인',
   })
   @Get('/sign-in/google')
   @Public()
   @UseGuards(GoogleGuard)
-  async signInByGoogle(@Req() request: RequestWithUser) {
-    return;
-  }
+  async signInByGoogle(@Req() request: RequestWithUser) {}
 
-  // 구글로그인 리다이렉트
-  @ApiOperation({
-    summary: '구글 연동 로그인 리다이렉트',
-    description: '구글 연동 로그인 리다이렉트',
-  })
+  // 구글로그인 콜백
+  @ApiExcludeEndpoint()
   @Get('oauth/google')
   @Public()
   @UseGuards(GoogleGuard)

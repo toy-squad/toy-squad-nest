@@ -10,7 +10,13 @@ import {
   Res,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiExcludeEndpoint,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Public } from 'auth/decorators/public.decorator';
 import { UsersService } from 'users/users.service';
 import { SendEmailForResetPwdRequestDto } from './dtos/requests/send-email-for-reset-request.dto';
@@ -41,6 +47,7 @@ export class EmailController {
     this.SERVER_URL = this.configService.get('SERVER_URL');
   }
 
+  @ApiExcludeEndpoint()
   @Public()
   @Post()
   async sendEmail(
@@ -58,7 +65,7 @@ export class EmailController {
    */
   @Post('pwd')
   @ApiOperation({
-    summary: '비밀번호 재설정 요청 이메일 입력 API',
+    summary: '[public] 비밀번호 재설정 요청 이메일 입력 API',
     description:
       '로그인 페이지에서 "비밀번호 찾기" 버튼 클릭 후에 비밀번호를 찾을 이메일을 입력합니다.',
   })
