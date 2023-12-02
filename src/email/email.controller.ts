@@ -10,7 +10,13 @@ import {
   Res,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiExcludeEndpoint,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Public } from 'auth/decorators/public.decorator';
 import { UsersService } from 'users/users.service';
 import { SendEmailForResetPwdRequestDto } from './dtos/requests/send-email-for-reset-request.dto';
@@ -41,6 +47,7 @@ export class EmailController {
     this.SERVER_URL = this.configService.get('SERVER_URL');
   }
 
+  @ApiExcludeEndpoint()
   @Public()
   @Post()
   async sendEmail(
@@ -57,12 +64,16 @@ export class EmailController {
    * 입력한 이메일에 비밀번호 재설정 이메일 탬플릿을 보내주는 API
    */
   @Post('pwd')
-  @Public()
   @ApiOperation({
-    summary: '비밀번호 재설정 요청 이메일 입력',
+    summary: '[public] 비밀번호 재설정 요청 이메일 입력 API',
     description:
       '로그인 페이지에서 "비밀번호 찾기" 버튼 클릭 후에 비밀번호를 찾을 이메일을 입력합니다.',
   })
+  @ApiBody({
+    type: SendEmailForResetPwdRequestDto,
+    description: '비밀번호 변경 대상 이메일을 입력합니다.',
+  })
+  @Public()
   async sendEmailForResetPwd(
     @Req() req: Request,
     @Res() res: Response,
@@ -110,7 +121,8 @@ export class EmailController {
 
   @Get('pwd')
   @ApiOperation({
-    summary: '비밀번호 재설정 토큰 검사 및 새로운 비밀번호 입력폼',
+    summary:
+      '비밀번호 재설정 토큰 검사 및 새로운 비밀번호 입력폼으로 리다이렉트 API',
     description:
       '이메일에서 "비밀번호 재설정" 버튼을 클릭하면 비밀번호 재설정 토큰이 유효성 검사에서 이상없으면 비밀번호 재설정 UI폼으로 리다이렉트합니다.',
   })
