@@ -106,15 +106,4 @@ export class CommentRepository{
         throw new Error(`Could not update comment with id ${id}`);
         }
     }
-
-    // 댓글 영구 삭제 (Hard Delete)
-    async hardDeleteComment(id: string): Promise<void> {
-        try {
-        await this.repo.delete(id);
-        } catch (error) {
-        this.logger.error(`Failed to hard delete comment ${id}`, error.stack);
-        throw new Error(`Could not hard delete comment with id ${id}`);
-        }
-    }
-
 }
