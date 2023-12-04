@@ -211,6 +211,6 @@ export class Project extends CoreEntity {
   /**
    * 프로젝트 : 댓글 = 1:N
    */
-  @OneToMany(() => Comment, (comment) => comment.project)
+  @OneToMany(() => Comment, (comment) => comment.project, {eager: true})
   comments: Comment[];
 }
