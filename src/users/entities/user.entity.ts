@@ -3,6 +3,7 @@ import { CoreEntity } from '../../commons/entities/core.entity';
 import { Column, Entity, JoinColumn, OneToMany } from 'typeorm';
 import { Role } from 'role/entities/role.entity';
 import { Project } from 'projects/entities/project.entity';
+import { Comment } from 'comment/entities/comment.entity';
 
 @Entity({ schema: process.env.DB_NAME })
 export class User extends CoreEntity {
@@ -127,4 +128,11 @@ export class User extends CoreEntity {
   @OneToMany(() => Role, (role) => role.user)
   @JoinColumn({ name: 'user', referencedColumnName: 'id' })
   roles: Role[];
+
+  /**
+   * 유저 : 댓글 = 1:N
+   */
+  @ApiProperty({ description: '유저:댓글=1:N' })
+  @OneToMany(() => Comment, (comment) => comment.user)
+  comments: Comment[];
 }
