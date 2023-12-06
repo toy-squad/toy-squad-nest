@@ -30,9 +30,13 @@ export class ProjectsRepository {
             recruitEndDate,
             startDate,
             endDate, 
-            place, field, platform } = dto;
+            place, field, platform, keyword } = dto;
 
     const query = this.repo.createQueryBuilder('project');
+
+    if (keyword) {
+      query.andWhere('project.name LIKE :keyword OR project.description LIKE :keyword OR project.intro LIKE :keyword', { keyword: `%${keyword}%`})
+    }
 
     if (firstPosition) {
       query.andWhere('project.firstPosition IN (:...firstPosition)', { firstPosition });
