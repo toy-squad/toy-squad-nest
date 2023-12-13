@@ -13,6 +13,8 @@ import { PassportModule } from '@nestjs/passport';
 import { RedisModule } from 'redis/redis.module';
 import { RoleModule } from './role/role.module';
 import { AccessControlAllowOriginMiddleware } from 'commons/middlewares/access-control-allow-origin.middleware';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { SendEmailToNewUserListener } from 'users/listeners/send-email-to-new-user.listener';
 import { CommentModule } from './comment/comment.module';
 
 @Module({
@@ -80,6 +82,7 @@ import { CommentModule } from './comment/comment.module';
       logging: process.env.NODE_ENV !== 'production',
       charset: 'utf8mb4',
     }),
+    EventEmitterModule.forRoot(),
     AuthModule,
     UsersModule,
     ProjectModule,
@@ -91,7 +94,7 @@ import { CommentModule } from './comment/comment.module';
     CommentModule,
   ],
   controllers: [AppController],
-  providers: [],
+  providers: [SendEmailToNewUserListener],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

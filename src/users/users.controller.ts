@@ -15,13 +15,23 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { DEFAULT_PAGE, DEFAULT_TAKE } from 'commons/dtos/pagination-query-dto';
-import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ResetPassword } from 'auth/decorators/reset-password.decorator';
-import { AuthService } from 'auth/auth.service';
 import { Request, Response } from 'express';
-import { FindAndUpdatePasswordRequestDto } from './dtos/requests/find-and-update-password-request.dto';
 import { ConfigService } from '@nestjs/config';
 import { Public } from 'auth/decorators/public.decorator';
+import { FindAndUpdatePasswordRequestDto } from './dtos/requests/find-and-update-password-request.dto';
+import { positionCategory } from './types/position.type';
+import { UpdateUserInfoRequestDto } from './dtos/requests/update-user-info-request.dto';
 
 @ApiTags('유저 API')
 @Controller('users')
@@ -49,10 +59,17 @@ export class UsersController {
     summary: '회원가입 포지션 선택 API',
     description: '좌측: 카테고리 포지션, 우측: 상세 포지션',
   })
-  @ApiCreatedResponse({
-    description: '선택 카테고리에 대응되는 상세포지션 리스트를 반환한다',
+  @ApiQuery({
+    name: 'position',
+    enum: ['DEVELOPER', 'DESIGNER', 'MANAGER'],
   })
-  async getDetailPositions(@Query('position') categoryPosition: any) {
+  @ApiOkResponse({
+    description:
+      '포지션 카테고리(DEVELOPER / DESIGNER / MANAGER)에 대한 상세 포지션 리스트를 반환한다.',
+  })
+  async getDetailPositions(
+    @Query('position') categoryPosition: positionCategory,
+  ) {
     const detailPosition = await this.userService.getDetailPositions(
       categoryPosition,
     );
@@ -72,6 +89,18 @@ export class UsersController {
     summary: '유저 목록 API',
     description: '유저 리스트 및 검색',
   })
+  @ApiQuery({
+    name: 'page',
+    example: 1,
+    required: false,
+    description: '페이징',
+  })
+  @ApiQuery({
+    name: 'take',
+    example: 10,
+    required: false,
+    description: '1페이지당 게시물 최대 개수',
+  })
   async getUsers(
     @Query('page', new DefaultValuePipe(DEFAULT_PAGE), ParseIntPipe)
     page: number,
@@ -85,6 +114,59 @@ export class UsersController {
   }
 
   /**
+   * 비밀번호 변경
+   * - URL : /api/users/pwd
+   */
+  @Patch('pwd')
+  @ApiOperation({
+    summary: '비밀번호 변경',
+    description:
+      '비밀번호 재설정 폼에서 "비밀번호 변경" 버튼을 클릭하면 비밀번호변경 api를 호출합니다.',
+  })
+  @ApiBody({
+    type: FindAndUpdatePasswordRequestDto,
+  })
+  @ApiOkResponse({
+    status: 200,
+    description: '비밀번호 변경 완료하였습니다.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: '존재하지 않은 유저입니다',
+  })
+  @ResetPassword()
+  async findAndUpdatePwd(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Body() dto: FindAndUpdatePasswordRequestDto,
+  ) {
+    try {
+      const { email, newPassword } = req.body;
+      // 유저 이메일
+      const user = await this.userService.findOneUser({
+        email: email,
+        allowPassword: false,
+      });
+
+      if (!user) {
+        throw new NotFoundException('존재하지 않은 유저입니다.');
+      }
+
+      // 비밀번호 수정
+      await this.userService.updateUserInfo({
+        userId: user.id,
+        password: newPassword,
+      });
+
+      // 로그인페이지로 리다이렉트(프론트)
+      return res.status(200).json('비밀번호 변경 완료하였습니다.');
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * TODO
    * 유저 상세 페이지
    * URL: /api/users/:id/detail/
    * - 비밀번호 포함
@@ -95,11 +177,16 @@ export class UsersController {
     summary: '유저 상세페이지 API',
     description: '유저 상세정보',
   })
+  @ApiParam({
+    name: 'id',
+    description: '유저 PK',
+  })
   async getUserDetail(@Param('id') userId: string) {
     return await this.userService.findOneUser({ userId: userId });
   }
 
   /**
+   * TODO
    * 유저정보 수정
    * URL: /api/users/:id
    */
@@ -108,7 +195,14 @@ export class UsersController {
     summary: '유저 정보 수정 API',
     description: '유저 정보 수정',
   })
-  async updateUserInfo(@Param('id') userId: string, @Body() dto: any) {
+  @ApiParam({
+    name: 'id',
+    description: '유저 PK',
+  })
+  async updateUserInfo(
+    @Param('id') userId: string,
+    @Body() dto: UpdateUserInfoRequestDto,
+  ) {
     return await this.userService.updateUserInfo({ userId, ...dto });
   }
 
@@ -121,44 +215,16 @@ export class UsersController {
     summary: '회원 탈퇴 API',
     description: '회원 탈퇴 및 유저계정 삭제',
   })
+  @ApiParam({
+    name: 'id',
+    description: '유저 PK',
+  })
+  @ApiOkResponse({
+    description: '회원탈퇴 Success',
+  })
   async deleteUser(@Param('id') userId: string) {
     try {
       await this.userService.deleteUser(userId);
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  /**
-   * 비밀번호 재설정
-   * - URL : /api/users/pwd?token={비밀번호재설정토큰}&email={이메일}
-   */
-  @ResetPassword()
-  @Patch('pwd')
-  async findAndUpdatePwd(
-    @Req() req: Request,
-    @Res() res: Response,
-    @Body() dto: FindAndUpdatePasswordRequestDto,
-  ) {
-    try {
-      // 유저 이메일
-      const user = await this.userService.findOneUser({
-        email: dto.email,
-        allowPassword: false,
-      });
-
-      if (!user) {
-        throw new NotFoundException('존재하지 않은 유저입니다.');
-      }
-
-      // 비밀번호 수정
-      await this.userService.updateUserInfo({
-        userId: user.id,
-        password: dto.newPassword,
-      });
-
-      // 로그인페이지로 리다이렉트
-      return res.status(302).redirect(`${this.FRONTEND_URL}/login`);
     } catch (error) {
       throw error;
     }
