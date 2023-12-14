@@ -6,56 +6,73 @@ import {
   Patch,
   Param,
   Delete,
+  Res,
+  Req,
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
-import { CreateCommentDto } from './dto/create-comment.dto';
-import { UpdateCommentDto } from './dto/update-comment.dto';
 
 @Controller('comment')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
-  // 댓글작성
+  // 프로젝트 모집공고에 댓글작성
   @Post()
-  async createComment(@Body() createCommentDto: CreateCommentDto) {
-    return await this.commentService.create(createCommentDto);
+  async createComment(@Req() req: Request, @Res() res: Response) {
+    return await this.commentService.createComment({});
   }
 
   // 대댓글 작성
-  @Post(':id/reply')
-  async generateReplyComment() {}
+  @Post(':comment_id/reply')
+  async generateReplyComment(@Req() req: Request, @Res() res: Response) {
+    return await this.commentService.createComment({});
+  }
 
   // 대댓글에 해시태그 답글작성
-  @Post(':id/reply/hashtag')
-  async generateHashtagReplyComment() {}
-
-  // 프로젝트 댓글 전체 조회
-  @Get()
-  async findAll() {
-    return await this.commentService.findAll();
+  @Post(':comment_id/reply/hashtag')
+  async generateHashtagReplyComment(@Req() req: Request, @Res() res: Response) {
+    return await this.commentService.createComment({});
   }
 
-  // 댓글(대댓글) id로 조회
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return await this.commentService.findOne(+id);
-  }
-  // 프로젝트 id로 대댓글 조회
-  @Get(':id/children')
-  async getReplyComments() {}
-
-  // 댓글 수정
-  @Patch(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() updateCommentDto: UpdateCommentDto,
+  // 프로젝트 모집공고에 작성된 댓글 전체 조회 + 페이징조회
+  @Get(':project_id')
+  async getAllComments(
+    @Param(':project_id') projectId: string,
+    @Req() req: Request,
+    @Res() res: Response,
   ) {
-    return await this.commentService.update(+id, updateCommentDto);
+    return await this.commentService.findAllCommentsByProjectId();
   }
 
-  // 댓글 삭제 (softDelete)
-  @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return await this.commentService.remove(+id);
+  // 댓글 및 대댓글 포함 댓글 조회
+  @Get(':comment_id')
+  async getAllReplyComments(
+    @Param('comment_id') commentId: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    return await this.commentService.getAllReplyCommentsByCommentId();
+  }
+
+  // 댓글 수정 / 대댓글 수정
+  @Patch(':comment_id')
+  async update(
+    @Param('comment_id') commentId: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    // 본인이 작성한 글인지 검사
+    return await this.commentService.updateComment();
+  }
+
+  // 댓글 삭제 / 대댓글 삭제 (not soft delete)
+  // 댓글삭제되면 대댓글도 같이 삭제된다.
+  @Delete(':comment_id')
+  async remove(
+    @Param('comment_id') commentId: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    // 본인이 작성한 글인지 검사
+    return await this.commentService.removeComment();
   }
 }

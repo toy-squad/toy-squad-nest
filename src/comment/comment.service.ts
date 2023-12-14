@@ -1,26 +1,47 @@
-import { Injectable } from '@nestjs/common';
-import { CreateCommentDto } from './dto/create-comment.dto';
-import { UpdateCommentDto } from './dto/update-comment.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { CreateCommentDto, UpdateCommentDto } from './dto/comment.dto';
+import { CommentRepository } from './comment.repository';
 
 @Injectable()
 export class CommentService {
-  create(createCommentDto: CreateCommentDto) {
-    return 'This action adds a new comment';
+  constructor(private readonly commentRepository: CommentRepository) {}
+
+  // 댓글 작성
+  async createComment(dto: CreateCommentDto) {
+    return await this.commentRepository.createAndSave();
   }
 
-  findAll() {
-    return `This action returns all comment`;
+  async findAllCommentsByProjectId() {
+    return await this.commentRepository.findAllCommentsByProjectWithPagination();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} comment`;
+  async getAllReplyCommentsByCommentId() {
+    return await this.commentRepository.findCommentById();
   }
 
-  update(id: number, updateCommentDto: UpdateCommentDto) {
-    return `This action updates a #${id} comment`;
+  async updateComment(dto: UpdateCommentDto) {
+    const { commentUpdateType } = dto;
+    try {
+      switch (commentUpdateType) {
+        case 'COMMENT': // 댓글 내용 수정
+          await this.commentRepository.updateCommentContent();
+        case 'LIKE': // 댓글 좋아요 증가
+          await this.commentRepository.incrementLikes();
+        case 'DISLIKE': // 댓글 싫어요
+          await this.commentRepository.incrementDislikes();
+        default:
+          throw new BadRequestException(
+            '댓글내용 / 좋아요 / 싫어요 만 업데이트 가능합니다.',
+          );
+      }
+    } catch (error) {
+      throw error;
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} comment`;
+  async removeComment(commentId: string) {
+    try {
+    } catch (error) {}
+    return await this.commentRepository.removeComment(commentId);
   }
 }

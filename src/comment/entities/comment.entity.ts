@@ -55,7 +55,7 @@ export class Comment extends CoreEntity {
    */
   @ManyToOne(() => Comment, (comment) => comment.children, {
     nullable: true,
-    // onDelete: 'CASCADE',
+    onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'parentId' })
   parent: Comment;
