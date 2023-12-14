@@ -4,12 +4,15 @@ import { User } from 'users/entities/user.entity';
 
 export class CommentDto {
   // 댓글내용
+  @IsNotEmpty()
   content: string;
 
   // 댓글작성자 ID
-  user: string;
+  @IsNotEmpty()
+  userId: string;
 
   // 프로젝트 ID
+  @IsNotEmpty()
   projectId: string;
 }
 
@@ -25,13 +28,13 @@ export class CreateCommentDto extends PartialType(CommentDto) {
   @IsNotEmpty()
   commentType: CommentType;
 
-  // 부모댓글
-  @IsNotEmpty()
-  parent: Comment;
-
-  // 해시태그 대상 댓글
+  // 부모댓글 아이디
   @IsOptional()
-  hashtagTarget?: Comment;
+  parentCommentId?: string;
+
+  // 해시태그 대상 댓글 아이디
+  @IsOptional()
+  hashtagTargetCommentId?: string;
 }
 
 /**

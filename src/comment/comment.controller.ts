@@ -10,6 +10,8 @@ import {
   Req,
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
+import RequestWithUser from 'auth/interfaces/request-with-user.interface';
+import { Public } from 'auth/decorators/public.decorator';
 
 @Controller('comment')
 export class CommentController {
@@ -17,37 +19,62 @@ export class CommentController {
 
   // 프로젝트 모집공고에 댓글작성
   @Post()
-  async createComment(@Req() req: Request, @Res() res: Response) {
-    return await this.commentService.createComment({});
+  async createComment(@Req() req: RequestWithUser, @Res() res: Response) {
+    return await this.commentService.createComment({
+      commentType: 'C',
+      userId: req.user.userId,
+      projectId: req.body.project_id,
+      content: req.body.content,
+    });
   }
 
   // 대댓글 작성
   @Post(':comment_id/reply')
-  async generateReplyComment(@Req() req: Request, @Res() res: Response) {
-    return await this.commentService.createComment({});
+  async generateReplyComment(
+    @Req() req: RequestWithUser,
+    @Res() res: Response,
+  ) {
+    return await this.commentService.createComment({
+      commentType: 'R',
+      userId: req.user.userId,
+      projectId: req.body.project_id,
+      content: req.body.content,
+      parentCommentId: req.body.parent_comment_id,
+    });
   }
 
   // 대댓글에 해시태그 답글작성
   @Post(':comment_id/reply/hashtag')
-  async generateHashtagReplyComment(@Req() req: Request, @Res() res: Response) {
-    return await this.commentService.createComment({});
+  async generateHashtagReplyComment(
+    @Req() req: RequestWithUser,
+    @Res() res: Response,
+  ) {
+    return await this.commentService.createComment({
+      commentType: 'H',
+      userId: req.user.userId,
+      projectId: req.body.project_id,
+      content: req.body.content,
+      parentCommentId: req.body.parent_comment_id,
+      hashtagTargetCommentId: req.body.hashtag_target_comment_id,
+    });
   }
 
   // 프로젝트 모집공고에 작성된 댓글 전체 조회 + 페이징조회
+  @Public()
   @Get(':project_id')
   async getAllComments(
     @Param(':project_id') projectId: string,
-    @Req() req: Request,
+    @Req() req: RequestWithUser,
     @Res() res: Response,
   ) {
     return await this.commentService.findAllCommentsByProjectId();
   }
 
   // 댓글 및 대댓글 포함 댓글 조회
+  @Public()
   @Get(':comment_id')
   async getAllReplyComments(
     @Param('comment_id') commentId: string,
-    @Req() req: Request,
     @Res() res: Response,
   ) {
     return await this.commentService.getAllReplyCommentsByCommentId();
@@ -57,7 +84,7 @@ export class CommentController {
   @Patch(':comment_id')
   async update(
     @Param('comment_id') commentId: string,
-    @Req() req: Request,
+    @Req() req: RequestWithUser,
     @Res() res: Response,
   ) {
     // 본인이 작성한 글인지 검사
@@ -69,7 +96,7 @@ export class CommentController {
   @Delete(':comment_id')
   async remove(
     @Param('comment_id') commentId: string,
-    @Req() req: Request,
+    @Req() req: RequestWithUser,
     @Res() res: Response,
   ) {
     // 본인이 작성한 글인지 검사
