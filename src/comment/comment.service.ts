@@ -17,7 +17,7 @@ export class CommentService {
   // 댓글 작성
   async createComment(dto: CreateCommentDto) {
     try {
-      await this.commentRepository.createAndSave();
+      return await this.commentRepository.createAndSave();
     } catch (error) {
       throw error;
     }
