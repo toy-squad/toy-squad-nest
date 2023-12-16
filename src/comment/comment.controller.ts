@@ -67,7 +67,7 @@ export class CommentController {
     @Req() req: RequestWithUser,
     @Res() res: Response,
   ) {
-    return await this.commentService.findAllCommentsByProjectId();
+    return await this.commentService.findAllCommentsByProjectId({});
   }
 
   // 댓글 및 대댓글 포함 댓글 조회
@@ -77,7 +77,7 @@ export class CommentController {
     @Param('comment_id') commentId: string,
     @Res() res: Response,
   ) {
-    return await this.commentService.getAllReplyCommentsByCommentId();
+    return await this.commentService.getAllReplyCommentsByCommentId({});
   }
 
   // 댓글 수정 / 대댓글 수정
@@ -88,7 +88,7 @@ export class CommentController {
     @Res() res: Response,
   ) {
     // 본인이 작성한 글인지 검사
-    return await this.commentService.updateComment();
+    return await this.commentService.updateComment({});
   }
 
   // 댓글 삭제 / 대댓글 삭제 (not soft delete)
@@ -100,6 +100,6 @@ export class CommentController {
     @Res() res: Response,
   ) {
     // 본인이 작성한 글인지 검사
-    return await this.commentService.removeComment();
+    return await this.commentService.removeComment(commentId);
   }
 }

@@ -45,6 +45,10 @@ export class CreateCommentDto extends PartialType(CommentDto) {
  */
 export type CommentUpdateType = 'COMMENT' | 'LIKE' | 'DISLIKE';
 export class UpdateCommentDto {
+  // 작성자 아이디
+  @IsNotEmpty()
+  userId: string;
+
   // 코멘트 아이디
   @IsNotEmpty()
   commentId: string;
@@ -56,4 +60,14 @@ export class UpdateCommentDto {
   // 수정된 코멘트내용
   @IsOptional()
   newContent?: string;
+}
+
+export class DeleteCommentDto {
+  // 작성자 아이디
+  @IsNotEmpty()
+  userId: string;
+
+  // 코멘트 아이디
+  @IsNotEmpty()
+  commentId: string;
 }

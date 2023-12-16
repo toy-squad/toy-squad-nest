@@ -46,11 +46,10 @@ export class CommentRepository {
   }
 
   // 댓글 ID로 조회
-  async findCommentById(id: string) {
-    // TODO
+  async findCommentById(comment_id: string) {
     return await this.repo.findOne({
-      where: { id, deletedAt: null },
-      relations: ['user', 'parent', 'children'],
+      where: { id: comment_id, deletedAt: null },
+      relations: ['user', 'project'],
     });
   }
 
@@ -71,6 +70,7 @@ export class CommentRepository {
 
   // Delete
   async removeComment(id: string) {
-    await this.repo.softDelete(id);
+    // 영구삭제
+    await this.repo.delete(id);
   }
 }
