@@ -44,7 +44,7 @@ export class Comment extends CoreEntity {
     onDelete: 'CASCADE',
     eager: true,
   })
-  user: User;
+  author: User;
 
   // --------------------------------------------------------
   /**

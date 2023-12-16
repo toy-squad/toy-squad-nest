@@ -143,6 +143,6 @@ export class User extends CoreEntity {
    * 유저 : 댓글 = 1:N
    */
   @ApiProperty({ description: '유저:댓글=1:N' })
-  @OneToMany(() => Comment, (comment) => comment.user)
+  @OneToMany(() => Comment, (comment) => comment.author)
   comments: Comment[];
 }
