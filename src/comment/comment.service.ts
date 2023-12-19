@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import {
   CreateCommentDto,
   DeleteCommentDto,
+  GetAllCommentsDto,
   UpdateCommentDto,
 } from './dto/comment.dto';
 import { CommentRepository } from './comment.repository';
@@ -23,16 +24,23 @@ export class CommentService {
     }
   }
 
-  async findAllCommentsByProjectId() {
-    return await this.commentRepository.findAllCommentsByProjectWithPagination();
+  async findAllCommentsByProjectId(dto: GetAllCommentsDto) {
+    return await this.commentRepository.findAllCommentsByProjectWithPagination(
+      dto,
+    );
   }
 
-  async getAllReplyCommentsByCommentId() {
-    return await this.commentRepository.findCommentById();
+  async getAllReplyCommentsByCommentId(commentId: string) {
+    // commentId에 해당하는 댓글이 있는지 확인
+    // 대댓글들을 리턴한다
+    const replyComments = await this.commentRepository.findCommentById(
+      commentId,
+    );
+    return replyComments;
   }
 
   async updateComment(dto: UpdateCommentDto) {
-    const { commentUpdateType, commentId, userId } = dto;
+    const { commentUpdateType, commentId, userId, newContent } = dto;
     try {
       // 본인이 작성한 글인지 검사한다.
       const isAuthor =
@@ -48,7 +56,16 @@ export class CommentService {
           }
 
           // 댓글 내용 수정
-          await this.commentRepository.updateCommentContent();
+          if (
+            newContent.replace(' \t\n', '').length === 0 ||
+            newContent.length < 10
+          ) {
+            throw new BadRequestException('최소 10자를 입력해주세요.');
+          }
+          await this.commentRepository.updateCommentContent(
+            commentId,
+            newContent,
+          );
           break;
         }
         case 'LIKE': {

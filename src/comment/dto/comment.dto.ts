@@ -1,5 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { IsNotEmpty, IsOptional } from 'class-validator';
+import { PaginationQueryDto } from 'commons/dtos/pagination-query-dto';
 import { User } from 'users/entities/user.entity';
 
 export class CommentDto {
@@ -70,4 +71,10 @@ export class DeleteCommentDto {
   // 코멘트 아이디
   @IsNotEmpty()
   commentId: string;
+}
+
+export class GetAllCommentsDto extends PartialType(PaginationQueryDto) {
+  // 프로젝트 모집공고 아이디
+  @IsNotEmpty()
+  projectId: string;
 }

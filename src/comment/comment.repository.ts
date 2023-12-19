@@ -3,6 +3,7 @@ import { Comment } from './entities/comment.entity';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from 'projects/entities/project.entity';
+import { GetAllCommentsDto } from './dto/comment.dto';
 
 @Injectable()
 export class CommentRepository {
@@ -29,18 +30,17 @@ export class CommentRepository {
 
   // 게시물 ID에 따른 댓글 조회 (페이징 포함)
   async findAllCommentsByProjectWithPagination(
-    projectId: string,
-    page: number = 1,
-    limit: number = 10,
+    dto: GetAllCommentsDto,
   ): Promise<[Comment[], number]> {
+    const { page, take, projectId } = dto;
     // TODO
     const project = await this.entityManager.findOne(Project, projectId);
     const [comments, total] = await this.repo.findAndCount({
       where: { project: project, deletedAt: null },
       relations: ['user', 'parent'],
       order: { createdAt: 'DESC' },
-      take: limit,
-      skip: limit * (page - 1),
+      take: take,
+      skip: take * (page - 1),
     });
     return [comments, total];
   }

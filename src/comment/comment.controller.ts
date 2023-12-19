@@ -8,11 +8,15 @@ import {
   Delete,
   Res,
   Req,
+  Query,
+  DefaultValuePipe,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { Response } from 'express';
 import RequestWithUser from 'auth/interfaces/request-with-user.interface';
 import { Public } from 'auth/decorators/public.decorator';
+import { DEFAULT_PAGE, DEFAULT_TAKE } from 'commons/dtos/pagination-query-dto';
 
 @Controller('comment')
 export class CommentController {
@@ -71,10 +75,17 @@ export class CommentController {
   @Get(':project_id')
   async getAllComments(
     @Param(':project_id') projectId: string,
-    @Req() req: RequestWithUser,
+    @Query('page', new DefaultValuePipe(DEFAULT_PAGE), ParseIntPipe)
+    page: number,
+    @Query('limit', new DefaultValuePipe(DEFAULT_TAKE), ParseIntPipe)
+    limit: number,
     @Res() res: Response,
   ) {
-    const comments = await this.commentService.findAllCommentsByProjectId({});
+    const comments = await this.commentService.findAllCommentsByProjectId({
+      page: page,
+      take: limit,
+      projectId: projectId,
+    });
 
     // comment: 프로젝트 모집공고에 있는 댓글들(대댓글X), 대댓글 개수
     return res.status(200).json({
@@ -91,7 +102,7 @@ export class CommentController {
     @Res() res: Response,
   ) {
     const replyComments =
-      await this.commentService.getAllReplyCommentsByCommentId({});
+      await this.commentService.getAllReplyCommentsByCommentId(commentId);
 
     /**
      * comment_id: 댓글 아이디
