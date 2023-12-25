@@ -26,13 +26,13 @@ export class GetProjectsRequestDto {
   secondPosition?: SecondPositionType[];
   
   @IsOptional()
-  @IsEnum(ContactType)
-  contactType?: ContactType;
+  @IsEnum(ContactType, { each: true })
+  contactType?: ContactType[];
   
   @IsOptional()
   @Type(() => Number)
-  @IsInt()
-  memberCount?: number;
+  @IsInt( { each: true } )
+  memberCount?: number[];
   
   @IsOptional()
   @IsString()
@@ -75,8 +75,8 @@ export class GetProjectsRequestDto {
   endDate: string;
 
   @IsOptional()
-  @IsString()
-  place?: string;
+  @IsString({ each: true })
+  place?: string[];
 
   @IsOptional()
   @IsEnum(FirstPositionType, { each: true })
