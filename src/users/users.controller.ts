@@ -3,15 +3,21 @@ import {
   Controller,
   DefaultValuePipe,
   Delete,
+  FileTypeValidator,
   Get,
   Logger,
+  MaxFileSizeValidator,
   NotFoundException,
   Param,
+  ParseFilePipe,
+  ParseFilePipeBuilder,
   ParseIntPipe,
   Patch,
   Query,
   Req,
   Res,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { DEFAULT_PAGE, DEFAULT_TAKE } from 'commons/dtos/pagination-query-dto';
@@ -32,12 +38,15 @@ import { Public } from 'auth/decorators/public.decorator';
 import { FindAndUpdatePasswordRequestDto } from './dtos/requests/find-and-update-password-request.dto';
 import { positionCategory } from './types/position.type';
 import { UpdateUserInfoRequestDto } from './dtos/requests/update-user-info-request.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Express } from 'express';
 
 @ApiTags('유저 API')
 @Controller('users')
 export class UsersController {
   private readonly logger = new Logger(UsersController.name);
   private FRONTEND_URL;
+  private BUCKET_NAME;
 
   constructor(
     private readonly userService: UsersService,
@@ -191,6 +200,7 @@ export class UsersController {
    * URL: /api/users/:id
    */
   @Patch('/:id')
+  @UseInterceptors(FileInterceptor('file'))
   @ApiOperation({
     summary: '유저 정보 수정 API',
     description: '유저 정보 수정',
@@ -202,8 +212,57 @@ export class UsersController {
   async updateUserInfo(
     @Param('id') userId: string,
     @Body() dto: UpdateUserInfoRequestDto,
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: 'jpeg',
+        })
+        .addFileTypeValidator({
+          fileType: 'png',
+        })
+        .addFileTypeValidator({
+          fileType: 'gif',
+        })
+        .addMaxSizeValidator({
+          maxSize: 10 * 1024 * 1024, // 10MB
+        })
+        .build({
+          fileIsRequired: false,
+        }),
+    )
+    file?: Express.Multer.File,
   ) {
-    return await this.userService.updateUserInfo({ userId, ...dto });
+    return await this.userService.updateUserInfo({
+      userId,
+      ...dto,
+      imgProfileFile: file,
+    });
+  }
+
+  @Public()
+  async uploadImg(
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: 'jpeg',
+        })
+        .addFileTypeValidator({
+          fileType: 'png',
+        })
+        .addFileTypeValidator({
+          fileType: 'gif',
+        })
+        .addMaxSizeValidator({
+          maxSize: 10 * 1024 * 1024, // 10MB
+        })
+        .build({
+          fileIsRequired: false,
+        }),
+    )
+    file?: Express.Multer.File,
+  ) {
+    console.log(file);
+    return file;
   }
 
   /**

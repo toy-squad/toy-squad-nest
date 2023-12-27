@@ -177,7 +177,7 @@ export class UsersService {
    */
   async updateUserInfo(dto: UpdateUserInfoRequestDto) {
     try {
-      const { userId, ...updatedUserInfo } = dto;
+      const { userId, imgProfileFile } = dto;
 
       // userId 를 갖는 유저가 존재하는지 확인
       const defaultUserInfo: UpdatedUserInfoType =
@@ -188,13 +188,9 @@ export class UsersService {
         throw new NotFoundException('존재하지 않은 회원입니다.');
       }
 
-      // const entries = Object.entries(dto);
-      // for (const [key, value] of entries) {
-      //   if (value === null) {
-      //     // dto 에서 값이 존재하지 않으면 기존 정보를 저장하도록한다.
-      //     dto[key] = defaultUserInfo[key];
-      //   }
-      // }
+      // 이미지 프로필파일은 s3에 저장한다
+      if (imgProfileFile) {
+      }
       await this.usersRepository.updateUserInfo(dto);
     } catch (error) {
       throw error;

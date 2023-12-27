@@ -20,10 +20,6 @@ export class UpdateUserInfoRequestDto {
   phone?: string;
 
   @IsOptional()
-  @IsString()
-  imgUrl?: string;
-
-  @IsOptional()
   tendency?: string[];
 
   @IsOptional()
@@ -51,4 +47,8 @@ export class UpdateUserInfoRequestDto {
   // 구글 아이디
   @IsOptional()
   googleAuthId?: any;
+
+  // 이미지 프로필 파일
+  @IsOptional()
+  imgProfileFile?: any;
 }

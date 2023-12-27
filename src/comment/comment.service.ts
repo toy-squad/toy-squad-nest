@@ -7,17 +7,37 @@ import {
 } from './dto/comment.dto';
 import { CommentRepository } from './comment.repository';
 import { UsersRepository } from 'users/users.repository';
+import { ProjectsRepository } from 'projects/projects.repository';
 
 @Injectable()
 export class CommentService {
   constructor(
     private readonly commentRepository: CommentRepository,
     private readonly userRepository: UsersRepository,
+    private readonly projectRepository: ProjectsRepository,
   ) {}
 
   // 댓글 작성
   async createComment(dto: CreateCommentDto) {
+    const { projectId, userId, commentType } = dto;
     try {
+      // projectId 로 프로젝트 모집공고 데이터를 구한다.
+      const project = await this.projectRepository.findOneProject(projectId);
+
+      // userId 로 작성자 회원정보 데이터를 구한다.
+      const commentAuthorUser = await this.userRepository.findOneUser({
+        userId: userId,
+        allowPassword: false,
+      });
+
+      // commentType: 'R'
+      if (commentType === 'R') {
+        
+      }
+      // commentType: 'H'
+      else if (commentType === 'H') {
+        
+      }
       return await this.commentRepository.createAndSave();
     } catch (error) {
       throw error;

@@ -6,9 +6,15 @@ import { Comment } from './entities/comment.entity';
 import { CommentRepository } from './comment.repository';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from 'users/users.module';
+import { ProjectModule } from 'projects/project.module';
 
 @Module({
-  imports: [ConfigModule, UsersModule, TypeOrmModule.forFeature([Comment])],
+  imports: [
+    ConfigModule,
+    UsersModule,
+    ProjectModule,
+    TypeOrmModule.forFeature([Comment]),
+  ],
   exports: [TypeOrmModule],
   controllers: [CommentController],
   providers: [CommentService, CommentRepository],

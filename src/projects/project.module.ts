@@ -9,7 +9,12 @@ import { UsersModule } from 'users/users.module';
 import { CommentModule } from 'comment/comment.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Project]), RoleModule, UsersModule, CommentModule],
+  imports: [
+    TypeOrmModule.forFeature([Project]),
+    RoleModule,
+    UsersModule,
+    CommentModule,
+  ],
   controllers: [ProjectsController],
   providers: [ProjectsService, ProjectsRepository],
   exports: [ProjectsService, ProjectsRepository],
