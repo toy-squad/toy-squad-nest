@@ -41,7 +41,7 @@ async function bootstrap() {
       'http://localhost:3000',
       'https://web-toy-squad-client-20zynm2mljtlwyix.sel4.cloudtype.app',
     ],
-    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT', 'OPTION', 'head'],
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT', 'OPTIONS'],
     credentials: true,
   };
   app.enableCors(corsOptions);
