@@ -12,7 +12,6 @@ import { HealthModule } from './health/health.module';
 import { PassportModule } from '@nestjs/passport';
 import { RedisModule } from 'redis/redis.module';
 import { RoleModule } from './role/role.module';
-import { AccessControlAllowOriginMiddleware } from 'commons/middlewares/access-control-allow-origin.middleware';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { SendEmailToNewUserListener } from 'users/listeners/send-email-to-new-user.listener';
 
@@ -98,9 +97,6 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     if (process.env.NODE_ENV !== 'production') {
       consumer.apply(LoggersMiddleware).forRoutes('*');
-
-      // 응답헤더에 access-control-allow-origin을 부여한다.
-      consumer.apply(AccessControlAllowOriginMiddleware).forRoutes('*');
     }
   }
 }

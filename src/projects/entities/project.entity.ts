@@ -197,7 +197,7 @@ export class Project extends CoreEntity {
   /**
    * 프로젝트 : 유저 = N:1
    */
-  @ManyToOne(() => User, (user) => user.projects)
+  @ManyToOne(() => User, (user) => user.projects, { eager: true })
   user: User;
 
   /**

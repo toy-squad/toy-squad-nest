@@ -88,6 +88,108 @@ export class ProjectsController {
     required: false,
     schema: { default: 10 },
   })
+  @ApiQuery({
+    name: 'keyword',
+    description: '검색어',
+    type: String,
+    required: false,
+  })
+  @ApiQuery({
+    name: 'firstPosition',
+    description: '1차 직무',
+    type: String,
+    required: false,
+    isArray: true,
+  })
+  @ApiQuery({
+    name: 'secondPosition',
+    description: '2차 직무',
+    type: String,
+    required: false,
+    isArray: true,
+  })
+  @ApiQuery({
+    name: 'contactType',
+    description: '대면방식',
+    type: String,
+    required: false,
+    enum: ['C(Contact)', 'U(Untact)', 'M(Mix)'],
+    schema: { default: 'U(Untact)' },
+  })
+  @ApiQuery({
+    name: 'memberCount',
+    description: '모집인원',
+    type: Number,
+    required: false,
+  })
+  @ApiQuery({
+    name: 'recruitStartDate',
+    description: '모집 시작일',
+    type: String,
+    required: false,
+    example: '2021-01-01',
+  })
+  @ApiQuery({
+    name: 'recruitEndDate',
+    description: '모집 종료일',
+    type: String,
+    required: false,
+    example: '2021-01-01',
+  })
+  @ApiQuery({
+    name: 'startDate',
+    description: '프로젝트 시작일',
+    type: String,
+    required: false,
+    example: '2021-01-01',
+  })
+  @ApiQuery({
+    name: 'endDate',
+    description: '프로젝트 종료일',
+    type: String,
+    required: false,
+    example: '2021-01-01',
+  })
+  @ApiQuery({
+    name: 'place',
+    description: '지역',
+    type: String,
+    required: false,
+  })
+  @ApiQuery({
+    name: 'field',
+    description: '분야',
+    type: String,
+    required: false,
+    isArray: true,
+    enum: [
+      'HEALTH_FITNESS(건강/ 운동)',
+      'BEAUTY_FASHION(뷰티/ 패션)',
+      'ECOMMERCE(이커머스',
+      'FINANCE(금융)',
+      'SPORTS(스포츠)',
+      'MEDICAL(의료)',
+      'MATCHING_SERVICE(매칭 서비스)',
+      'NEWS(뉴스)',
+      'CHILDREN(어린이)',
+      'SOCIAL_NETWORK(소셜네트워크)',
+      'ARTIFICIAL_INTELLIGENCE(인공지능)',
+      'OTHER(기타)' ],
+  })
+  @ApiQuery({
+    name: 'platform',
+    description: '플랫폼',
+    type: String,
+    required: false,
+    isArray: true,
+    enum: [
+      'ANDROID_APP(안드로이드 앱)',
+      'IOS_APP(IOS 앱)',
+      'RESPONSIVE_WEB(반응형 웹)',
+      'INSTALLABLE_SOLUTION(설치형/솔루션)',
+      'PC_PROGRAM(PC 프로그램)',
+      'GAME(게임)' ],
+  })
   @Get('list')
   async getProjects(
     @Query() reqDto: GetProjectsRequestDto,
