@@ -3,7 +3,7 @@ import { Comment } from './entities/comment.entity';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from 'projects/entities/project.entity';
-import { GetAllCommentsDto } from './dto/comment.dto';
+import { CreateCommentDto, GetAllCommentsDto } from './dto/comment.dto';
 
 @Injectable()
 export class CommentRepository {
@@ -21,11 +21,23 @@ export class CommentRepository {
   }
 
   // 댓글 생성 및 저장
-  async createAndSave() {
-    // TODO
-    const comment = this.repo.create();
-    await this.repo.save(comment);
-    return comment;
+  async createAndSave(dto: CreateCommentDto) {
+    try {
+      await this.queryRunner.connect();
+      await this.queryRunner.startTransaction();
+
+      // TODO
+      const comment = this.repo.create();
+      await this.repo.save(comment);
+
+      await this.queryRunner.commitTransaction();
+      return comment;
+    } catch (error) {
+      await this.queryRunner.rollbackTransaction();
+    } finally {
+      // release query runner which is manually created...
+      await this.queryRunner.release();
+    }
   }
 
   // 게시물 ID에 따른 댓글 조회 (페이징 포함)

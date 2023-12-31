@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import {
-  CreateCommentDto,
+  CreateCommentRequestDto,
   DeleteCommentDto,
   GetAllCommentsDto,
   UpdateCommentDto,
@@ -8,6 +8,8 @@ import {
 import { CommentRepository } from './comment.repository';
 import { UsersRepository } from 'users/users.repository';
 import { ProjectsRepository } from 'projects/projects.repository';
+import { Project } from 'projects/entities/project.entity';
+import { User } from 'users/entities/user.entity';
 
 @Injectable()
 export class CommentService {
@@ -18,27 +20,58 @@ export class CommentService {
   ) {}
 
   // 댓글 작성
-  async createComment(dto: CreateCommentDto) {
+  async createComment(dto: CreateCommentRequestDto) {
     const { projectId, userId, commentType } = dto;
+    let parentComment = undefined;
+    let hashtagTargetAuthor = undefined;
+
     try {
       // projectId 로 프로젝트 모집공고 데이터를 구한다.
-      const project = await this.projectRepository.findOneProject(projectId);
+      const project: Project = await this.projectRepository.findOneProject(
+        projectId,
+      );
 
       // userId 로 작성자 회원정보 데이터를 구한다.
-      const commentAuthorUser = await this.userRepository.findOneUser({
+      const commentAuthorUser: User = await this.userRepository.findOneUser({
         userId: userId,
         allowPassword: false,
       });
 
-      // commentType: 'R'
+      // 부모댓글
       if (commentType === 'R') {
-        
+        // 부모댓글을 구한다
+        parentComment = await this.commentRepository.findCommentById(
+          dto.parentCommentId,
+        );
       }
-      // commentType: 'H'
+
+      // 해시태그
       else if (commentType === 'H') {
-        
+        // 부모댓글을 구한다.
+        parentComment = await this.commentRepository.findCommentById(
+          dto.parentCommentId,
+        );
+
+        // 해시태그 댓글을 구한다
+        const hashTagTargetComment =
+          await this.commentRepository.findCommentById(
+            dto.hashtagTargetCommentId,
+          );
+
+        // 해시태그의 작성자 유저아이디를 구한다.
+        hashtagTargetAuthor = await this.userRepository.findOneUser(
+          hashTagTargetComment.author,
+        );
       }
-      return await this.commentRepository.createAndSave();
+
+      return await this.commentRepository.createAndSave({
+        commentType: commentType,
+        project: project,
+        commentAuthor: commentAuthorUser,
+        content: dto.content,
+        parentComment: parentComment,
+        hashtagTargetAuthor: hashtagTargetAuthor,
+      });
     } catch (error) {
       throw error;
     }
