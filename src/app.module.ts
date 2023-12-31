@@ -15,6 +15,7 @@ import { RoleModule } from './role/role.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { SendEmailToNewUserListener } from 'users/listeners/send-email-to-new-user.listener';
 import { CommentModule } from './comment/comment.module';
+import { AwsModule } from './aws/aws.module';
 
 @Module({
   imports: [
@@ -91,6 +92,7 @@ import { CommentModule } from './comment/comment.module';
     RedisModule,
     RoleModule,
     CommentModule,
+    AwsModule,
   ],
   controllers: [AppController],
   providers: [SendEmailToNewUserListener],

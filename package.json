@@ -20,6 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.484.0",
     "@liaoliaots/nestjs-redis": "^9.0.5",
     "@nestjs-modules/mailer": "^1.8.1",
     "@nestjs/axios": "^3.0.1",
@@ -37,7 +38,7 @@
     "@nestjs/typeorm": "^9.0.1",
     "@types/bcrypt": "^5.0.0",
     "@types/cors": "^2.8.13",
-    "aws-sdk": "^2.1525.0",
+    "aws-sdk": "^2.1528.0",
     "axios": "^1.6.1",
     "bcrypt": "^5.1.0",
     "cache-manager": "^5.2.3",
