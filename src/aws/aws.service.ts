@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { ConfigService } from '@nestjs/config';
+import { imageUploadToS3Dto } from './dtos/aws.dto';
 
 @Injectable()
 export class AwsService {
@@ -21,18 +22,15 @@ export class AwsService {
     });
   }
 
-  async imageUploadToS3(
-    dirName: string,
-    fileName: string,
-    uploadFile: Express.Multer.File,
-    ext: string,
-  ) {
+  async imageUploadToS3(dto: imageUploadToS3Dto) {
+    const { dirName, fileName, uploadFile } = dto;
+
     // AWS S3에 이미지 업로드
     const command = new PutObjectCommand({
       Bucket: this.AWS_BUCKET_NAME, // 저장할 S3 버킷
       Key: `${dirName}/${fileName}`, // 업로드될 파일 이름
       Body: uploadFile.buffer, // 업로드할 파일
-      ContentType: `image/${ext}`, // 파일타입
+      ContentType: uploadFile.mimetype, // 파일타입
     });
 
     // 생성된 명령을 S3 클라이언트에 전달하여 이미지업로드를 수행한다

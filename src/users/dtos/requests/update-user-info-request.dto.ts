@@ -50,5 +50,5 @@ export class UpdateUserInfoRequestDto {
 
   // 이미지 프로필 파일
   @IsOptional()
-  imgProfileFile?: any;
+  imgProfileFile?: Express.Multer.File;
 }

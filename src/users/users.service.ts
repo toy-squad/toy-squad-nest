@@ -194,6 +194,12 @@ export class UsersService {
 
       // 이미지 프로필파일은 s3에 저장한다
       if (imgProfileFile) {
+        await this.awsService.imageUploadToS3({
+          dirName: `${userId}/profile`,
+          fileName: imgProfileFile.originalname,
+          uploadFile: imgProfileFile,
+          ext: imgProfileFile.mimetype,
+        });
       }
       await this.usersRepository.updateUserInfo(dto);
     } catch (error) {
