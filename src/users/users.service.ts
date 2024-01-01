@@ -15,13 +15,17 @@ import { GetUserDetailRequestDto } from './dtos/requests/get-user-detail-request
 import { UpdateUserInfoRequestDto } from './dtos/requests/update-user-info-request.dto';
 import { UpdatedUserInfoType } from './types/update-user-info.type';
 import { UpdatePasswordRequestDto } from 'users/dtos/requests/update-password-request.dto';
+import { AwsService } from 'aws/aws.service';
 
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
   static readonly positionCategory = ['DEVELOPER', 'DESIGNER', 'MANAGER'];
 
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(
+    private readonly usersRepository: UsersRepository,
+    private readonly awsService: AwsService,
+  ) {}
 
   /**
    * 카테고리에 매핑되는 포지션 조회

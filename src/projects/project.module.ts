@@ -7,6 +7,7 @@ import { ProjectsRepository } from './projects.repository';
 import { RoleModule } from 'role/role.module';
 import { UsersModule } from 'users/users.module';
 import { CommentModule } from 'comment/comment.module';
+import { AwsModule } from 'aws/aws.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { CommentModule } from 'comment/comment.module';
     RoleModule,
     UsersModule,
     CommentModule,
+    AwsModule,
   ],
   controllers: [ProjectsController],
   providers: [ProjectsService, ProjectsRepository],

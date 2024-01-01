@@ -67,6 +67,11 @@ import { AwsModule } from './aws/aws.module';
         FRONTEND_URL: Joi.string().required(),
         /** RESET_PASSWORD */
         RESET_PASSWORD_TOKEN_EXPIRATION: Joi.number().required(),
+        /** AWS */
+        AWS_ACCESS_KEY: Joi.string().required(),
+        AWS_SECRET_ACCESS_KEY: Joi.string().required(),
+        AWS_REGION: Joi.string().required(),
+        AWS_BUCKET_NAME: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRoot({
