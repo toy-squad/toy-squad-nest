@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from './entities/project.entity';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { CreateNewProjectDto } from './dtos/requests/create-new-project.dto';
 import { UpdateProjectRequestDto } from './dtos/requests/update-project-request.dto';
 import { GetProjectsRequestDto } from './dtos/requests/get-projects-request.dto';
@@ -47,11 +47,27 @@ export class ProjectsRepository {
     }
 
     if (contactType) {
-      query.andWhere('project.contactType = :contactType', { contactType });
+      query.andWhere( new Brackets(qb => {
+        contactType.forEach((type, index) => {
+          if (index === 0) {
+            qb.where('project.contactType LIKE :contactType', { contactType: `%${type}%` });
+          } else {
+            qb.orWhere('project.contactType LIKE :contactType', { contactType: `%${type}%` });
+          }
+        });
+      }));
     }
 
     if (memberCount) {
-      query.andWhere('project.memberCount = :memberCount', { memberCount });
+      query.andWhere( new Brackets(qb => {
+        memberCount.forEach((count, index) => {
+          if (index === 0) {
+            qb.where('project.memberCount = :memberCount', { memberCount: count });
+          } else {
+            qb.orWhere('project.memberCount = :memberCount', { memberCount: count });
+          }
+        });
+      }));
     }
 
     if (recruitStartDate && recruitEndDate) {
@@ -63,15 +79,39 @@ export class ProjectsRepository {
     }
 
     if (place) {
-      query.andWhere('project.place = :place', { place });
+      query.andWhere( new Brackets(qb => {
+        place.forEach((place, index) => {
+          if (index === 0) {
+            qb.where('project.place LIKE :place', { place: `%${place}%` });
+          } else {
+            qb.orWhere('project.place LIKE :place', { place: `%${place}%` });
+          }
+        });
+      }));
     }
 
     if (field) {
-      query.andWhere('project.field IN (:...field)', { field });
+      query.andWhere( new Brackets(qb => {
+        field.forEach((field, index) => {
+          if (index === 0) {
+            qb.where('project.field LIKE :field', { field: `%${field}%` });
+          } else {
+            qb.orWhere('project.field LIKE :field', { field: `%${field}%` });
+          }
+        });
+      }));
     }
 
     if (platform) {
-      query.andWhere('project.platform IN (:...platform)', { platform });
+      query.andWhere( new Brackets(qb => {
+        platform.forEach((platform, index) => {
+          if (index === 0) {
+            qb.where('project.platform LIKE :platform', { platform: `%${platform}%` });
+          } else {
+            qb.orWhere('project.platform LIKE :platform', { platform: `%${platform}%` });
+          }
+        });
+      }));
     }
 
     query.skip((page - 1) * limit);
