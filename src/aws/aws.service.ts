@@ -10,7 +10,7 @@ export class AwsService {
   AWS_BUCKET_NAME: string;
 
   constructor(private configService: ConfigService) {
-    this.AWS_REGION = this.configService.get('AWS_REGION');
+    this.AWS_REGION = this.configService.get('AWS_REGION') ?? 'ap-northeast-2';
     this.AWS_BUCKET_NAME = this.configService.get('AWS_BUCKET_NAME');
 
     this.s3Client = new S3Client({

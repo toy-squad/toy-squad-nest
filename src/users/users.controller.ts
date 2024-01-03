@@ -40,6 +40,11 @@ import { positionCategory } from './types/position.type';
 import { UpdateUserInfoRequestDto } from './dtos/requests/update-user-info-request.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
+import RequestWithUser from 'auth/interfaces/request-with-user.interface';
+import {
+  UPLOAD_IMAGE_MAX_SIZE,
+  VALID_IMAGE_FILE_TYPES_REGEX,
+} from 'commons/constants/FILE_CONSTANT';
 
 @ApiTags('유저 API')
 @Controller('users')
@@ -86,6 +91,49 @@ export class UsersController {
       categoryPosition: categoryPosition,
       detailPosition: detailPosition,
     };
+  }
+
+  /**
+   * TODO
+   * 유저정보 수정
+   * URL: /api/users
+   */
+  @Patch()
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({
+    summary: '유저 정보 수정 API',
+    description: '유저 정보 수정',
+  })
+  @ApiParam({
+    name: 'id',
+    description: '유저 PK',
+  })
+  async updateUserInfo(
+    @Req() req: RequestWithUser,
+    @Res() res: Response,
+    @Body() requestDto: UpdateUserInfoRequestDto,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          // 이미지 타입 검사
+          new FileTypeValidator({ fileType: VALID_IMAGE_FILE_TYPES_REGEX }),
+
+          // 이미지 크기 10MB 넘는지 검사
+          new MaxFileSizeValidator({ maxSize: UPLOAD_IMAGE_MAX_SIZE }),
+        ],
+      }),
+    )
+    file?: Express.Multer.File,
+  ) {
+    const { userId } = req.user;
+    const dto = req.body;
+
+    await this.userService.updateUserInfo({
+      ...dto,
+      userId: userId,
+      imgProfileFile: file,
+    });
+    res.status(200).json('수정 완료');
   }
 
   /**
@@ -194,54 +242,7 @@ export class UsersController {
     return await this.userService.findOneUser({ userId: userId });
   }
 
-  /**
-   * TODO
-   * 유저정보 수정
-   * URL: /api/users/:id
-   */
-  @Patch('/:id')
-  @UseInterceptors(FileInterceptor('file'))
-  @ApiOperation({
-    summary: '유저 정보 수정 API',
-    description: '유저 정보 수정',
-  })
-  @ApiParam({
-    name: 'id',
-    description: '유저 PK',
-  })
-  async updateUserInfo(
-    @Param('id') userId: string,
-    @Body() dto: UpdateUserInfoRequestDto,
-    @UploadedFile(
-      new ParseFilePipeBuilder()
-        .addFileTypeValidator({
-          fileType: 'image/jpg',
-        })
-        .addFileTypeValidator({
-          fileType: 'image/jpeg',
-        })
-        .addFileTypeValidator({
-          fileType: 'image/png',
-        })
-        .addFileTypeValidator({
-          fileType: 'image/gif',
-        })
-        .addMaxSizeValidator({
-          maxSize: 10 * 1024 * 1024, // 10MB
-        })
-        .build({
-          fileIsRequired: false,
-        }),
-    )
-    file?: Express.Multer.File,
-  ) {
-    return await this.userService.updateUserInfo({
-      userId,
-      ...dto,
-      imgProfileFile: file,
-    });
-  }
-
+  @Patch('test/images')
   @Public()
   async uploadImg(
     @UploadedFile(

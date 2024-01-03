@@ -12,7 +12,10 @@ import { FindUserRequestDto } from './dtos/requests/find-one-user-request.dto';
 import { ConfirmPasswordRequestDto } from './dtos/requests/confirm-password-request.dto';
 import { FindUserListRequestDto } from './dtos/requests/find-user-list-request.dto';
 import { GetUserDetailRequestDto } from './dtos/requests/get-user-detail-request.dto';
-import { UpdateUserInfoRequestDto } from './dtos/requests/update-user-info-request.dto';
+import {
+  UpdateUserInfoServiceDto,
+  UpdateUserInfoRequestDto,
+} from './dtos/requests/update-user-info-request.dto';
 import { UpdatedUserInfoType } from './types/update-user-info.type';
 import { UpdatePasswordRequestDto } from 'users/dtos/requests/update-password-request.dto';
 import { AwsService } from 'aws/aws.service';
@@ -179,9 +182,9 @@ export class UsersService {
    * - dto: 정보수정 요청 데이터
    * - defaultUserInfo: 기존 DB에 저장된 유저정보
    */
-  async updateUserInfo(dto: UpdateUserInfoRequestDto) {
+  async updateUserInfo(dto: UpdateUserInfoServiceDto) {
     try {
-      const { userId, imgProfileFile } = dto;
+      const { userId, imgProfileFile, ...userInfo } = dto;
 
       // userId 를 갖는 유저가 존재하는지 확인
       const defaultUserInfo: UpdatedUserInfoType =
@@ -193,15 +196,25 @@ export class UsersService {
       }
 
       // 이미지 프로필파일은 s3에 저장한다
+      let imgUrl: string;
       if (imgProfileFile) {
-        await this.awsService.imageUploadToS3({
+        imgUrl = await this.awsService.imageUploadToS3({
           dirName: `${userId}/profile`,
           fileName: imgProfileFile.originalname,
           uploadFile: imgProfileFile,
           ext: imgProfileFile.mimetype,
         });
       }
-      await this.usersRepository.updateUserInfo(dto);
+
+      if (!imgUrl) {
+        throw new BadRequestException('이미지 URL이 존재하지 않습니다.');
+      }
+
+      await this.usersRepository.updateUserInfo({
+        userId: userId,
+        imgUrl: imgUrl,
+        ...userInfo,
+      });
     } catch (error) {
       throw error;
     }
