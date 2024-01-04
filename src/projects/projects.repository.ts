@@ -92,13 +92,12 @@ export class ProjectsRepository {
     return await query.getManyAndCount();
   }
 
-  async findOneProject(id: string): Promise<Project> {
+  async findOneProject(projectId: string) {
     try {
       const project = await this.dataSource
-        .createQueryBuilder()
-        .select('project')
-        .from(Project, 'project')
-        .where('project.id = :id', { id: id })
+        .getRepository(Project)
+        .createQueryBuilder('project')
+        .where('project.id = :projectId', { projectId: projectId })
         .getOne();
       return project;
     } catch (error) {
