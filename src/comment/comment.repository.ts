@@ -1,6 +1,10 @@
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Comment } from './entities/comment.entity';
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from 'projects/entities/project.entity';
 import { CreateCommentDto, GetAllCommentsDto } from './dto/comment.dto';
@@ -9,52 +13,52 @@ import { CreateCommentDto, GetAllCommentsDto } from './dto/comment.dto';
 export class CommentRepository {
   private logger = new Logger('CommentRepository');
 
-  private queryRunner;
-  private entityManager;
-
   constructor(
-    @InjectRepository(Comment)
-    private readonly repo: Repository<Comment>,
-  ) {
-    this.queryRunner = repo.queryRunner;
-    this.entityManager = repo.manager;
-  }
+    @InjectRepository(Comment) private readonly repo: Repository<Comment>,
+    private readonly dataSource: DataSource,
+  ) {}
 
   // 댓글 생성 및 저장
   async createAndSave(dto: CreateCommentDto) {
+    const { content, project, commentAuthor } = dto;
     try {
-      await this.queryRunner.connect();
-      await this.queryRunner.startTransaction();
-
-      // TODO
-      const comment = this.repo.create();
-      await this.repo.save(comment);
-
-      await this.queryRunner.commitTransaction();
-      return comment;
+      await this.dataSource
+        .createQueryBuilder()
+        .insert()
+        .into(Comment)
+        .values({
+          content: content,
+          project: project,
+          author: commentAuthor,
+        })
+        .execute();
     } catch (error) {
-      await this.queryRunner.rollbackTransaction();
-    } finally {
-      // release query runner which is manually created...
-      await this.queryRunner.release();
+      throw new InternalServerErrorException(error, error.stack);
     }
   }
 
   // 게시물 ID에 따른 댓글 조회 (페이징 포함)
-  async findAllCommentsByProjectWithPagination(
-    dto: GetAllCommentsDto,
-  ): Promise<[Comment[], number]> {
+  async findAllCommentsByProjectWithPagination(dto: GetAllCommentsDto) {
     const { page, take, projectId } = dto;
-    // TODO
-    const project = await this.entityManager.findOne(Project, projectId);
-    const [comments, total] = await this.repo.findAndCount({
-      where: { project: project, deletedAt: null },
-      relations: ['user', 'parent'],
-      order: { createdAt: 'DESC' },
-      take: take,
-      skip: take * (page - 1),
-    });
-    return [comments, total];
+
+    // 프로젝트를 찾는다.
+    const project = await this.dataSource
+      .getRepository(Project)
+      .createQueryBuilder('project')
+      .where('project.id = :projectId', { projectId: projectId });
+
+    // 프로젝트의 댓글을 찾는다.
+    const comments = await this.dataSource
+      .getRepository(Comment)
+      .createQueryBuilder('comment')
+      .leftJoinAndSelect('comment.author', 'user')
+      .leftJoinAndSelect('comment.project', 'project')
+      .where('project.id = :projectId', { projectId: projectId })
+      .orderBy('comment.createdAt', 'DESC')
+      .take(take)
+      .skip(take * (page - 1));
+
+    return comments;
   }
 
   // 댓글 ID로 조회

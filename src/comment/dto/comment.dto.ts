@@ -3,6 +3,7 @@ import { IsNotEmpty, IsOptional } from 'class-validator';
 import { PaginationQueryDto } from 'commons/dtos/pagination-query-dto';
 import { Project } from 'projects/entities/project.entity';
 import { User } from 'users/entities/user.entity';
+import { Comment } from 'comment/entities/comment.entity';
 
 export class CommentDto {
   // 댓글내용
@@ -18,6 +19,16 @@ export class CommentDto {
   projectId: string;
 }
 
+export class CreateCommentRequestDto {
+  // 댓글내용
+  @IsNotEmpty()
+  content: string;
+
+  // 프로젝트 ID
+  @IsNotEmpty()
+  projectId: string;
+}
+
 /**
  * CommentType - 댓글타입
  * - C : 댓글
@@ -25,7 +36,7 @@ export class CommentDto {
  * - H : 대댓글에 해시태그
  */
 export type CommentType = 'C' | 'R' | 'H';
-export class CreateCommentRequestDto extends PartialType(CommentDto) {
+export class CreateCommentServiceDto extends PartialType(CommentDto) {
   // 댓글 타입
   @IsNotEmpty()
   commentType: CommentType;

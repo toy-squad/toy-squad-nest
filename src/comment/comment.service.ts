@@ -1,6 +1,10 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
 import {
-  CreateCommentRequestDto,
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import {
+  CreateCommentServiceDto,
   DeleteCommentDto,
   GetAllCommentsDto,
   UpdateCommentDto,
@@ -20,22 +24,26 @@ export class CommentService {
   ) {}
 
   // 댓글 작성
-  async createComment(dto: CreateCommentRequestDto) {
+  async createComment(dto: CreateCommentServiceDto) {
     const { projectId, userId, commentType } = dto;
     let parentComment = undefined;
     let hashtagTargetAuthor = undefined;
 
     try {
-      // projectId 로 프로젝트 모집공고 데이터를 구한다.
-      const project: Project = await this.projectRepository.findOneProject(
-        projectId,
-      );
-
       // userId 로 작성자 회원정보 데이터를 구한다.
-      const commentAuthorUser: User = await this.userRepository.findOneUser({
+      const commentAuthorUser = await this.userRepository.findOneUser({
         userId: userId,
         allowPassword: false,
       });
+      if (!commentAuthorUser) {
+        throw new BadRequestException('잘못된 접근입니다.');
+      }
+
+      // projectId 로 프로젝트 모집공고 데이터를 구한다.
+      const project = await this.projectRepository.findOneProject(projectId);
+      if (!project) {
+        throw new NotFoundException('프로젝트가 존재하지 않습니다.');
+      }
 
       // 부모댓글
       if (commentType === 'R') {
@@ -64,7 +72,7 @@ export class CommentService {
         );
       }
 
-      return await this.commentRepository.createAndSave({
+      await this.commentRepository.createAndSave({
         commentType: commentType,
         project: project,
         commentAuthor: commentAuthorUser,

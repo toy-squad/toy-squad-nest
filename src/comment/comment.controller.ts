@@ -17,6 +17,7 @@ import { Response } from 'express';
 import RequestWithUser from 'auth/interfaces/request-with-user.interface';
 import { Public } from 'auth/decorators/public.decorator';
 import { DEFAULT_PAGE, DEFAULT_TAKE } from 'commons/dtos/pagination-query-dto';
+import { CreateCommentRequestDto } from './dto/comment.dto';
 
 @Controller('comment')
 export class CommentController {
@@ -24,11 +25,15 @@ export class CommentController {
 
   // 프로젝트 모집공고에 댓글작성
   @Post()
-  async createComment(@Req() req: RequestWithUser, @Res() res: Response) {
+  async createComment(
+    @Req() req: RequestWithUser,
+    @Res() res: Response,
+    @Body() requestDto: CreateCommentRequestDto,
+  ) {
     await this.commentService.createComment({
       commentType: 'C',
       userId: req.user.userId,
-      projectId: req.body.project_id,
+      projectId: req.body.projectId,
       content: req.body.content,
     });
 
@@ -40,13 +45,14 @@ export class CommentController {
   async generateReplyComment(
     @Req() req: RequestWithUser,
     @Res() res: Response,
+    @Body() requestDto: CreateCommentRequestDto,
   ) {
     await this.commentService.createComment({
       commentType: 'R',
       userId: req.user.userId,
-      projectId: req.body.project_id,
+      projectId: req.body.projectId,
       content: req.body.content,
-      parentCommentId: req.body.parent_comment_id,
+      parentCommentId: req.body.parentCommentId,
     });
 
     return res.status(200).json({ message: '대댓글 작성 완료' });
@@ -57,14 +63,15 @@ export class CommentController {
   async generateHashtagReplyComment(
     @Req() req: RequestWithUser,
     @Res() res: Response,
+    @Body() requestDto: CreateCommentRequestDto,
   ) {
     await this.commentService.createComment({
       commentType: 'H',
       userId: req.user.userId,
-      projectId: req.body.project_id,
+      projectId: req.body.projectId,
       content: req.body.content,
-      parentCommentId: req.body.parent_comment_id,
-      hashtagTargetCommentId: req.body.hashtag_target_comment_id,
+      parentCommentId: req.body.parentCommentId,
+      hashtagTargetCommentId: req.body.hashtagTargetCommentId,
     });
 
     return res.status(200).json({ message: '대댓글 작성 완료' });
