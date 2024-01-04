@@ -1,49 +1,55 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from './entities/project.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { CreateNewProjectDto } from './dtos/requests/create-new-project.dto';
 import { UpdateProjectRequestDto } from './dtos/requests/update-project-request.dto';
 import { GetProjectsRequestDto } from './dtos/requests/get-projects-request.dto';
 
 @Injectable()
 export class ProjectsRepository {
-  private queryRunner;
-  private entityManager;
-
   constructor(
-    @InjectRepository(Project)
-    private readonly repo: Repository<Project>,
-  ) {
-    this.queryRunner = repo.queryRunner;
-    this.entityManager = repo.manager;
-  }
+    @InjectRepository(Project) private readonly repo: Repository<Project>,
+    private readonly dataSource: DataSource,
+  ) {}
 
   async getProjects(dto: GetProjectsRequestDto): Promise<[Project[], number]> {
-    const { page, 
-            limit, 
-            firstPosition, 
-            secondPosition, 
-            contactType, 
-            memberCount, 
-            recruitStartDate,
-            recruitEndDate,
-            startDate,
-            endDate, 
-            place, field, platform, keyword } = dto;
+    const {
+      page,
+      limit,
+      firstPosition,
+      secondPosition,
+      contactType,
+      memberCount,
+      recruitStartDate,
+      recruitEndDate,
+      startDate,
+      endDate,
+      place,
+      field,
+      platform,
+      keyword,
+    } = dto;
 
-    const query = this.repo.createQueryBuilder('project');
+    const query = await this.repo.createQueryBuilder('project');
 
     if (keyword) {
-      query.andWhere('project.name LIKE :keyword OR project.description LIKE :keyword OR project.intro LIKE :keyword', { keyword: `%${keyword}%`})
+      query.andWhere(
+        'project.name LIKE :keyword OR project.description LIKE :keyword OR project.intro LIKE :keyword',
+        { keyword: `%${keyword}%` },
+      );
     }
 
     if (firstPosition) {
-      query.andWhere('project.firstPosition IN (:...firstPosition)', { firstPosition });
+      query.andWhere('project.firstPosition IN (:...firstPosition)', {
+        firstPosition,
+      });
     }
 
     if (secondPosition) {
-      query.andWhere('project.secondPosition IN (:...secondPosition)', { secondPosition });
+      query.andWhere('project.secondPosition IN (:...secondPosition)', {
+        secondPosition,
+      });
     }
 
     if (contactType) {
@@ -55,11 +61,17 @@ export class ProjectsRepository {
     }
 
     if (recruitStartDate && recruitEndDate) {
-      query.andWhere('Date(project.recruitStartDate) <= Date(:recruitEndDate) AND Date(project.recruitEndDate) >= Date(:recruitStartDate)', { recruitStartDate, recruitEndDate });
+      query.andWhere(
+        'Date(project.recruitStartDate) <= Date(:recruitEndDate) AND Date(project.recruitEndDate) >= Date(:recruitStartDate)',
+        { recruitStartDate, recruitEndDate },
+      );
     }
 
     if (startDate && endDate) {
-      query.andWhere('Date(project.start_date) <= Date(:endDate) AND Date(project.end_date) >= Date(:startDate)', { startDate, endDate });
+      query.andWhere(
+        'Date(project.start_date) <= Date(:endDate) AND Date(project.end_date) >= Date(:startDate)',
+        { startDate, endDate },
+      );
     }
 
     if (place) {
@@ -82,7 +94,13 @@ export class ProjectsRepository {
 
   async findOneProject(id: string): Promise<Project> {
     try {
-      return this.repo.findOneBy({ id: id });
+      const project = await this.dataSource
+        .createQueryBuilder()
+        .select('project')
+        .from(Project, 'project')
+        .where('project.id = :id', { id: id })
+        .getOne();
+      return project;
     } catch (error) {
       throw error;
     }
