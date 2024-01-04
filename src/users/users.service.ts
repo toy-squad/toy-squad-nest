@@ -204,10 +204,10 @@ export class UsersService {
           uploadFile: imgProfileFile,
           ext: imgProfileFile.mimetype,
         });
-      }
 
-      if (!imgUrl) {
-        throw new BadRequestException('이미지 URL이 존재하지 않습니다.');
+        if (!imgUrl) {
+          throw new BadRequestException('이미지 URL이 존재하지 않습니다.');
+        }
       }
 
       await this.usersRepository.updateUserInfo({
