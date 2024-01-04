@@ -94,8 +94,6 @@ export class UsersController {
   }
 
   /**
-   * TODO
-   * 유저정보 수정
    * URL: /api/users
    */
   @Patch()
@@ -242,38 +240,11 @@ export class UsersController {
     return await this.userService.findOneUser({ userId: userId });
   }
 
-  @Patch('test/images')
-  @Public()
-  async uploadImg(
-    @UploadedFile(
-      new ParseFilePipeBuilder()
-        .addFileTypeValidator({
-          fileType: 'jpeg',
-        })
-        .addFileTypeValidator({
-          fileType: 'png',
-        })
-        .addFileTypeValidator({
-          fileType: 'gif',
-        })
-        .addMaxSizeValidator({
-          maxSize: 10 * 1024 * 1024, // 10MB
-        })
-        .build({
-          fileIsRequired: false,
-        }),
-    )
-    file?: Express.Multer.File,
-  ) {
-    console.log(file);
-    return file;
-  }
-
   /**
    * 회원탈퇴
-   * URL: /api/users/:id
+   * URL: /api/users
    */
-  @Delete('/:id')
+  @Delete()
   @ApiOperation({
     summary: '회원 탈퇴 API',
     description: '회원 탈퇴 및 유저계정 삭제',
@@ -285,9 +256,12 @@ export class UsersController {
   @ApiOkResponse({
     description: '회원탈퇴 Success',
   })
-  async deleteUser(@Param('id') userId: string) {
+  async deleteUser(@Req() req: RequestWithUser, @Res() res: Response) {
     try {
+      const { userId } = req.user;
       await this.userService.deleteUser(userId);
+
+      res.status(204).send();
     } catch (error) {
       throw error;
     }
