@@ -188,14 +188,12 @@ export class UsersService {
         throw new NotFoundException('존재하지 않은 회원입니다.');
       }
 
-      // const entries = Object.entries(dto);
-      // for (const [key, value] of entries) {
-      //   if (value === null) {
-      //     // dto 에서 값이 존재하지 않으면 기존 정보를 저장하도록한다.
-      //     dto[key] = defaultUserInfo[key];
-      //   }
-      // }
-      await this.usersRepository.updateUserInfo(dto);
+      // 비밀번호 패스워드 수정할 경우 - 새로운 비밀번호를 암호화한다.
+      const password = dto.password
+        ? await bcrypt.hash(dto.password, 10)
+        : undefined;
+
+      await this.usersRepository.updateUserInfo({ ...dto, password: password });
     } catch (error) {
       throw error;
     }
