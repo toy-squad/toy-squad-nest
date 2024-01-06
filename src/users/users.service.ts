@@ -195,6 +195,11 @@ export class UsersService {
         throw new NotFoundException('존재하지 않은 회원입니다.');
       }
 
+      // 비밀번호 패스워드 수정할 경우 - 새로운 비밀번호를 암호화한다.
+      const password = dto.password
+        ? await bcrypt.hash(dto.password, 10)
+        : undefined;
+
       // 이미지 프로필파일은 s3에 저장한다
       let imgUrl: string;
       if (imgProfileFile) {
@@ -211,9 +216,10 @@ export class UsersService {
       }
 
       await this.usersRepository.updateUserInfo({
+        ...userInfo,
         userId: userId,
         imgUrl: imgUrl,
-        ...userInfo,
+        password: password,
       });
     } catch (error) {
       throw error;
