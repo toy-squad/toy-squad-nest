@@ -41,18 +41,20 @@ export class CommentController {
   }
 
   // 대댓글 작성
-  @Post(':comment_id/reply')
+  @Post('reply')
   async generateReplyComment(
     @Req() req: RequestWithUser,
     @Res() res: Response,
     @Body() requestDto: CreateCommentRequestDto,
   ) {
+    const { userId } = req.user;
+    const { projectId, content, parentCommentId } = req.body;
     await this.commentService.createComment({
       commentType: 'R',
-      userId: req.user.userId,
-      projectId: req.body.projectId,
-      content: req.body.content,
-      parentCommentId: req.body.parentCommentId,
+      userId: userId,
+      projectId: projectId,
+      content: content,
+      parentCommentId: parentCommentId,
     });
 
     return res.status(200).json({ message: '대댓글 작성 완료' });
@@ -70,7 +72,7 @@ export class CommentController {
       userId: req.user.userId,
       projectId: req.body.projectId,
       content: req.body.content,
-      parentCommentId: req.body.parentCommentId,
+      parentCommentId: req.params.comment_id,
       hashtagTargetCommentId: req.body.hashtagTargetCommentId,
     });
 

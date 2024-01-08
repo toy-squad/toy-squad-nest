@@ -30,6 +30,7 @@ export class CommentRepository {
           content: content,
           project: project,
           author: commentAuthor,
+          parent: dto.parentComment,
         })
         .execute();
     } catch (error) {
@@ -56,17 +57,27 @@ export class CommentRepository {
       .where('project.id = :projectId', { projectId: projectId })
       .orderBy('comment.createdAt', 'DESC')
       .take(take)
-      .skip(take * (page - 1));
+      .skip(take * (page - 1))
+      .getRawMany();
 
     return comments;
   }
 
   // 댓글 ID로 조회
-  async findCommentById(comment_id: string) {
-    return await this.repo.findOne({
-      where: { id: comment_id, deletedAt: null },
-      relations: ['user', 'project'],
-    });
+  async findCommentById(commentId: string) {
+    const comment = await this.dataSource
+      .getRepository(Comment)
+      .createQueryBuilder('comment')
+      .leftJoinAndSelect('comment.project', 'project')
+      .leftJoinAndSelect('comment.author', 'user')
+      .where('comment.id = :commentId', { commentId: commentId })
+      .getOne();
+
+    return comment;
+    // return await this.repo.findOne({
+    //   where: { id: comment_id, deletedAt: null },
+    //   relations: ['user', 'project'],
+    // });
   }
 
   // 댓글 좋아요 수 증가

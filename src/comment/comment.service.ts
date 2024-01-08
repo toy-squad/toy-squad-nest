@@ -51,6 +51,9 @@ export class CommentService {
         parentComment = await this.commentRepository.findCommentById(
           dto.parentCommentId,
         );
+        if (!parentComment) {
+          throw new NotFoundException('댓글이 존재하지 않습니다.');
+        }
       }
 
       // 해시태그
