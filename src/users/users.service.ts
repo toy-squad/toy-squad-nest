@@ -19,6 +19,7 @@ import {
 import { UpdatedUserInfoType } from './types/update-user-info.type';
 import { UpdatePasswordRequestDto } from 'users/dtos/requests/update-password-request.dto';
 import { AwsService } from 'aws/aws.service';
+import { RedisService } from 'redis/redis.service';
 
 @Injectable()
 export class UsersService {
@@ -28,6 +29,7 @@ export class UsersService {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly awsService: AwsService,
+    private readonly redisService: RedisService,
   ) {}
 
   /**
@@ -221,6 +223,11 @@ export class UsersService {
         imgUrl: imgUrl,
         password: password,
       });
+
+      // 더이상 비밀번호 변경 못하도록 reset-pwd-{user_id} 토큰값을 지운다.
+      if (password) {
+        await this.redisService.del(`reset-pwd-${userId}`);
+      }
     } catch (error) {
       throw error;
     }
