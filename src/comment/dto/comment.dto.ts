@@ -1,5 +1,5 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { IsNotEmpty, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsOptional, Min } from 'class-validator';
 import { PaginationQueryDto } from 'commons/dtos/pagination-query-dto';
 import { Project } from 'projects/entities/project.entity';
 import { User } from 'users/entities/user.entity';
@@ -29,11 +29,12 @@ export class CreateCommentRequestDto {
   projectId: string;
 }
 
+// TODO: 네이밍변경 해시태그 -> 멘션
 /**
  * CommentType - 댓글타입
  * - C : 댓글
  * - R : 대댓글
- * - H : 대댓글에 해시태그
+ * - H : 대댓글에 멘션
  */
 export type CommentType = 'C' | 'R' | 'H';
 export class CreateCommentServiceDto extends PartialType(CommentDto) {
@@ -65,6 +66,7 @@ export class CreateCommentDto {
 
   // 코멘트 내용
   @IsNotEmpty()
+  @Min(5)
   content: string;
 
   // 부모댓글
@@ -73,7 +75,7 @@ export class CreateCommentDto {
 
   // 해시태그 대상 댓글 아이디
   @IsOptional()
-  hashtagTargetAuthor?: User;
+  hashtagTargetComment?: Comment;
 }
 
 /**

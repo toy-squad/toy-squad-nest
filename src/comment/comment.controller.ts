@@ -60,25 +60,31 @@ export class CommentController {
     return res.status(200).json({ message: '대댓글 작성 완료' });
   }
 
+  // TODO: 해시태그(#) -> 멘션(@) 으로 변경, 타입도 H -> M 으로 변경
+  // TODO: hashtagTargetCommentId -> mentionTargetId 로 변경
   // 대댓글에 해시태그 답글작성
-  @Post(':comment_id/reply/hashtag')
+  @Post('reply/hashtag')
   async generateHashtagReplyComment(
     @Req() req: RequestWithUser,
     @Res() res: Response,
     @Body() requestDto: CreateCommentRequestDto,
   ) {
+    const { userId } = req.user;
+    const { projectId, content, parentCommentId, hashtagTargetCommentId } =
+      req.body;
     await this.commentService.createComment({
       commentType: 'H',
-      userId: req.user.userId,
-      projectId: req.body.projectId,
-      content: req.body.content,
-      parentCommentId: req.params.comment_id,
-      hashtagTargetCommentId: req.body.hashtagTargetCommentId,
+      userId: userId,
+      projectId: projectId,
+      content: content,
+      parentCommentId: parentCommentId,
+      hashtagTargetCommentId: hashtagTargetCommentId,
     });
 
     return res.status(200).json({ message: '대댓글 작성 완료' });
   }
 
+  // TODO
   // 프로젝트 모집공고에 작성된 댓글 전체 조회 + 페이징조회
   @Public()
   @Get(':project_id')
@@ -103,6 +109,7 @@ export class CommentController {
     });
   }
 
+  // TODO
   // 댓글이 갖는 대댓글 조회
   @Public()
   @Get(':comment_id')

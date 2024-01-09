@@ -20,7 +20,7 @@ export class CommentRepository {
 
   // 댓글 생성 및 저장
   async createAndSave(dto: CreateCommentDto) {
-    const { content, project, commentAuthor } = dto;
+    const { content, project, commentAuthor, commentType } = dto;
     try {
       await this.dataSource
         .createQueryBuilder()
@@ -30,7 +30,9 @@ export class CommentRepository {
           content: content,
           project: project,
           author: commentAuthor,
+          commentType: commentType,
           parent: dto.parentComment,
+          hashtagTarget: dto.hashtagTargetComment,
         })
         .execute();
     } catch (error) {

@@ -1,3 +1,4 @@
+import { CommentType } from 'comment/dto/comment.dto';
 import { CoreEntity } from 'commons/entities/core.entity';
 import { Project } from 'projects/entities/project.entity';
 import {
@@ -25,6 +26,10 @@ export class Comment extends CoreEntity {
   // 싫어요 수
   @Column({ default: 0 })
   dislikes: number;
+
+  // 댓글타입
+  @Column({ default: 'C' })
+  commentType: CommentType;
 
   /**
    * 댓글:프로젝트 = N:1
@@ -77,11 +82,13 @@ export class Comment extends CoreEntity {
    * - 대댓글에 댓글을 작성한경우
    * - 해시태그는 대댓글의 아이디를 참조한다
    */
+  // TODO: hashtagTarget -> MentionTarget
   @OneToMany(() => Comment, (comment) => comment.hashtagTarget, {
     nullable: true,
   })
   hashtagComments: Comment[];
 
+  // TODO: hashtagComments -> MentionedComments
   @ManyToOne(() => Comment, (comment) => comment.hashtagComments)
   @JoinColumn()
   hashtagTarget: Comment;

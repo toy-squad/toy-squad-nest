@@ -25,9 +25,7 @@ export class CommentService {
 
   // 댓글 작성
   async createComment(dto: CreateCommentServiceDto) {
-    const { projectId, userId, commentType } = dto;
-    let parentComment = undefined;
-    let hashtagTargetAuthor = undefined;
+    const { projectId, userId, commentType, content } = dto;
 
     try {
       // userId 로 작성자 회원정보 데이터를 구한다.
@@ -40,13 +38,12 @@ export class CommentService {
       }
 
       // projectId 로 프로젝트 모집공고 데이터를 구한다.
+      let parentComment = undefined; // 부모댓글
+      let hashtagTargetComment = undefined; // 해시태그
       const project = await this.projectRepository.findOneProject(projectId);
       if (!project) {
         throw new NotFoundException('프로젝트가 존재하지 않습니다.');
-      }
-
-      // 부모댓글
-      if (commentType === 'R') {
+      } else if (commentType === 'R') {
         // 부모댓글을 구한다
         parentComment = await this.commentRepository.findCommentById(
           dto.parentCommentId,
@@ -54,25 +51,32 @@ export class CommentService {
         if (!parentComment) {
           throw new NotFoundException('댓글이 존재하지 않습니다.');
         }
-      }
-
-      // 해시태그
-      else if (commentType === 'H') {
+      } else if (commentType === 'H') {
         // 부모댓글을 구한다.
         parentComment = await this.commentRepository.findCommentById(
           dto.parentCommentId,
         );
 
         // 해시태그 댓글을 구한다
-        const hashTagTargetComment =
-          await this.commentRepository.findCommentById(
-            dto.hashtagTargetCommentId,
-          );
+        hashtagTargetComment = await this.commentRepository.findCommentById(
+          dto.hashtagTargetCommentId,
+        );
+
+        if (!hashtagTargetComment) {
+          throw new NotFoundException('댓글이 존재하지 않습니다.');
+        }
 
         // 해시태그의 작성자 유저아이디를 구한다.
-        hashtagTargetAuthor = await this.userRepository.findOneUser(
-          hashTagTargetComment.author,
+        const hashtagTargetAuthor = await this.userRepository.findOneUser(
+          hashtagTargetComment.author,
         );
+
+        if (!hashtagTargetAuthor) {
+          throw new NotFoundException('존재하지 않은 댓글 저자입니다.');
+        }
+
+        const contentWithHashTag = `@${hashtagTargetAuthor.name} ${content}`;
+        dto.content = contentWithHashTag;
       }
 
       await this.commentRepository.createAndSave({
@@ -81,7 +85,7 @@ export class CommentService {
         commentAuthor: commentAuthorUser,
         content: dto.content,
         parentComment: parentComment,
-        hashtagTargetAuthor: hashtagTargetAuthor,
+        hashtagTargetComment: hashtagTargetComment,
       });
     } catch (error) {
       throw error;
