@@ -129,14 +129,14 @@ export class CommentController {
     @Req() req: RequestWithUser,
     @Res() res: Response,
   ) {
-    const { user, commentUpdateType } = req.body;
+    const { commentUpdateType, newContent } = req.body;
+    const { userId } = req.user;
 
     await this.commentService.updateComment({
-      userId: user.userId,
+      userId: userId,
       commentId: commentId,
       commentUpdateType: commentUpdateType ?? 'COMMENT',
-      newContent:
-        commentUpdateType === 'COMMENT' ? req.body.newContent : undefined,
+      newContent: commentUpdateType === 'COMMENT' ? newContent : undefined,
     });
 
     return res.status(200).json({ message: '댓글 수정 성공하였습니다.' });
