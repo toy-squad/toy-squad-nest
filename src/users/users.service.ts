@@ -85,13 +85,15 @@ export class UsersService {
       const hashedPassword = await bcrypt.hash(password, 10);
 
       // 포지션 유효성 검사
-      const checkAvailablePosition = await this.checkAllowedDetailPosition(
-        position,
-        position_category,
-      );
+      if (position && position_category) {
+        const checkAvailablePosition = await this.checkAllowedDetailPosition(
+          position,
+          position_category,
+        );
 
-      if (!checkAvailablePosition) {
-        throw new BadRequestException('존재하지 않은 포지션 입니다');
+        if (!checkAvailablePosition) {
+          throw new BadRequestException('존재하지 않은 포지션 입니다');
+        }
       }
 
       const newUser = await this.usersRepository.createNewUser({

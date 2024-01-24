@@ -93,6 +93,8 @@ export class User extends CoreEntity {
   @Column({
     name: 'position',
     comment: '포지션',
+    nullable: true,
+    default: null,
   })
   position: string;
 

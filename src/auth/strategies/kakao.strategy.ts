@@ -1,9 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PassportStrategy } from '@nestjs/passport';
 import { AuthService } from 'auth/auth.service';
 import TokenPayload from 'auth/interfaces/token-payload.interface';
 import { Strategy } from 'passport-kakao';
 import { UpdateUserInfoRequestDto } from 'users/dtos/requests/update-user-info-request.dto';
+import { SendEmailToNewUserEvent } from 'users/events/send-email-to-new-user.event';
 import { UsersService } from 'users/users.service';
 
 @Injectable()
@@ -11,6 +13,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy) {
   constructor(
     private readonly authService: AuthService,
     private readonly userService: UsersService,
+    private readonly eventEmitter: EventEmitter2,
   ) {
     super({
       clientID: process.env.KAKAO_CLIENT_ID,
@@ -41,24 +44,39 @@ export class KakaoStrategy extends PassportStrategy(Strategy) {
       }
 
       // 카카오톡에 계정이 존재하나, 토이스쿼드 회원으로 등록 여부 확인
-      const toySquadUser = await this.userService.findOneUser({
+      let toySquadUser = await this.userService.findOneUser({
         email: email,
         allowPassword: false,
       });
 
       if (!toySquadUser) {
-        throw new NotFoundException(
-          '토이스쿼드에서는 존재하지 않은 회원입니다. 회원가입후에 다시 시도해주세요.',
-        );
-      }
+        // 토이스쿼드 회원이 아닌데 카카오 연동로그인을 한 경우 -> db에 등록한다.
+        const newUser = await this.userService.createUser({
+          email: email,
+          password: `toysquad+${Date.now()}+${email}`,
+          name: profile.username,
+        });
 
-      if (!toySquadUser.kakaoAuthId) {
-        // 토이스쿼드 회원이지만, 카카오 연동로그인을 하지 않은경우
         // - db 업데이트로 카카오 아이디 값을 업데이트한다.
         await this.userService.updateUserInfo({
-          userId: toySquadUser.id,
+          userId: newUser.id,
           kakaoAuthId: id, // 카카오 아이디
         });
+
+        toySquadUser = await this.userService.findOneUser({
+          email: email,
+          allowPassword: false,
+        });
+
+        const sendEmailToNewUserEvent: SendEmailToNewUserEvent = {
+          email: newUser.email,
+          name: newUser.name,
+        };
+
+        this.eventEmitter.emit(
+          'send.email.to.new.user',
+          sendEmailToNewUserEvent,
+        );
       }
 
       const payload: TokenPayload = { email: email, userId: toySquadUser.id };
