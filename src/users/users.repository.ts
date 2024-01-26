@@ -10,7 +10,7 @@ import { CreateUserRequestDto } from './dtos/requests/create-user-request.dto';
 import { FindUserRequestDto } from './dtos/requests/find-one-user-request.dto';
 import { FindUserListRequestDto } from './dtos/requests/find-user-list-request.dto';
 import { PublicUserInfo } from './types/public-user-info.type';
-import { UpdateUserInfoRequestDto } from './dtos/requests/update-user-info-request.dto';
+import { UpdateUserInfoRepositoryDto } from './dtos/requests/update-user-info-request.dto';
 // import { FindUserListResponseDto } from './dtos/responses/find-user-list-response.dto';
 
 @Injectable()
@@ -103,14 +103,14 @@ export class UsersRepository {
     }
   }
 
-  async updateUserInfo(dto: UpdateUserInfoRequestDto) {
+  async updateUserInfo(dto: UpdateUserInfoRepositoryDto) {
     try {
       const { userId, ...updatedUserInfo } = dto;
       await this.dataSource
         .getRepository(User)
         .createQueryBuilder()
         .update(User)
-        .set(updatedUserInfo)
+        .set({ ...updatedUserInfo })
         .where('id = :id', { id: userId })
         .execute();
     } catch (error) {

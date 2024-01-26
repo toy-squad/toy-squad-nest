@@ -1,12 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PassportStrategy } from '@nestjs/passport';
 import TokenPayload from 'auth/interfaces/token-payload.interface';
 import { Strategy } from 'passport-google-oauth2';
+import { SendEmailToNewUserEvent } from 'users/events/send-email-to-new-user.event';
 import { UsersService } from 'users/users.service';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly userService: UsersService) {
+  constructor(
+    private readonly userService: UsersService,
+    private readonly eventEmitter: EventEmitter2,
+  ) {
     super({
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -29,26 +34,41 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
         );
       }
 
-      // 구글계정이 존재하나, 토이스쿼드 회원으로 등록 여부 확인
-      const { id, email } = profile._json;
-      const toySquadUser = await this.userService.findOneUser({
+      const { id, email, displayName } = profile;
+      // 토이스쿼드 데이터베이스에 이메일이 있는지 확인
+      let toySquadUser = await this.userService.findOneUser({
         email: email,
         allowPassword: false,
       });
 
       if (!toySquadUser) {
-        throw new NotFoundException(
-          '토이스쿼드에서는 존재하지 않은 회원입니다. 회원가입후에 다시 시도해주세요.',
-        );
-      }
-
-      if (!toySquadUser.googleAuthId) {
-        // 토이스쿼드 회원이지만, 구글 연동로그인을 하지 않은경우
-        // - db 업데이트로 카카오 아이디 값을 업데이트한다.
-        await this.userService.updateUserInfo({
-          userId: toySquadUser.id,
-          googleAuthId: id, // 카카오 아이디
+        // 토이스쿼드 계정 생성
+        const newUser = await this.userService.createUser({
+          email: email,
+          password: `toysquad+${Date.now()}+${email}`, // 임시패스워드
+          name: displayName,
         });
+
+        await this.userService.updateUserInfo({
+          userId: newUser.id,
+          googleAuthId: id, // 구글 아이디
+        });
+
+        toySquadUser = await this.userService.findOneUser({
+          email: email,
+          allowPassword: false,
+        });
+
+        // 회원가입 환영 이메일 전송
+        const sendEmailToNewUserEvent: SendEmailToNewUserEvent = {
+          email: newUser.email,
+          name: newUser.name,
+        };
+
+        this.eventEmitter.emit(
+          'send.email.to.new.user',
+          sendEmailToNewUserEvent,
+        );
       }
 
       const payload: TokenPayload = { email: email, userId: toySquadUser.id };

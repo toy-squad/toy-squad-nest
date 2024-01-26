@@ -1,6 +1,6 @@
 import { Transform, Type } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
-import { ContactType, FirstPositionType, PlatformType, SecondPositionType } from 'projects/enums/projectType.enum';
+import { ContactType, FieldType, FirstPositionType, PlatformType, SecondPositionType } from 'projects/enums/projectType.enum';
 import { isValidDate } from 'projects/utils/date.util';
 
 export class GetProjectsRequestDto {
@@ -18,6 +18,10 @@ export class GetProjectsRequestDto {
   limit = 10;
 
   @IsOptional()
+  @IsString()
+  keyword?: string;
+
+  @IsOptional()
   @IsEnum(FirstPositionType, { each: true })
   firstPosition?: FirstPositionType[];
 
@@ -26,13 +30,13 @@ export class GetProjectsRequestDto {
   secondPosition?: SecondPositionType[];
   
   @IsOptional()
-  @IsEnum(ContactType)
-  contactType?: ContactType;
+  @IsEnum(ContactType, { each: true })
+  contactType?: ContactType[];
   
   @IsOptional()
   @Type(() => Number)
-  @IsInt()
-  memberCount?: number;
+  @IsInt( { each: true } )
+  memberCount?: number[];
   
   @IsOptional()
   @IsString()
@@ -75,12 +79,12 @@ export class GetProjectsRequestDto {
   endDate: string;
 
   @IsOptional()
-  @IsString()
-  place?: string;
+  @IsString({ each: true })
+  place?: string[];
 
   @IsOptional()
-  @IsEnum(FirstPositionType, { each: true })
-  field?: FirstPositionType[];
+  @IsEnum(FieldType, { each: true })
+  field?: FieldType[];
 
   @IsOptional()
   @IsEnum(PlatformType, { each: true })

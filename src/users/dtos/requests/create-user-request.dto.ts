@@ -44,7 +44,7 @@ export class CreateUserRequestDto {
   })
   @IsOptional()
   @IsString()
-  phone: string;
+  phone?: string;
 
   @ApiProperty({
     required: false,
@@ -53,7 +53,7 @@ export class CreateUserRequestDto {
   })
   @IsOptional()
   @IsArray()
-  fields: string[];
+  fields?: string[];
 
   @ApiProperty({
     required: true,
@@ -62,16 +62,18 @@ export class CreateUserRequestDto {
     example: 'DEVELOPER',
     enum: ['DEVELOPER', 'DESIGNER', 'MANAGER'],
   })
+  @IsOptional()
   @IsString()
-  position_category: positionCategory;
+  position_category?: positionCategory;
 
   @ApiProperty({
     required: true,
     description: '세부 포지션',
     example: '웹 풀스택 개발자',
   })
+  @IsOptional()
   @IsString()
-  position: string; // 세부포지션선택
+  position?: string; // 세부포지션선택
 
   @ApiProperty({
     required: false,
@@ -80,7 +82,7 @@ export class CreateUserRequestDto {
   })
   @IsOptional()
   @IsString()
-  intro: string;
+  intro?: string;
 
   @ApiProperty({
     required: false,
@@ -89,5 +91,5 @@ export class CreateUserRequestDto {
   })
   @IsOptional()
   @IsArray()
-  skills: string[];
+  skills?: string[];
 }

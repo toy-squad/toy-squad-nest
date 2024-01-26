@@ -12,9 +12,10 @@ import { HealthModule } from './health/health.module';
 import { PassportModule } from '@nestjs/passport';
 import { RedisModule } from 'redis/redis.module';
 import { RoleModule } from './role/role.module';
-import { AccessControlAllowOriginMiddleware } from 'commons/middlewares/access-control-allow-origin.middleware';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { SendEmailToNewUserListener } from 'users/listeners/send-email-to-new-user.listener';
+import { CommentModule } from './comment/comment.module';
+import { AwsModule } from './aws/aws.module';
 
 @Module({
   imports: [
@@ -66,6 +67,11 @@ import { SendEmailToNewUserListener } from 'users/listeners/send-email-to-new-us
         FRONTEND_URL: Joi.string().required(),
         /** RESET_PASSWORD */
         RESET_PASSWORD_TOKEN_EXPIRATION: Joi.number().required(),
+        /** AWS */
+        AWS_ACCESS_KEY: Joi.string().required(),
+        AWS_SECRET_ACCESS_KEY: Joi.string().required(),
+        AWS_REGION: Joi.string().required(),
+        AWS_BUCKET_NAME: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRoot({
@@ -90,6 +96,8 @@ import { SendEmailToNewUserListener } from 'users/listeners/send-email-to-new-us
     PassportModule,
     RedisModule,
     RoleModule,
+    CommentModule,
+    AwsModule,
   ],
   controllers: [AppController],
   providers: [SendEmailToNewUserListener],
@@ -98,9 +106,6 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     if (process.env.NODE_ENV !== 'production') {
       consumer.apply(LoggersMiddleware).forRoutes('*');
-
-      // 응답헤더에 access-control-allow-origin을 부여한다.
-      consumer.apply(AccessControlAllowOriginMiddleware).forRoutes('*');
     }
   }
 }

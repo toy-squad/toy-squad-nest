@@ -1,5 +1,8 @@
 import { PickType } from '@nestjs/mapped-types';
-import { UpdateUserInfoRequestDto } from 'users/dtos/requests/update-user-info-request.dto';
+import {
+  UpdateUserInfoServiceDto,
+  UpdateUserInfoRequestDto,
+} from 'users/dtos/requests/update-user-info-request.dto';
 
 export interface UpdatePassword {
   password: string;
@@ -7,7 +10,7 @@ export interface UpdatePassword {
 }
 
 export class UpdatePasswordRequestDto
-  extends PickType(UpdateUserInfoRequestDto, ['userId', 'password'] as const)
+  extends PickType(UpdateUserInfoServiceDto, ['userId', 'password'] as const)
   implements UpdatePassword
 {
   password: string;

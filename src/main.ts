@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
+import * as session from 'express-session';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -30,6 +31,19 @@ async function bootstrap() {
     }),
   );
 
+  // express-session
+  app.use(
+    session({
+      secret: process.env.SESSION_SECRET,
+      saveUninitialized: false,
+      cookie: {
+        secure: true,
+        httpOnly: true,
+        maxAge: 86400, // 24h
+      },
+    }),
+  );
+
   // cookie-parser 사용
   app.use(cookieParser());
 
@@ -41,7 +55,7 @@ async function bootstrap() {
       'http://localhost:3000',
       'https://web-toy-squad-client-20zynm2mljtlwyix.sel4.cloudtype.app',
     ],
-    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT', 'OPTION', 'head'],
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT', 'OPTIONS'],
     credentials: true,
   };
   app.enableCors(corsOptions);

@@ -1,3 +1,5 @@
+import { PartialType } from '@nestjs/mapped-types';
+import { OmitType } from '@nestjs/swagger';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
@@ -117,4 +119,26 @@ export class UpdateUserInfoRequestDto {
   // 구글 아이디
   @IsOptional()
   googleAuthId?: any;
+
+  // 이미지 프로필 파일
+  @IsOptional()
+  imgProfileFile?: Express.Multer.File;
 }
+
+export class UpdateUserInfoServiceDto extends PartialType(
+  UpdateUserInfoRequestDto,
+) {
+  // required : 수정할 회원 아이디
+  @IsNotEmpty()
+  @IsString()
+  userId: string;
+
+  // 이미지 프로필 파일 url
+  @IsOptional()
+  imgUrl?: string;
+}
+
+export class UpdateUserInfoRepositoryDto extends OmitType(
+  UpdateUserInfoServiceDto,
+  ['imgProfileFile'] as const,
+) {}

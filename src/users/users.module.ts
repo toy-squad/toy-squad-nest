@@ -6,12 +6,16 @@ import { User } from './entities/user.entity';
 import { UsersRepository } from './users.repository';
 import { AuthModule } from 'auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { AwsModule } from 'aws/aws.module';
+import { RedisModule } from 'redis/redis.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
     forwardRef(() => AuthModule),
     ConfigModule,
+    AwsModule,
+    RedisModule,
   ],
   providers: [UsersService, UsersRepository],
   controllers: [UsersController],
