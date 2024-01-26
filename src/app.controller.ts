@@ -290,25 +290,17 @@ export class AppController {
       secure: true,
     });
 
-    res.cookie('access_token', tokens.access_token, {
-      maxAge: +this.configService.get('ACCESS_TOKEN_EXPIRATION'),
-      httpOnly: true,
-      secure: true,
-    });
-
-    res.cookie('refresh_token', tokens.refresh_token, {
-      maxAge: this.REFRESH_TOKEN_EXPIRATION,
-      httpOnly: true,
-      secure: true,
-    });
-
-    // return res.status(200).json({
-    //   ...tokens,
-    //   user_id: user.userId,
-    // });
+    // redirect 임시 URL을 보내고 프론트엔드가 토큰값, 아이디 정보를 파싱하여 세션스토리지에 저장하도록한다.
+    const { access_token, refresh_token } = tokens;
     return res
       .status(200)
-      .redirect(`${this.configService.get('FRONTEND_URL')}/main`);
+      .redirect(
+        `${this.configService.get(
+          'FRONTEND_URL',
+        )}/oauth/kakao?accessToken=${access_token}&refreshToken=${refresh_token}&user_id=${
+          user.userId
+        }`,
+      );
   }
 
   /**
@@ -342,9 +334,16 @@ export class AppController {
       sameSite: AppController.COOKIE_SECURE_OPTION ? 'none' : undefined,
     });
 
-    return res.status(200).json({
-      ...tokens,
-      user_id: user.userId,
-    });
+    // redirect 임시 URL을 보내고 프론트엔드가 토큰값, 아이디 정보를 파싱하여 세션스토리지에 저장하도록한다.
+    const { access_token, refresh_token } = tokens;
+    return res
+      .status(200)
+      .redirect(
+        `${this.configService.get(
+          'FRONTEND_URL',
+        )}/oauth/google?accessToken=${access_token}&refreshToken=${refresh_token}&user_id=${
+          user.userId
+        }`,
+      );
   }
 }

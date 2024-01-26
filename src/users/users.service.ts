@@ -104,7 +104,9 @@ export class UsersService {
       // 새로운 유저 생성했을 때, 중요정보를 리턴하지 않도록 한다.
       const newUserPublicInfo = await this.findOneUser({
         userId: newUser.id,
+        allowPassword: false,
       });
+
       return newUserPublicInfo;
     } catch (error) {
       this.logger.error(error.message);

@@ -19,7 +19,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy) {
       clientID: process.env.KAKAO_CLIENT_ID,
       clientSecret: process.env.KAKAO_SECRET_KEY,
       callbackURL: process.env.KAKAO_CALLBACK_URL,
-      scope: ['account_email'],
+      scope: ['account_email', 'profile_nickname', 'profile_image'],
     });
   }
 
@@ -39,8 +39,10 @@ export class KakaoStrategy extends PassportStrategy(Strategy) {
       const { id, ..._profile } = profile;
       const email = _profile?._json?.kakao_account?.email;
 
+      const name = _profile?._json?.kakao_account?.profile_nickname ?? email;
+
       if (!email) {
-        throw new NotFoundException('해당 계정을 찾을 수 없습니다.');
+        throw new NotFoundException('해당 카카오 계정을 찾을 수 없습니다.');
       }
 
       // 카카오톡에 계정이 존재하나, 토이스쿼드 회원으로 등록 여부 확인
@@ -53,8 +55,8 @@ export class KakaoStrategy extends PassportStrategy(Strategy) {
         // 토이스쿼드 회원이 아닌데 카카오 연동로그인을 한 경우 -> db에 등록한다.
         const newUser = await this.userService.createUser({
           email: email,
-          password: `toysquad+${Date.now()}+${email}`,
-          name: profile.username,
+          password: `toysquad+${Date.now()}+${email}`, // 임시 패스워드
+          name: name,
         });
 
         // - db 업데이트로 카카오 아이디 값을 업데이트한다.
@@ -68,6 +70,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy) {
           allowPassword: false,
         });
 
+        // 회원가입 환영 이메일 전송
         const sendEmailToNewUserEvent: SendEmailToNewUserEvent = {
           email: newUser.email,
           name: newUser.name,
