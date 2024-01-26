@@ -6,6 +6,7 @@ import { RoleRepository } from '../role/role.repository';
 import { UsersRepository } from '../users/users.repository';
 import { GetProjectsRequestDto } from './dtos/requests/get-projects-request.dto';
 import { GetProjectsResponseDto } from './dtos/response/get-projects-response.dto';
+import { AwsService } from 'aws/aws.service';
 
 @Injectable()
 export class ProjectsService {
@@ -13,6 +14,7 @@ export class ProjectsService {
     private readonly userRepository: UsersRepository,
     private readonly projectsRepository: ProjectsRepository,
     private readonly roleRepository: RoleRepository,
+    private readonly awsService: AwsService,
   ) {}
 
   async createNewProject(requestDto: CreateNewProjectRequestDto) {

@@ -47,7 +47,7 @@ export class CreateNewProjectRequestDto implements ICreateProjectDto {
 
   // 프로젝트 //
   // 프로젝트이름
-  @ApiProperty({ description: '프로젝트 이름', required: true})
+  @ApiProperty({ description: '프로젝트 이름', required: true })
   @IsNotEmpty()
   @IsString()
   name: string; // required

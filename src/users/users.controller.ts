@@ -3,15 +3,21 @@ import {
   Controller,
   DefaultValuePipe,
   Delete,
+  FileTypeValidator,
   Get,
   Logger,
+  MaxFileSizeValidator,
   NotFoundException,
   Param,
+  ParseFilePipe,
+  ParseFilePipeBuilder,
   ParseIntPipe,
   Patch,
   Query,
   Req,
   Res,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { DEFAULT_PAGE, DEFAULT_TAKE } from 'commons/dtos/pagination-query-dto';
@@ -32,12 +38,20 @@ import { Public } from 'auth/decorators/public.decorator';
 import { FindAndUpdatePasswordRequestDto } from './dtos/requests/find-and-update-password-request.dto';
 import { positionCategory } from './types/position.type';
 import { UpdateUserInfoRequestDto } from './dtos/requests/update-user-info-request.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Express } from 'express';
+import RequestWithUser from 'auth/interfaces/request-with-user.interface';
+import {
+  UPLOAD_IMAGE_MAX_SIZE,
+  VALID_IMAGE_FILE_TYPES_REGEX,
+} from 'commons/constants/FILE_CONSTANT';
 
 @ApiTags('유저 API')
 @Controller('users')
 export class UsersController {
   private readonly logger = new Logger(UsersController.name);
   private FRONTEND_URL;
+  private BUCKET_NAME;
 
   constructor(
     private readonly userService: UsersService,
@@ -77,6 +91,47 @@ export class UsersController {
       categoryPosition: categoryPosition,
       detailPosition: detailPosition,
     };
+  }
+
+  /**
+   * URL: /api/users
+   */
+  @Patch()
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({
+    summary: '유저 정보 수정 API',
+    description: '유저 정보 수정',
+  })
+  @ApiParam({
+    name: 'id',
+    description: '유저 PK',
+  })
+  async updateUserInfo(
+    @Req() req: RequestWithUser,
+    @Res() res: Response,
+    @Body() requestDto: UpdateUserInfoRequestDto,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          // 이미지 타입 검사
+          new FileTypeValidator({ fileType: VALID_IMAGE_FILE_TYPES_REGEX }),
+
+          // 이미지 크기 10MB 넘는지 검사
+          new MaxFileSizeValidator({ maxSize: UPLOAD_IMAGE_MAX_SIZE }),
+        ],
+      }),
+    )
+    file?: Express.Multer.File,
+  ) {
+    const { userId } = req.user;
+    const dto = req.body;
+
+    await this.userService.updateUserInfo({
+      ...dto,
+      userId: userId,
+      imgProfileFile: file,
+    });
+    res.status(200).json('수정 완료');
   }
 
   /**
@@ -186,31 +241,10 @@ export class UsersController {
   }
 
   /**
-   * TODO
-   * 유저정보 수정
-   * URL: /api/users/:id
-   */
-  @Patch('/:id')
-  @ApiOperation({
-    summary: '유저 정보 수정 API',
-    description: '유저 정보 수정',
-  })
-  @ApiParam({
-    name: 'id',
-    description: '유저 PK',
-  })
-  async updateUserInfo(
-    @Param('id') userId: string,
-    @Body() dto: UpdateUserInfoRequestDto,
-  ) {
-    return await this.userService.updateUserInfo({ userId, ...dto });
-  }
-
-  /**
    * 회원탈퇴
-   * URL: /api/users/:id
+   * URL: /api/users
    */
-  @Delete('/:id')
+  @Delete()
   @ApiOperation({
     summary: '회원 탈퇴 API',
     description: '회원 탈퇴 및 유저계정 삭제',
@@ -222,9 +256,12 @@ export class UsersController {
   @ApiOkResponse({
     description: '회원탈퇴 Success',
   })
-  async deleteUser(@Param('id') userId: string) {
+  async deleteUser(@Req() req: RequestWithUser, @Res() res: Response) {
     try {
+      const { userId } = req.user;
       await this.userService.deleteUser(userId);
+
+      res.status(204).send();
     } catch (error) {
       throw error;
     }

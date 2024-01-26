@@ -165,7 +165,7 @@ export class ProjectsController {
     enum: [
       'HEALTH_FITNESS(건강/ 운동)',
       'BEAUTY_FASHION(뷰티/ 패션)',
-      'ECOMMERCE(이커머스',
+      'ECOMMERCE(이커머스)',
       'FINANCE(금융)',
       'SPORTS(스포츠)',
       'MEDICAL(의료)',
@@ -174,7 +174,8 @@ export class ProjectsController {
       'CHILDREN(어린이)',
       'SOCIAL_NETWORK(소셜네트워크)',
       'ARTIFICIAL_INTELLIGENCE(인공지능)',
-      'OTHER(기타)' ],
+      'OTHER(기타)',
+    ],
   })
   @ApiQuery({
     name: 'platform',
@@ -188,7 +189,8 @@ export class ProjectsController {
       'RESPONSIVE_WEB(반응형 웹)',
       'INSTALLABLE_SOLUTION(설치형/솔루션)',
       'PC_PROGRAM(PC 프로그램)',
-      'GAME(게임)' ],
+      'GAME(게임)',
+    ],
   })
   @Get('list')
   async getProjects(

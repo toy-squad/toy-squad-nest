@@ -6,9 +6,17 @@ import { Project } from './entities/project.entity';
 import { ProjectsRepository } from './projects.repository';
 import { RoleModule } from 'role/role.module';
 import { UsersModule } from 'users/users.module';
+import { CommentModule } from 'comment/comment.module';
+import { AwsModule } from 'aws/aws.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Project]), RoleModule, UsersModule],
+  imports: [
+    TypeOrmModule.forFeature([Project]),
+    RoleModule,
+    UsersModule,
+    CommentModule,
+    AwsModule,
+  ],
   controllers: [ProjectsController],
   providers: [ProjectsService, ProjectsRepository],
   exports: [ProjectsService, ProjectsRepository],
