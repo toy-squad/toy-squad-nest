@@ -232,6 +232,14 @@ export class UsersService {
       if (password) {
         await this.redisService.del(`reset-pwd-${userId}`);
       }
+
+      // 업데이트시킨 유저정보를 구한다.
+      const updatedUserInfo = await this.usersRepository.findOneUser({
+        userId: userId,
+        allowPassword: false,
+      });
+
+      return updatedUserInfo;
     } catch (error) {
       throw error;
     }

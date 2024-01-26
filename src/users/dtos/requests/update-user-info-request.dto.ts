@@ -4,16 +4,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpdateUserInfoRequestDto {
-  // required : 수정할 회원 아이디
-  @IsNotEmpty()
-  @IsString()
-  @ApiProperty({
-    description: '유저 아이다 (유저 PK)',
-    required: true,
-    example: 'c2e3a923-7cdb-4716-9caa-839f22639e68',
-  })
-  userId: string;
-
   // optional : 수정정보
   @ApiProperty({
     description: '비밀번호',
@@ -41,14 +31,6 @@ export class UpdateUserInfoRequestDto {
   @IsOptional()
   @IsString()
   phone?: string;
-
-  @ApiProperty({
-    description: '이미지',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  imgUrl?: string;
 
   // TODO
   // @ApiProperty({
@@ -128,12 +110,20 @@ export class UpdateUserInfoRequestDto {
 export class UpdateUserInfoServiceDto extends PartialType(
   UpdateUserInfoRequestDto,
 ) {
-  // required : 수정할 회원 아이디
+  // required : 수정할 회원 PK
+  @ApiProperty({
+    description: '수정대상 회원 고유ID',
+    required: true,
+  })
   @IsNotEmpty()
   @IsString()
   userId: string;
 
   // 이미지 프로필 파일 url
+  @ApiProperty({
+    description: '이미지',
+    required: false,
+  })
   @IsOptional()
   imgUrl?: string;
 }
