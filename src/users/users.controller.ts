@@ -150,7 +150,7 @@ export class UsersController {
     });
 
     // 없으면 기본이미지 url을 리턴한다.
-    res.status(200).json({
+    return res.status(200).json({
       profile_url: updatedUserInfo.imgUrl ?? undefined,
     });
   }

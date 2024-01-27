@@ -2,6 +2,7 @@ import { PartialType } from '@nestjs/mapped-types';
 import { OmitType } from '@nestjs/swagger';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { positionCategory } from 'users/types/position.type';
 
 export class UpdateUserInfoRequestDto {
   // optional : 수정정보
@@ -65,7 +66,7 @@ export class UpdateUserInfoRequestDto {
   })
   @IsOptional()
   @IsString()
-  positionCategory?: string;
+  positionCategory?: positionCategory;
 
   @ApiProperty({
     description: '세부 포지션',

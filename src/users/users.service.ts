@@ -210,7 +210,7 @@ export class UsersService {
       let imgUrl: string;
       if (imgProfileFile) {
         imgUrl = await this.awsService.imageUploadToS3({
-          dirName: `${userId}/profile`,
+          dirName: `users/${userId}/profile`,
           fileName: imgProfileFile.originalname,
           uploadFile: imgProfileFile,
           ext: imgProfileFile.mimetype,
