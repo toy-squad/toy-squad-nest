@@ -60,6 +60,7 @@ export class CreateUserRequestDto {
     description:
       '포지션 카테고리 - 개발자(DEVELOPER), 디자이너(DESIGNER), 기획자(MANAGER) 중 한개 선택',
     example: 'DEVELOPER',
+    enum: ['DEVELOPER', 'DESIGNER', 'MANAGER'],
   })
   @IsOptional()
   @IsString()

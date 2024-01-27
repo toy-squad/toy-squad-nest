@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   DefaultValuePipe,
@@ -23,7 +24,6 @@ import { UsersService } from './users.service';
 import { DEFAULT_PAGE, DEFAULT_TAKE } from 'commons/dtos/pagination-query-dto';
 import {
   ApiBody,
-  ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -45,6 +45,7 @@ import {
   UPLOAD_IMAGE_MAX_SIZE,
   VALID_IMAGE_FILE_TYPES_REGEX,
 } from 'commons/constants/FILE_CONSTANT';
+import { UpdateLikesValueRequestDto } from './dtos/requests/update-likes-value-request.dto';
 
 @ApiTags('유저 API')
 @Controller('users')
@@ -97,19 +98,38 @@ export class UsersController {
    * URL: /api/users
    */
   @Patch()
-  @UseInterceptors(FileInterceptor('file'))
-  @ApiOperation({
-    summary: '유저 정보 수정 API',
-    description: '유저 정보 수정',
-  })
-  @ApiParam({
-    name: 'id',
-    description: '유저 PK',
+  @ApiResponse({
+    status: 404,
+    description: '존재하지 않은 회원입니다.',
   })
   async updateUserInfo(
     @Req() req: RequestWithUser,
     @Res() res: Response,
     @Body() requestDto: UpdateUserInfoRequestDto,
+  ) {
+    const { userId } = req.user;
+    const dto = req.body;
+
+    await this.userService.updateUserInfo({
+      ...dto,
+      userId: userId,
+    });
+    res.status(200).json('수정 완료');
+  }
+
+  // 이미지 파일 업로드
+  @Patch('/profile')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({
+    summary: '유저 정보 수정 API',
+    description: '유저 정보 수정',
+  })
+  @ApiOkResponse({
+    status: 200,
+  })
+  async uploadProfileImage(
+    @Req() req: RequestWithUser,
+    @Res() res: Response,
     @UploadedFile(
       new ParseFilePipe({
         validators: [
@@ -121,17 +141,18 @@ export class UsersController {
         ],
       }),
     )
-    file?: Express.Multer.File,
+    file?: Express.Multer.File | undefined,
   ) {
     const { userId } = req.user;
-    const dto = req.body;
-
-    await this.userService.updateUserInfo({
-      ...dto,
+    const updatedUserInfo = await this.userService.updateUserInfo({
       userId: userId,
       imgProfileFile: file,
     });
-    res.status(200).json('수정 완료');
+
+    // 없으면 기본이미지 url을 리턴한다.
+    return res.status(200).json({
+      profile_url: updatedUserInfo.imgUrl ?? undefined,
+    });
   }
 
   /**
@@ -221,6 +242,66 @@ export class UsersController {
   }
 
   /**
+   * [PATCH] /api/users/likes
+   *
+   *  유저 좋아요 클릭 -> likes 값만 업데이트
+   * */
+  @Patch('likes')
+  @ApiOperation({
+    summary: '단일유저 좋아요 API',
+    description: '유저 1명에게 좋아요 버튼을 누르면 좋아요값이 +1 된다.',
+  })
+  @ApiOkResponse({
+    status: 200,
+    description: '좋아요 Success',
+  })
+  @ApiResponse({
+    status: 400,
+    description: '자기자신에게 좋아요를 줄 수 없습니다.',
+  })
+  @ApiResponse({
+    status: 404,
+    description:
+      '존재하지 않은 회원 입니다. - 좋아요 대상 유저가 존재하지 않을 경우',
+  })
+  async updateLikesValue(
+    @Req() req: RequestWithUser,
+    @Res() res: Response,
+    @Body() dto: UpdateLikesValueRequestDto,
+  ) {
+    // 좋아요를 준 대상과 좋아요 받은 대상이 동일한 경우
+    const { user, body } = req;
+    const targetUserId = dto.target_user_id
+      ? dto.target_user_id
+      : body.target_user_id;
+    if (user.userId === targetUserId) {
+      throw new BadRequestException('자기자신에게 좋아요를 줄 수 없습니다.');
+    }
+
+    // target 유저에 대한 likes 정보를 갖고온다.
+    const targetUser = await this.userService.findOneUser({
+      userId: dto.target_user_id,
+    });
+    if (!targetUser) {
+      throw new NotFoundException('존재하지 않은 회원입니다.');
+    }
+
+    // 좋아요값 업데이트
+    await this.userService.updateUserInfo({
+      userId: targetUserId,
+      likes: targetUser.likes + 1,
+    });
+
+    return res
+      .status(200)
+      .json(
+        `좋아요 반영 완료하였습니다 : ${targetUser.likes} -> ${
+          targetUser.likes + 1
+        }`,
+      );
+  }
+
+  /**
    * TODO
    * 유저 상세 페이지
    * URL: /api/users/:id/detail/
@@ -229,13 +310,14 @@ export class UsersController {
   @Public()
   @Get(':id/detail')
   @ApiOperation({
-    summary: '유저 상세페이지 API',
+    summary: '[public] 유저 상세페이지 API',
     description: '유저 상세정보',
   })
   @ApiParam({
     name: 'id',
     description: '유저 PK',
   })
+  @ApiOkResponse()
   async getUserDetail(@Param('id') userId: string) {
     return await this.userService.findOneUser({ userId: userId });
   }

@@ -105,7 +105,7 @@ export class UsersRepository {
 
   async updateUserInfo(dto: UpdateUserInfoRepositoryDto) {
     try {
-      const { userId, ...updatedUserInfo } = dto;
+      const { userId, positionCategory, ...updatedUserInfo } = dto;
       await this.dataSource
         .getRepository(User)
         .createQueryBuilder()
