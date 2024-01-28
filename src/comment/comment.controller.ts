@@ -62,23 +62,23 @@ export class CommentController {
 
   // TODO: 해시태그(#) -> 멘션(@) 으로 변경, 타입도 H -> M 으로 변경
   // TODO: hashtagTargetCommentId -> mentionTargetId 로 변경
-  // 대댓글에 해시태그 답글작성
-  @Post('reply/hashtag')
-  async generateHashtagReplyComment(
+  // 대댓글에 멘션 답글작성
+  @Post('reply/mention')
+  async generateMentionReplyComment(
     @Req() req: RequestWithUser,
     @Res() res: Response,
     @Body() requestDto: CreateCommentRequestDto,
   ) {
     const { userId } = req.user;
-    const { projectId, content, parentCommentId, hashtagTargetCommentId } =
+    const { projectId, content, parentCommentId, mentionTargetCommentId } =
       req.body;
     await this.commentService.createComment({
-      commentType: 'H',
+      commentType: 'M',
       userId: userId,
       projectId: projectId,
       content: content,
       parentCommentId: parentCommentId,
-      hashtagTargetCommentId: hashtagTargetCommentId,
+      mentionTargetCommentId: mentionTargetCommentId,
     });
 
     return res.status(200).json({ message: '대댓글 작성 완료' });
@@ -150,16 +150,16 @@ export class CommentController {
   }
 
   // 댓글 삭제 / 대댓글 삭제 (not soft delete)
-  // 댓글삭제되면 대댓글도 같이 삭제된다.
+  // 삭제대상 코멘트만 삭제된다.
   @Delete(':comment_id')
   async remove(
     @Param('comment_id') commentId: string,
     @Req() req: RequestWithUser,
     @Res() res: Response,
   ) {
-    const { user } = req.body;
+    const { userId } = req.user;
     await this.commentService.removeComment({
-      userId: user.userId,
+      userId: userId,
       commentId: commentId,
     });
     return res.status(200).json({ message: '댓글 삭제 성공하였습니다.' });

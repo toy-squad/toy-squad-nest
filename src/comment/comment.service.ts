@@ -39,7 +39,7 @@ export class CommentService {
 
       // projectId 로 프로젝트 모집공고 데이터를 구한다.
       let parentComment = undefined; // 부모댓글
-      let hashtagTargetComment = undefined; // 해시태그
+      let mentionTargetComment = undefined; // 멘션된 코멘트
       const project = await this.projectRepository.findOneProject(projectId);
       if (!project) {
         throw new NotFoundException('프로젝트가 존재하지 않습니다.');
@@ -51,31 +51,31 @@ export class CommentService {
         if (!parentComment) {
           throw new NotFoundException('댓글이 존재하지 않습니다.');
         }
-      } else if (commentType === 'H') {
+      } else if (commentType === 'M') {
         // 부모댓글을 구한다.
         parentComment = await this.commentRepository.findCommentById(
           dto.parentCommentId,
         );
 
-        // 해시태그 댓글을 구한다
-        hashtagTargetComment = await this.commentRepository.findCommentById(
-          dto.hashtagTargetCommentId,
+        // 멘션된 댓글을 구한다
+        mentionTargetComment = await this.commentRepository.findCommentById(
+          dto.mentionTargetCommentId,
         );
 
-        if (!hashtagTargetComment) {
+        if (!mentionTargetComment) {
           throw new NotFoundException('댓글이 존재하지 않습니다.');
         }
 
-        // 해시태그의 작성자 유저아이디를 구한다.
-        const hashtagTargetAuthor = await this.userRepository.findOneUser(
-          hashtagTargetComment.author,
+        // 멘션된 유저의 아이디를 구한다.
+        const mentionTargetAuthor = await this.userRepository.findOneUser(
+          mentionTargetComment.author,
         );
 
-        if (!hashtagTargetAuthor) {
+        if (!mentionTargetAuthor) {
           throw new NotFoundException('존재하지 않은 댓글 저자입니다.');
         }
 
-        const contentWithHashTag = `@${hashtagTargetAuthor.name} ${content}`;
+        const contentWithHashTag = `@${mentionTargetAuthor.name} ${content}`;
         dto.content = contentWithHashTag;
       }
 
@@ -85,7 +85,7 @@ export class CommentService {
         commentAuthor: commentAuthorUser,
         content: dto.content,
         parentComment: parentComment,
-        hashtagTargetComment: hashtagTargetComment,
+        mentionTargetComment: mentionTargetComment,
       });
     } catch (error) {
       throw error;

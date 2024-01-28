@@ -32,7 +32,7 @@ export class CommentRepository {
           author: commentAuthor,
           commentType: commentType,
           parent: dto.parentComment,
-          hashtagTarget: dto.hashtagTargetComment,
+          mentionTarget: dto.mentionTargetComment,
         })
         .execute();
     } catch (error) {

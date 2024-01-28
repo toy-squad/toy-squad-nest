@@ -121,8 +121,8 @@ export class UsersController {
   @Patch('/profile')
   @UseInterceptors(FileInterceptor('file'))
   @ApiOperation({
-    summary: '유저 정보 수정 API',
-    description: '유저 정보 수정',
+    summary: '유저 프로필 이미지 수정 API',
+    description: '유저 프로필 이미지 수정',
   })
   @ApiOkResponse({
     status: 200,

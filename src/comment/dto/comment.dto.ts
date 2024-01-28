@@ -29,14 +29,13 @@ export class CreateCommentRequestDto {
   projectId: string;
 }
 
-// TODO: 네이밍변경 해시태그 -> 멘션
 /**
  * CommentType - 댓글타입
  * - C : 댓글
  * - R : 대댓글
- * - H : 대댓글에 멘션
+ * - M : 대댓글에 멘션
  */
-export type CommentType = 'C' | 'R' | 'H';
+export type CommentType = 'C' | 'R' | 'M';
 export class CreateCommentServiceDto extends PartialType(CommentDto) {
   // 댓글 타입
   @IsNotEmpty()
@@ -46,9 +45,9 @@ export class CreateCommentServiceDto extends PartialType(CommentDto) {
   @IsOptional()
   parentCommentId?: string;
 
-  // 해시태그 대상 댓글 아이디
+  // 멘션 대상 댓글 아이디
   @IsOptional()
-  hashtagTargetCommentId?: string;
+  mentionTargetCommentId?: string;
 }
 
 export class CreateCommentDto {
@@ -73,9 +72,9 @@ export class CreateCommentDto {
   @IsOptional()
   parentComment?: Comment;
 
-  // 해시태그 대상 댓글 아이디
+  // 멘션 대상 댓글 아이디
   @IsOptional()
-  hashtagTargetComment?: Comment;
+  mentionTargetComment?: Comment;
 }
 
 /**
