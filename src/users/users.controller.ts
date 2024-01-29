@@ -27,6 +27,7 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiProperty,
   ApiQuery,
   ApiResponse,
   ApiTags,

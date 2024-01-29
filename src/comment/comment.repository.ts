@@ -40,6 +40,7 @@ export class CommentRepository {
     }
   }
 
+  // TODO
   // 게시물 ID에 따른 댓글 조회 (페이징 포함)
   async findAllCommentsByProjectWithPagination(dto: GetAllCommentsDto) {
     const { page, take, projectId } = dto;
@@ -65,6 +66,7 @@ export class CommentRepository {
     return comments;
   }
 
+  // TODO
   // 댓글 ID로 조회
   async findCommentById(commentId: string) {
     const comment = await this.dataSource

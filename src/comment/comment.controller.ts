@@ -129,7 +129,7 @@ export class CommentController {
       .json({ comment_id: commentId, reply_comments: replyComments });
   }
 
-  // 댓글 수정 / 대댓글 수정
+  // 댓글 수정 / 대댓글 수정 / 좋아요 / 싫어요
   @Patch(':comment_id')
   async update(
     @Param('comment_id') commentId: string,
@@ -146,7 +146,20 @@ export class CommentController {
       newContent: commentUpdateType === 'COMMENT' ? newContent : undefined,
     });
 
-    return res.status(200).json({ message: '댓글 수정 성공하였습니다.' });
+    let message;
+    switch (commentUpdateType) {
+      case 'COMMENT':
+        message = '댓글 수정 완료했습니다.';
+        break;
+      case 'LIKE':
+        message = '좋아요 반영 완료했습니다';
+        break;
+      case 'DISLIKE':
+        message = '싫어요 반영 완료했습니다';
+        break;
+    }
+
+    return res.status(200).json({ message });
   }
 
   // 댓글 삭제 / 대댓글 삭제 (not soft delete)
