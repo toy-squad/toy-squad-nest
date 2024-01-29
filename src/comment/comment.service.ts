@@ -7,6 +7,7 @@ import {
   CreateCommentServiceDto,
   DeleteCommentDto,
   GetAllCommentsDto,
+  GetAllCommentsResponseDto,
   UpdateCommentDto,
 } from './dto/comment.dto';
 import { CommentRepository } from './comment.repository';
@@ -66,7 +67,7 @@ export class CommentService {
           throw new NotFoundException('댓글이 존재하지 않습니다.');
         }
 
-        // 멘션된 유저의 아이디를 구한다.
+        // 멘션대상 댓글 작성자 아이디를 구한다.
         const mentionTargetAuthor = await this.userRepository.findOneUser(
           mentionTargetComment.author,
         );
@@ -92,10 +93,29 @@ export class CommentService {
     }
   }
 
-  async findAllCommentsByProjectId(dto: GetAllCommentsDto) {
-    return await this.commentRepository.findAllCommentsByProjectWithPagination(
-      dto,
-    );
+  async findAllCommentsByProjectId(
+    dto: GetAllCommentsDto,
+  ): Promise<GetAllCommentsResponseDto[]> {
+    // 프로젝트의 코멘트를 구한다
+    const comments =
+      await this.commentRepository.findAllCommentsByProjectWithPagination(dto);
+
+    return comments.map((c) => {
+      return {
+        comment_id: c.comment_id,
+        user_id: c.user_id,
+        user_email: c.user_email,
+        user_name: c.user_name,
+        user_img_url: c.user_img_url,
+        project_id: c.project_id,
+        comment_type: c.comment_commentType,
+        content: c.comment_content,
+        likes: c.comment_likes,
+        dislikes: c.comment_dislikes,
+        created_at: c.comment_created_at,
+        deleted_at: c.comment_deleted_at,
+      };
+    });
   }
 
   async getAllReplyCommentsByCommentId(commentId: string) {

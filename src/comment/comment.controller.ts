@@ -17,7 +17,12 @@ import { Response } from 'express';
 import RequestWithUser from 'auth/interfaces/request-with-user.interface';
 import { Public } from 'auth/decorators/public.decorator';
 import { DEFAULT_PAGE, DEFAULT_TAKE } from 'commons/dtos/pagination-query-dto';
-import { CreateCommentRequestDto } from './dto/comment.dto';
+import {
+  CreateCommentRequestDto,
+  DeleteCommentDto,
+  GetAllCommentsDto,
+} from './dto/comment.dto';
+import { ApiBody } from '@nestjs/swagger';
 
 @Controller('comment')
 export class CommentController {
@@ -60,8 +65,6 @@ export class CommentController {
     return res.status(200).json({ message: '대댓글 작성 완료' });
   }
 
-  // TODO: 해시태그(#) -> 멘션(@) 으로 변경, 타입도 H -> M 으로 변경
-  // TODO: hashtagTargetCommentId -> mentionTargetId 로 변경
   // 대댓글에 멘션 답글작성
   @Post('reply/mention')
   async generateMentionReplyComment(
@@ -77,19 +80,20 @@ export class CommentController {
       userId: userId,
       projectId: projectId,
       content: content,
-      parentCommentId: parentCommentId,
-      mentionTargetCommentId: mentionTargetCommentId,
+      parentCommentId: parentCommentId, // 부모댓글
+      mentionTargetCommentId: mentionTargetCommentId, // 멘션대상 코멘트
     });
 
     return res.status(200).json({ message: '대댓글 작성 완료' });
   }
 
   // TODO
-  // 프로젝트 모집공고에 작성된 댓글 전체 조회 + 페이징조회
+  // 프로젝트 모집공고에 작성된 댓글(commentType: C) 조회
   @Public()
-  @Get(':project_id')
+  @Get(':project_id/comments')
+  @ApiBody({ type: GetAllCommentsDto })
   async getAllComments(
-    @Param(':project_id') projectId: string,
+    @Param('project_id') projectId: string,
     @Query('page', new DefaultValuePipe(DEFAULT_PAGE), ParseIntPipe)
     page: number,
     @Query('limit', new DefaultValuePipe(DEFAULT_TAKE), ParseIntPipe)
@@ -105,12 +109,13 @@ export class CommentController {
     // comment: 프로젝트 모집공고에 있는 댓글들(대댓글X), 대댓글 개수
     return res.status(200).json({
       project_id: projectId,
+      commentLength: comments.length,
       comments: comments,
     });
   }
 
   // TODO
-  // 댓글이 갖는 대댓글 조회
+  // 댓글(C)이 갖는 대댓글(R, M) 조회
   @Public()
   @Get(':comment_id')
   async getAllReplyComments(
@@ -165,6 +170,9 @@ export class CommentController {
   // 댓글 삭제 / 대댓글 삭제 (not soft delete)
   // 삭제대상 코멘트만 삭제된다.
   @Delete(':comment_id')
+  @ApiBody({
+    type: DeleteCommentDto,
+  })
   async remove(
     @Param('comment_id') commentId: string,
     @Req() req: RequestWithUser,

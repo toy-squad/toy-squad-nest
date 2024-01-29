@@ -7,7 +7,11 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from 'projects/entities/project.entity';
-import { CreateCommentDto, GetAllCommentsDto } from './dto/comment.dto';
+import {
+  CreateCommentDto,
+  GetAllCommentsDto,
+  GetAllCommentsResponseDto,
+} from './dto/comment.dto';
 
 @Injectable()
 export class CommentRepository {
@@ -45,12 +49,6 @@ export class CommentRepository {
   async findAllCommentsByProjectWithPagination(dto: GetAllCommentsDto) {
     const { page, take, projectId } = dto;
 
-    // 프로젝트를 찾는다.
-    const project = await this.dataSource
-      .getRepository(Project)
-      .createQueryBuilder('project')
-      .where('project.id = :projectId', { projectId: projectId });
-
     // 프로젝트의 댓글을 찾는다.
     const comments = await this.dataSource
       .getRepository(Comment)
@@ -58,6 +56,7 @@ export class CommentRepository {
       .leftJoinAndSelect('comment.author', 'user')
       .leftJoinAndSelect('comment.project', 'project')
       .where('project.id = :projectId', { projectId: projectId })
+      .andWhere('comment.commentType = :commentType', { commentType: 'C' })
       .orderBy('comment.createdAt', 'DESC')
       .take(take)
       .skip(take * (page - 1))
@@ -102,6 +101,7 @@ export class CommentRepository {
   // Delete
   async removeComment(id: string) {
     // 영구삭제
-    await this.repo.delete(id);
+    // await this.repo.delete(id);
+    await this.repo.softDelete(id);
   }
 }

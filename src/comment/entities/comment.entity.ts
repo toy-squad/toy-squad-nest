@@ -82,13 +82,11 @@ export class Comment extends CoreEntity {
    * - 대댓글에 댓글을 작성한경우
    * - 해시태그는 대댓글의 아이디를 참조한다
    */
-  // TODO: hashtagTarget -> MentionTarget
   @OneToMany(() => Comment, (comment) => comment.mentionTarget, {
     nullable: true,
   })
   mentionComments: Comment[];
 
-  // TODO: hashtagComments -> MentionedComments
   @ManyToOne(() => Comment, (comment) => comment.mentionComments)
   @JoinColumn()
   mentionTarget: Comment;
