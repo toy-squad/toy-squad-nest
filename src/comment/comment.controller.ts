@@ -62,7 +62,7 @@ export class CommentController {
       parentCommentId: parentCommentId,
     });
 
-    return res.status(200).json({ message: '대댓글 작성 완료' });
+    return res.status(200).json({ message: '답글 작성 완료' });
   }
 
   // 대댓글에 멘션 답글작성
@@ -84,10 +84,9 @@ export class CommentController {
       mentionTargetCommentId: mentionTargetCommentId, // 멘션대상 코멘트
     });
 
-    return res.status(200).json({ message: '대댓글 작성 완료' });
+    return res.status(200).json({ message: '멘션 답글 작성 완료' });
   }
 
-  // TODO
   // 프로젝트 모집공고에 작성된 댓글(commentType: C) 조회
   @Public()
   @Get(':project_id/comments')
@@ -129,9 +128,13 @@ export class CommentController {
      * comment_id: 댓글 아이디
      * reply_comments: 대댓글
      */
-    return res
-      .status(200)
-      .json({ comment_id: commentId, reply_comments: replyComments });
+    const replyCommentsLength = replyComments.length;
+    return res.status(200).json({
+      comment_id: commentId,
+      reply_comments: replyCommentsLength > 0 ? replyComments : undefined,
+      reply_comments_length:
+        replyCommentsLength > 0 ? replyCommentsLength : undefined,
+    });
   }
 
   // 댓글 수정 / 대댓글 수정 / 좋아요 / 싫어요
@@ -167,8 +170,8 @@ export class CommentController {
     return res.status(200).json({ message });
   }
 
-  // 댓글 삭제 / 대댓글 삭제 (not soft delete)
-  // 삭제대상 코멘트만 삭제된다.
+  // 코멘트 아이디에 해당되는 코멘트 삭제
+  // soft-delete, hard-delete가 아닌 내용이 업데이트 됨
   @Delete(':comment_id')
   @ApiBody({
     type: DeleteCommentDto,
