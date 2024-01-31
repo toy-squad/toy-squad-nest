@@ -17,7 +17,12 @@ import { Response } from 'express';
 import RequestWithUser from 'auth/interfaces/request-with-user.interface';
 import { Public } from 'auth/decorators/public.decorator';
 import { DEFAULT_PAGE, DEFAULT_TAKE } from 'commons/dtos/pagination-query-dto';
-import { CreateCommentRequestDto } from './dto/comment.dto';
+import {
+  CreateCommentRequestDto,
+  DeleteCommentDto,
+  GetAllCommentsDto,
+} from './dto/comment.dto';
+import { ApiBody } from '@nestjs/swagger';
 
 @Controller('comment')
 export class CommentController {
@@ -57,39 +62,37 @@ export class CommentController {
       parentCommentId: parentCommentId,
     });
 
-    return res.status(200).json({ message: '대댓글 작성 완료' });
+    return res.status(200).json({ message: '답글 작성 완료' });
   }
 
-  // TODO: 해시태그(#) -> 멘션(@) 으로 변경, 타입도 H -> M 으로 변경
-  // TODO: hashtagTargetCommentId -> mentionTargetId 로 변경
-  // 대댓글에 해시태그 답글작성
-  @Post('reply/hashtag')
-  async generateHashtagReplyComment(
+  // 대댓글에 멘션 답글작성
+  @Post('reply/mention')
+  async generateMentionReplyComment(
     @Req() req: RequestWithUser,
     @Res() res: Response,
     @Body() requestDto: CreateCommentRequestDto,
   ) {
     const { userId } = req.user;
-    const { projectId, content, parentCommentId, hashtagTargetCommentId } =
+    const { projectId, content, parentCommentId, mentionTargetCommentId } =
       req.body;
     await this.commentService.createComment({
-      commentType: 'H',
+      commentType: 'M',
       userId: userId,
       projectId: projectId,
       content: content,
-      parentCommentId: parentCommentId,
-      hashtagTargetCommentId: hashtagTargetCommentId,
+      parentCommentId: parentCommentId, // 부모댓글
+      mentionTargetCommentId: mentionTargetCommentId, // 멘션대상 코멘트
     });
 
-    return res.status(200).json({ message: '대댓글 작성 완료' });
+    return res.status(200).json({ message: '멘션 답글 작성 완료' });
   }
 
-  // TODO
-  // 프로젝트 모집공고에 작성된 댓글 전체 조회 + 페이징조회
+  // 프로젝트 모집공고에 작성된 댓글(commentType: C) 조회
   @Public()
-  @Get(':project_id')
+  @Get(':project_id/comments')
+  @ApiBody({ type: GetAllCommentsDto })
   async getAllComments(
-    @Param(':project_id') projectId: string,
+    @Param('project_id') projectId: string,
     @Query('page', new DefaultValuePipe(DEFAULT_PAGE), ParseIntPipe)
     page: number,
     @Query('limit', new DefaultValuePipe(DEFAULT_TAKE), ParseIntPipe)
@@ -105,12 +108,13 @@ export class CommentController {
     // comment: 프로젝트 모집공고에 있는 댓글들(대댓글X), 대댓글 개수
     return res.status(200).json({
       project_id: projectId,
+      commentLength: comments.length,
       comments: comments,
     });
   }
 
   // TODO
-  // 댓글이 갖는 대댓글 조회
+  // 댓글(C)이 갖는 대댓글(R, M) 조회
   @Public()
   @Get(':comment_id')
   async getAllReplyComments(
@@ -124,12 +128,16 @@ export class CommentController {
      * comment_id: 댓글 아이디
      * reply_comments: 대댓글
      */
-    return res
-      .status(200)
-      .json({ comment_id: commentId, reply_comments: replyComments });
+    const replyCommentsLength = replyComments.length;
+    return res.status(200).json({
+      comment_id: commentId,
+      reply_comments: replyCommentsLength > 0 ? replyComments : undefined,
+      reply_comments_length:
+        replyCommentsLength > 0 ? replyCommentsLength : undefined,
+    });
   }
 
-  // 댓글 수정 / 대댓글 수정
+  // 댓글 수정 / 대댓글 수정 / 좋아요 / 싫어요
   @Patch(':comment_id')
   async update(
     @Param('comment_id') commentId: string,
@@ -146,20 +154,35 @@ export class CommentController {
       newContent: commentUpdateType === 'COMMENT' ? newContent : undefined,
     });
 
-    return res.status(200).json({ message: '댓글 수정 성공하였습니다.' });
+    let message;
+    switch (commentUpdateType) {
+      case 'COMMENT':
+        message = '댓글 수정 완료했습니다.';
+        break;
+      case 'LIKE':
+        message = '좋아요 반영 완료했습니다';
+        break;
+      case 'DISLIKE':
+        message = '싫어요 반영 완료했습니다';
+        break;
+    }
+
+    return res.status(200).json({ message });
   }
 
-  // 댓글 삭제 / 대댓글 삭제 (not soft delete)
-  // 댓글삭제되면 대댓글도 같이 삭제된다.
+  // 코멘트 아이디에 해당되는 코멘트 삭제(soft-delete)
   @Delete(':comment_id')
+  @ApiBody({
+    type: DeleteCommentDto,
+  })
   async remove(
     @Param('comment_id') commentId: string,
     @Req() req: RequestWithUser,
     @Res() res: Response,
   ) {
-    const { user } = req.body;
+    const { userId } = req.user;
     await this.commentService.removeComment({
-      userId: user.userId,
+      userId: userId,
       commentId: commentId,
     });
     return res.status(200).json({ message: '댓글 삭제 성공하였습니다.' });

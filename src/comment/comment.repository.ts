@@ -1,4 +1,4 @@
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import { Comment } from './entities/comment.entity';
 import {
   Injectable,
@@ -7,7 +7,13 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from 'projects/entities/project.entity';
-import { CreateCommentDto, GetAllCommentsDto } from './dto/comment.dto';
+import {
+  CreateCommentDto,
+  GetAllCommentsDto,
+  GetAllCommentsResponseDto,
+  findAllReplyAndMentionedCommentsRepositoryDto,
+  findCommentByCommentIdRepositoryDto,
+} from './dto/comment.dto';
 
 @Injectable()
 export class CommentRepository {
@@ -17,6 +23,29 @@ export class CommentRepository {
     @InjectRepository(Comment) private readonly repo: Repository<Comment>,
     private readonly dataSource: DataSource,
   ) {}
+
+  // 코멘트 ID로 코멘트 찾기
+  async findCommentById(dto: findCommentByCommentIdRepositoryDto) {
+    try {
+      const { commentId, commentType } = dto;
+      const query = this.dataSource
+        .getRepository(Comment)
+        .createQueryBuilder('comment')
+        .leftJoinAndSelect('comment.author', 'user')
+        .where('comment.id = :commentId', { commentId: commentId });
+
+      if (commentType) {
+        query.andWhere('comment.commentType = :commentType', {
+          commentType: commentType,
+        });
+      }
+
+      const comment = await query.getRawOne();
+      return comment;
+    } catch (error) {
+      throw new InternalServerErrorException(error, error.stack);
+    }
+  }
 
   // 댓글 생성 및 저장
   async createAndSave(dto: CreateCommentDto) {
@@ -32,7 +61,7 @@ export class CommentRepository {
           author: commentAuthor,
           commentType: commentType,
           parent: dto.parentComment,
-          hashtagTarget: dto.hashtagTargetComment,
+          mentionTarget: dto.mentionTargetComment,
         })
         .execute();
     } catch (error) {
@@ -44,12 +73,6 @@ export class CommentRepository {
   async findAllCommentsByProjectWithPagination(dto: GetAllCommentsDto) {
     const { page, take, projectId } = dto;
 
-    // 프로젝트를 찾는다.
-    const project = await this.dataSource
-      .getRepository(Project)
-      .createQueryBuilder('project')
-      .where('project.id = :projectId', { projectId: projectId });
-
     // 프로젝트의 댓글을 찾는다.
     const comments = await this.dataSource
       .getRepository(Comment)
@@ -57,6 +80,7 @@ export class CommentRepository {
       .leftJoinAndSelect('comment.author', 'user')
       .leftJoinAndSelect('comment.project', 'project')
       .where('project.id = :projectId', { projectId: projectId })
+      .andWhere('comment.commentType = :commentType', { commentType: 'C' })
       .orderBy('comment.createdAt', 'DESC')
       .take(take)
       .skip(take * (page - 1))
@@ -65,17 +89,21 @@ export class CommentRepository {
     return comments;
   }
 
-  // 댓글 ID로 조회
-  async findCommentById(commentId: string) {
-    const comment = await this.dataSource
+  async findAllReplyAndMentionedComments(
+    dto: findAllReplyAndMentionedCommentsRepositoryDto,
+  ) {
+    const { parentCommentId } = dto;
+    const replyComments = await this.dataSource
       .getRepository(Comment)
       .createQueryBuilder('comment')
-      .leftJoinAndSelect('comment.project', 'project')
       .leftJoinAndSelect('comment.author', 'user')
-      .where('comment.id = :commentId', { commentId: commentId })
-      .getOne();
+      .where('comment.parentId = :parentCommentId', {
+        parentCommentId: parentCommentId,
+      })
+      .andWhere("comment.commentType IN ('R', 'M')")
+      .getRawMany();
 
-    return comment;
+    return replyComments;
     // return await this.repo.findOne({
     //   where: { id: comment_id, deletedAt: null },
     //   relations: ['user', 'project'],
@@ -100,6 +128,9 @@ export class CommentRepository {
   // Delete
   async removeComment(id: string) {
     // 영구삭제
-    await this.repo.delete(id);
+    // await this.repo.delete(id);
+
+    // soft-delete
+    await this.repo.softDelete(id);
   }
 }
