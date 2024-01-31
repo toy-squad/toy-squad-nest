@@ -154,3 +154,26 @@ export interface GetAllCommentsResponseDto {
   created_at?: string; // 코멘트 생성일자
   deleted_at?: string; // 코멘트 삭제일자
 }
+
+export class findCommentByCommentIdRepositoryDto {
+  @ApiProperty({
+    description: '검색할 코멘트 아이디',
+    required: true,
+  })
+  @IsNotEmpty()
+  commentId: string;
+
+  @ApiProperty({
+    description: '코멘트 타입(C: 댓글 | R: 댓글의 답글 | M: 멘션 답글)',
+  })
+  @IsOptional()
+  commentType?: CommentType;
+}
+
+export class findAllReplyAndMentionedCommentsRepositoryDto {
+  @ApiProperty({
+    description: '검색 부모 코멘트 아이디',
+    required: true,
+  })
+  parentCommentId: string;
+}

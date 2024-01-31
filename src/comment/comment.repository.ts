@@ -1,4 +1,4 @@
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import { Comment } from './entities/comment.entity';
 import {
   Injectable,
@@ -11,6 +11,8 @@ import {
   CreateCommentDto,
   GetAllCommentsDto,
   GetAllCommentsResponseDto,
+  findAllReplyAndMentionedCommentsRepositoryDto,
+  findCommentByCommentIdRepositoryDto,
 } from './dto/comment.dto';
 
 @Injectable()
@@ -21,6 +23,29 @@ export class CommentRepository {
     @InjectRepository(Comment) private readonly repo: Repository<Comment>,
     private readonly dataSource: DataSource,
   ) {}
+
+  // 코멘트 ID로 코멘트 찾기
+  async findCommentById(dto: findCommentByCommentIdRepositoryDto) {
+    const { commentId, commentType } = dto;
+
+    const comment = await this.repo.findOne({
+      select: {
+        id: true,
+        content: true,
+        likes: true,
+        dislikes: true,
+        commentType: true,
+        createdAt: true,
+        deletedAt: true,
+      },
+      where: {
+        id: commentId,
+        commentType: commentType ?? undefined,
+      },
+    });
+
+    return comment;
+  }
 
   // 댓글 생성 및 저장
   async createAndSave(dto: CreateCommentDto) {
@@ -44,7 +69,6 @@ export class CommentRepository {
     }
   }
 
-  // TODO
   // 게시물 ID에 따른 댓글 조회 (페이징 포함)
   async findAllCommentsByProjectWithPagination(dto: GetAllCommentsDto) {
     const { page, take, projectId } = dto;
@@ -67,16 +91,22 @@ export class CommentRepository {
 
   // TODO
   // 댓글 ID로 조회
-  async findCommentById(commentId: string) {
-    const comment = await this.dataSource
+  async findAllReplyAndMentionedComments(
+    dto: findAllReplyAndMentionedCommentsRepositoryDto,
+  ) {
+    const { parentCommentId } = dto;
+    const replyComments = await this.dataSource
       .getRepository(Comment)
       .createQueryBuilder('comment')
       .leftJoinAndSelect('comment.project', 'project')
       .leftJoinAndSelect('comment.author', 'user')
-      .where('comment.id = :commentId', { commentId: commentId })
-      .getOne();
+      .where('comment.parentId = :parentCommentId', {
+        parentCommentId: parentCommentId,
+      })
+      .andWhere("comment.commentType IN ['R', 'M']")
+      .getMany();
 
-    return comment;
+    return replyComments;
     // return await this.repo.findOne({
     //   where: { id: comment_id, deletedAt: null },
     //   relations: ['user', 'project'],
@@ -102,6 +132,11 @@ export class CommentRepository {
   async removeComment(id: string) {
     // 영구삭제
     // await this.repo.delete(id);
-    await this.repo.softDelete(id);
+
+    // soft-delete
+    // await this.repo.softDelete(id);
+    await this.repo.update(id, {
+      content: '삭제된 댓글 입니다.',
+    });
   }
 }
