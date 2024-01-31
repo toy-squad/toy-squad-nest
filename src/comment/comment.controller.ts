@@ -170,8 +170,7 @@ export class CommentController {
     return res.status(200).json({ message });
   }
 
-  // 코멘트 아이디에 해당되는 코멘트 삭제
-  // soft-delete, hard-delete가 아닌 내용이 업데이트 됨
+  // 코멘트 아이디에 해당되는 코멘트 삭제(soft-delete)
   @Delete(':comment_id')
   @ApiBody({
     type: DeleteCommentDto,

@@ -23,24 +23,6 @@ export class CommentService {
     private readonly userRepository: UsersRepository,
     private readonly projectRepository: ProjectsRepository,
   ) {}
-  private async commentsMapper(comments: any) {
-    return comments.map((c) => {
-      return {
-        comment_id: c.comment_id,
-        user_id: c.user_id,
-        user_email: c.user_email,
-        user_name: c.user_name,
-        user_img_url: c.user_img_url,
-        project_id: c.project_id,
-        comment_type: c.comment_commentType,
-        content: c.comment_content,
-        likes: c.comment_likes,
-        dislikes: c.comment_dislikes,
-        created_at: c.comment_created_at,
-        deleted_at: c.comment_deleted_at,
-      };
-    });
-  }
 
   // 댓글 작성
   async createComment(dto: CreateCommentServiceDto) {
@@ -121,7 +103,22 @@ export class CommentService {
     const comments =
       await this.commentRepository.findAllCommentsByProjectWithPagination(dto);
 
-    return this.commentsMapper(comments);
+    return comments.map((c) => {
+      return {
+        comment_id: c.comment_id,
+        user_id: c.user_id,
+        user_email: c.user_email,
+        user_name: c.user_name,
+        user_img_url: c.user_img_url,
+        project_id: c.project_id,
+        comment_type: c.comment_commentType,
+        content: c.comment_content,
+        likes: c.comment_likes,
+        dislikes: c.comment_dislikes,
+        created_at: c.comment_created_at,
+        deleted_at: c.comment_deleted_at,
+      };
+    });
   }
 
   async getAllReplyCommentsByCommentId(commentId: string) {
@@ -142,7 +139,22 @@ export class CommentService {
         await this.commentRepository.findAllReplyAndMentionedComments({
           parentCommentId: commentId,
         });
-      return this.commentsMapper(replyComments);
+
+      return replyComments.map((c) => {
+        return {
+          comment_id: c.comment_id,
+          user_id: c.user_id,
+          user_email: c.user_email,
+          user_name: c.user_name,
+          user_img_url: c.user_img_url,
+          comment_type: c.comment_commentType,
+          content: c.comment_content,
+          likes: c.comment_likes,
+          dislikes: c.comment_dislikes,
+          created_at: c.comment_created_at,
+          deleted_at: c.comment_deleted_at,
+        };
+      });
     } catch (error) {
       throw error;
     }
@@ -237,7 +249,7 @@ export class CommentService {
       const comment = await this.commentRepository.findCommentById({
         commentId,
       });
-      const commentAuthorId = comment.author.id;
+      const commentAuthorId = comment.user_id;
 
       // 로그인한 유저아이디와 코멘트작성자 아이디가 일치한지 확인한다.
       return commentAuthorId === userId;

@@ -26,25 +26,25 @@ export class CommentRepository {
 
   // 코멘트 ID로 코멘트 찾기
   async findCommentById(dto: findCommentByCommentIdRepositoryDto) {
-    const { commentId, commentType } = dto;
+    try {
+      const { commentId, commentType } = dto;
+      const query = this.dataSource
+        .getRepository(Comment)
+        .createQueryBuilder('comment')
+        .leftJoinAndSelect('comment.author', 'user')
+        .where('comment.id = :commentId', { commentId: commentId });
 
-    const comment = await this.repo.findOne({
-      select: {
-        id: true,
-        content: true,
-        likes: true,
-        dislikes: true,
-        commentType: true,
-        createdAt: true,
-        deletedAt: true,
-      },
-      where: {
-        id: commentId,
-        commentType: commentType ?? undefined,
-      },
-    });
+      if (commentType) {
+        query.andWhere('comment.commentType = :commentType', {
+          commentType: commentType,
+        });
+      }
 
-    return comment;
+      const comment = await query.getRawOne();
+      return comment;
+    } catch (error) {
+      throw new InternalServerErrorException(error, error.stack);
+    }
   }
 
   // 댓글 생성 및 저장
@@ -89,8 +89,6 @@ export class CommentRepository {
     return comments;
   }
 
-  // TODO
-  // 댓글 ID로 조회
   async findAllReplyAndMentionedComments(
     dto: findAllReplyAndMentionedCommentsRepositoryDto,
   ) {
@@ -98,13 +96,12 @@ export class CommentRepository {
     const replyComments = await this.dataSource
       .getRepository(Comment)
       .createQueryBuilder('comment')
-      .leftJoinAndSelect('comment.project', 'project')
       .leftJoinAndSelect('comment.author', 'user')
       .where('comment.parentId = :parentCommentId', {
         parentCommentId: parentCommentId,
       })
-      .andWhere("comment.commentType IN ['R', 'M']")
-      .getMany();
+      .andWhere("comment.commentType IN ('R', 'M')")
+      .getRawMany();
 
     return replyComments;
     // return await this.repo.findOne({
@@ -134,9 +131,6 @@ export class CommentRepository {
     // await this.repo.delete(id);
 
     // soft-delete
-    // await this.repo.softDelete(id);
-    await this.repo.update(id, {
-      content: '삭제된 댓글 입니다.',
-    });
+    await this.repo.softDelete(id);
   }
 }
