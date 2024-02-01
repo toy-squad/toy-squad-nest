@@ -91,7 +91,7 @@ export class AuthService {
         refresh_token: refreshToken,
       };
     } catch (error) {
-      throw error;
+      throw error
     }
   }
 

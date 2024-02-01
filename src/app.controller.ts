@@ -10,6 +10,9 @@ import {
   Patch,
   Put,
   Query,
+  BadRequestException,
+  UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
 
 import { AuthService } from 'auth/auth.service';
@@ -62,11 +65,6 @@ export class AppController {
   }
 
   private readonly logger = new Logger(AppController.name);
-  @Public()
-  @Get()
-  getHello(): string {
-    return 'hello';
-  }
 
   /**
    * 회원가입 API
@@ -139,22 +137,34 @@ export class AppController {
     @Res() response: Response,
     @Body() dto: SignInRequestBody,
   ) {
-    const { user } = request;
+    try {
+      const { user } = request;
 
-    // 헤더에 Bearer Token 형태로 응답
-    const tokens = await this.authService.signIn(user.userId, user.email);
+      // 헤더에 Bearer Token 형태로 응답
+      const tokens = await this.authService.signIn(user.userId, user.email);
 
-    // 유저아이디를 쿠키에 저장
-    response.cookie('user_id', user.userId, {
-      maxAge: this.REFRESH_TOKEN_EXPIRATION,
-      httpOnly: true,
-      secure: AppController.COOKIE_SECURE_OPTION,
-      sameSite: AppController.COOKIE_SECURE_OPTION ? 'none' : undefined,
-    });
-    return response.json({
-      ...tokens,
-      user_id: user.userId,
-    });
+      // 유저아이디를 쿠키에 저장
+      response.cookie('user_id', user.userId, {
+        maxAge: this.REFRESH_TOKEN_EXPIRATION,
+        httpOnly: true,
+        secure: AppController.COOKIE_SECURE_OPTION,
+        sameSite: AppController.COOKIE_SECURE_OPTION ? 'none' : undefined,
+      });
+      return response.json({
+        ...tokens,
+        user_id: user.userId,
+      });
+    } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw new UnauthorizedException(error.message, error.stack);
+      }
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.message, error.stack);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message, error.stack);
+      }
+    }
   }
 
   /** 로그아웃 */
