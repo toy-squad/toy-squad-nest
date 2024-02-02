@@ -20,6 +20,10 @@ import { UpdatedUserInfoType } from './types/update-user-info.type';
 import { UpdatePasswordRequestDto } from 'users/dtos/requests/update-password-request.dto';
 import { AwsService } from 'aws/aws.service';
 import { RedisService } from 'redis/redis.service';
+import {
+  getImageFileTypeFromMimeType,
+  getKeyFromS3Url,
+} from 'commons/constants/FILE_CONSTANT';
 
 @Injectable()
 export class UsersService {
@@ -206,12 +210,21 @@ export class UsersService {
         ? await bcrypt.hash(dto.password, 10)
         : undefined;
 
-      // 이미지 프로필파일은 s3에 저장한다
       let imgUrl: string;
       if (imgProfileFile) {
+        // 데이터베이스에 저장된 유저정보의 이미지 필드가 존재한다면, 해당이미지를 s3에서 제거한다.
+        if (defaultUserInfo.imgUrl) {
+          const key = getKeyFromS3Url(defaultUserInfo.imgUrl);
+          await this.awsService.deleteImageFromS3({ key: key });
+        }
+
+        // 업로드한 이미지 확장자를 구한다.
+        const mimetype = getImageFileTypeFromMimeType(imgProfileFile.mimetype);
+
+        // 이미지 프로필파일은 s3에 저장한다
         imgUrl = await this.awsService.imageUploadToS3({
           dirName: `users/${userId}/profile`,
-          fileName: imgProfileFile.originalname,
+          fileName: `profile-img-${userId}.${mimetype}`,
           uploadFile: imgProfileFile,
           ext: imgProfileFile.mimetype,
         });
