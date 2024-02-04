@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from '@aws-sdk/client-s3';
 import { ConfigService } from '@nestjs/config';
-import { imageUploadToS3Dto } from './dtos/aws.dto';
+import { deleteImageFromS3Dto, imageUploadToS3Dto } from './dtos/aws.dto';
 
 @Injectable()
 export class AwsService {
@@ -38,5 +42,16 @@ export class AwsService {
 
     // 업로드된 이미지 URL을 반환
     return `https://s3.${this.AWS_REGION}.amazonaws.com/${this.AWS_BUCKET_NAME}/${dirName}/${fileName}`;
+  }
+
+  // 이미지 삭제
+  async deleteImageFromS3(dto: deleteImageFromS3Dto) {
+    const { key } = dto;
+    const command = new DeleteObjectCommand({
+      Bucket: this.AWS_BUCKET_NAME, // 삭제대상 S3 버킷
+      Key: key,
+    });
+
+    await this.s3Client.send(command);
   }
 }
