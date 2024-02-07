@@ -24,6 +24,7 @@ import { UsersService } from './users.service';
 import { DEFAULT_PAGE, DEFAULT_TAKE } from 'commons/dtos/pagination-query-dto';
 import {
   ApiBody,
+  ApiConsumes,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -38,7 +39,10 @@ import { ConfigService } from '@nestjs/config';
 import { Public } from 'auth/decorators/public.decorator';
 import { FindAndUpdatePasswordRequestDto } from './dtos/requests/find-and-update-password-request.dto';
 import { positionCategory } from './types/position.type';
-import { UpdateUserInfoRequestDto } from './dtos/requests/update-user-info-request.dto';
+import {
+  UpdateUserInfoRequestDto,
+  UploadProfileImageRequestDto,
+} from './dtos/requests/update-user-info-request.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 import RequestWithUser from 'auth/interfaces/request-with-user.interface';
@@ -99,15 +103,22 @@ export class UsersController {
    * URL: /api/users
    */
   @Patch()
+  @ApiOperation({
+    summary: '유저 정보 수정 API',
+    description: '유저 정보 수정 (프로필이미지 외 텍스트정보)',
+  })
+  @ApiBody({
+    type: UpdateUserInfoRequestDto,
+  })
   @ApiResponse({
     status: 404,
     description: '존재하지 않은 회원입니다.',
   })
-  async updateUserInfo(
-    @Req() req: RequestWithUser,
-    @Res() res: Response,
-    @Body() requestDto: UpdateUserInfoRequestDto,
-  ) {
+  @ApiOkResponse({
+    status: 200,
+    description: '수정완료',
+  })
+  async updateUserInfo(@Req() req: RequestWithUser, @Res() res: Response) {
     const { userId } = req.user;
     const dto = req.body;
 
@@ -120,14 +131,27 @@ export class UsersController {
 
   // 이미지 파일 업로드
   @Patch('/profile')
-  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   @ApiOperation({
     summary: '유저 프로필 이미지 수정 API',
     description: '유저 프로필 이미지 수정',
   })
   @ApiOkResponse({
     status: 200,
+    description: '업로드된 프로필 이미지의 S3 주소를 반환',
   })
+  @UseInterceptors(FileInterceptor('file'))
   async uploadProfileImage(
     @Req() req: RequestWithUser,
     @Res() res: Response,
@@ -142,7 +166,7 @@ export class UsersController {
         ],
       }),
     )
-    file?: Express.Multer.File | undefined,
+    file: Express.Multer.File,
   ) {
     const { userId } = req.user;
     const updatedUserInfo = await this.userService.updateUserInfo({
