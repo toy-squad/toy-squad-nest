@@ -10,3 +10,9 @@ export class deleteImageFromS3Dto {
   // key = ${dirName}/${fileName}
   key: string;
 }
+
+export class getImageUrlFromS3Dto {
+  // s3 imgUrl = https://s3.${this.AWS_REGION}.amazonaws.com/${this.AWS_BUCKET_NAME}/${dirName}/${fileName}
+  // key = ${dirName}/${fileName}
+  key: string;
+}
