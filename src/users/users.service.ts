@@ -189,8 +189,9 @@ export class UsersService {
 
   /**
    * 유저정보수정
-   * - dto: 정보수정 요청 데이터
-   * - defaultUserInfo: 기존 DB에 저장된 유저정보
+   * - 유저 비밀번호 수정
+   * - 유저 프로필 이미지 업로드
+   * - 유저 엔티티 필드 수정
    */
   async updateUserInfo(dto: UpdateUserInfoServiceDto) {
     try {
@@ -263,6 +264,31 @@ export class UsersService {
     try {
       // 비밀번호 재설정
       await this.usersRepository.updateUserInfo(dto);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // 기본이미지로 전환하기
+  async updatedDefaultProfileImage(userId: string) {
+    try {
+      // userId 를 갖는 유저가 존재하는지 확인
+      const defaultUserInfo: UpdatedUserInfoType =
+        await this.usersRepository.findOneUser({
+          userId: userId,
+        });
+      if (!defaultUserInfo) {
+        throw new NotFoundException('존재하지 않은 회원입니다.');
+      }
+
+      // 유저가 존재한다면 -> db에 저장된 imgUrl필드를 null로 변경한다.
+      await this.usersRepository.updatedDefaultProfileImage(userId);
+
+      // s3 버킷에 있는 데이터를 삭제한다.
+      const targetKey = getKeyFromS3Url(defaultUserInfo.imgUrl);
+      await this.awsService.deleteImageFromS3({
+        key: targetKey,
+      });
     } catch (error) {
       throw error;
     }

@@ -6,6 +6,7 @@ import {
   Delete,
   FileTypeValidator,
   Get,
+  InternalServerErrorException,
   Logger,
   MaxFileSizeValidator,
   NotFoundException,
@@ -51,6 +52,7 @@ import {
   VALID_IMAGE_FILE_TYPES_REGEX,
 } from 'commons/constants/FILE_CONSTANT';
 import { UpdateLikesValueRequestDto } from './dtos/requests/update-likes-value-request.dto';
+import { NotFound } from '@aws-sdk/client-s3';
 
 @ApiTags('유저 API')
 @Controller('users')
@@ -129,7 +131,7 @@ export class UsersController {
     res.status(200).json('수정 완료');
   }
 
-  // 이미지 파일 업로드
+  // 프로필 이미지 파일 업로드
   @Patch('/profile')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -178,6 +180,26 @@ export class UsersController {
     return res.status(200).json({
       profile_url: updatedUserInfo.imgUrl ?? undefined,
     });
+  }
+
+  // 프로필 이미지 파일 기본 이미지로 전환하기
+  @Delete('/profile')
+  async defaultProfileImage(@Req() req: RequestWithUser, @Res() res: Response) {
+    try {
+      const { userId } = req.user;
+      await this.userService.updatedDefaultProfileImage(userId);
+      return res.status(200).json({});
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(
+          '기본 프로필 이미지로 업로드하는데 실패하였습니다.',
+        );
+      } else if (error instanceof NotFoundException) {
+        throw new NotFoundException('존재하지 않은 회원 입니다.');
+      }
+
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   /**

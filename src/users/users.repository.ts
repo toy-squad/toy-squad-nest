@@ -117,4 +117,16 @@ export class UsersRepository {
       throw error;
     }
   }
+
+  async updatedDefaultProfileImage(userId): Promise<void> {
+    try {
+      await this.dataSource.createQueryRunner().manager.query(`
+        UPDATE user
+        SET img_url = null 
+        WHERE user.id = '${userId}'
+      `);
+    } catch (error) {
+      throw error;
+    }
+  }
 }

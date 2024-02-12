@@ -67,5 +67,7 @@ export class AwsService {
       Bucket: this.AWS_BUCKET_NAME, // 조회대상 S3버킷
       Key: key,
     });
+
+    await this.s3Client.send(command);
   }
 }
