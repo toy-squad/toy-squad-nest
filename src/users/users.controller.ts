@@ -12,7 +12,6 @@ import {
   NotFoundException,
   Param,
   ParseFilePipe,
-  ParseFilePipeBuilder,
   ParseIntPipe,
   Patch,
   Query,
@@ -29,7 +28,6 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
-  ApiProperty,
   ApiQuery,
   ApiResponse,
   ApiTags,
@@ -40,10 +38,7 @@ import { ConfigService } from '@nestjs/config';
 import { Public } from 'auth/decorators/public.decorator';
 import { FindAndUpdatePasswordRequestDto } from './dtos/requests/find-and-update-password-request.dto';
 import { positionCategory } from './types/position.type';
-import {
-  UpdateUserInfoRequestDto,
-  UploadProfileImageRequestDto,
-} from './dtos/requests/update-user-info-request.dto';
+import { UpdateUserInfoRequestDto } from './dtos/requests/update-user-info-request.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 import RequestWithUser from 'auth/interfaces/request-with-user.interface';
@@ -51,8 +46,7 @@ import {
   UPLOAD_IMAGE_MAX_SIZE,
   VALID_IMAGE_FILE_TYPES_REGEX,
 } from 'commons/constants/FILE_CONSTANT';
-import { UpdateLikesValueRequestDto } from './dtos/requests/update-likes-value-request.dto';
-import { NotFound } from '@aws-sdk/client-s3';
+import { UpdateLikeUserRequestDto } from './dtos/requests/update-like-user-request.dto';
 
 @ApiTags('유저 API')
 @Controller('users')
@@ -314,38 +308,40 @@ export class UsersController {
   async updateLikesValue(
     @Req() req: RequestWithUser,
     @Res() res: Response,
-    @Body() dto: UpdateLikesValueRequestDto,
+    @Body() dto: UpdateLikeUserRequestDto,
   ) {
-    // 좋아요를 준 대상과 좋아요 받은 대상이 동일한 경우
     const { user, body } = req;
-    const targetUserId = dto.target_user_id
-      ? dto.target_user_id
-      : body.target_user_id;
-    if (user.userId === targetUserId) {
-      throw new BadRequestException('자기자신에게 좋아요를 줄 수 없습니다.');
+    const { to, likeType } = body;
+    try {
+      // 좋아요를 준 유저(from)과 좋아요를 받은 유저(to)가 동일하면 에러발생
+      const targetUserId = body.to;
+      if (user.userId === targetUserId) {
+        throw new BadRequestException('자기자신에게 좋아요를 줄 수 없습니다.');
+      }
+
+      switch (likeType) {
+        case 'LIKE': // 좋아요
+        case 'CANCEL': // 좋아요 취소
+          await this.userService.updateLikeUser({
+            to: to,
+            from: user.userId,
+            likeType: likeType,
+          });
+          break;
+        default:
+          throw new BadRequestException(
+            'likeType는 LIKE(좋아요) / CANCEL(좋아요 취소) 값만 가능합니다.',
+          );
+      }
+      return res.status(200).json({
+        message:
+          likeType === 'LIKE' ? '좋아요 반영 완료' : '좋아요 취소 반영 완료',
+      });
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        new BadRequestException(error.message);
+      }
     }
-
-    // target 유저에 대한 likes 정보를 갖고온다.
-    const targetUser = await this.userService.findOneUser({
-      userId: dto.target_user_id,
-    });
-    if (!targetUser) {
-      throw new NotFoundException('존재하지 않은 회원입니다.');
-    }
-
-    // 좋아요값 업데이트
-    await this.userService.updateUserInfo({
-      userId: targetUserId,
-      likes: targetUser.likes + 1,
-    });
-
-    return res
-      .status(200)
-      .json(
-        `좋아요 반영 완료하였습니다 : ${targetUser.likes} -> ${
-          targetUser.likes + 1
-        }`,
-      );
   }
 
   /**
@@ -366,6 +362,16 @@ export class UsersController {
   })
   @ApiOkResponse()
   async getUserDetail(@Param('id') userId: string) {
+    // FIXME:
+    // 로그인하게되면 마이페이지에 기재 유저정보
+    //
+    // 1. 좋아요(누른좋아요, 받은좋아요)
+    // 2. 댓글 & 답글 관리
+    // 3. 리뷰 (받은리뷰, 작성한 리뷰)
+    // 4. 모집현황 (본인이 프로젝트 생성자/관리자의 경우)
+    // 5. 진행중인 프로젝트
+    // 6. 완료 프로젝트
+    // 7. 참여 신청
     return await this.userService.findOneUser({ userId: userId });
   }
 

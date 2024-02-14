@@ -24,6 +24,7 @@ import {
   getImageFileTypeFromMimeType,
   getKeyFromS3Url,
 } from 'commons/constants/FILE_CONSTANT';
+import { UpdateLikeUserRequestDto } from './dtos/requests/update-like-user-request.dto';
 
 @Injectable()
 export class UsersService {
@@ -255,7 +256,7 @@ export class UsersService {
 
       return updatedUserInfo;
     } catch (error) {
-      throw error;
+      return error;
     }
   }
 
@@ -265,7 +266,7 @@ export class UsersService {
       // 비밀번호 재설정
       await this.usersRepository.updateUserInfo(dto);
     } catch (error) {
-      throw error;
+      return error;
     }
   }
 
@@ -290,7 +291,42 @@ export class UsersService {
         key: targetKey,
       });
     } catch (error) {
-      throw error;
+      return error;
+    }
+  }
+
+  // FIXME
+  // 좋아요
+  async updateLikeUser(dto: UpdateLikeUserRequestDto) {
+    const { to, from, likeType } = dto;
+    try {
+      // 유저를 찾는다.
+      // target 유저에 대한 likes 정보를 갖고온다.
+      const targetUser = await this.findOneUser({
+        userId: to,
+      });
+      if (!targetUser) {
+        throw new NotFoundException('존재하지 않은 회원입니다.');
+      }
+
+      // 좋아요 / 좋아요 취소 반영
+      await this.updateUserInfo({
+        userId: to,
+        likes:
+          likeType === 'LIKE' ? targetUser.likes + 1 : targetUser.likes - 1,
+      });
+
+      if (likeType === 'LIKE') {
+        // likeType == 'LIKE' : 좋아요 반영
+        // likes 테이블에 추가
+      } else {
+        // likeType == 'CANCEL' : 좋아요 취소 반영
+        // from, to 에 일치하는 대상이 있는지 확인
+        // 있다면, likes 테이블 soft-delete
+        // 없다면 에러
+      }
+    } catch (error) {
+      return error;
     }
   }
 }
