@@ -118,7 +118,7 @@ export class UsersRepository {
     }
   }
 
-  async updatedDefaultProfileImage(userId): Promise<void> {
+  async updatedDefaultProfileImage(userId: string): Promise<void> {
     try {
       await this.dataSource.createQueryRunner().manager.query(`
         UPDATE user
