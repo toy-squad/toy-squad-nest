@@ -8,6 +8,7 @@ import { AuthModule } from 'auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { AwsModule } from 'aws/aws.module';
 import { RedisModule } from 'redis/redis.module';
+import { LikesModule } from 'likes/likes.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { RedisModule } from 'redis/redis.module';
     ConfigModule,
     AwsModule,
     RedisModule,
+    LikesModule,
   ],
   providers: [UsersService, UsersRepository],
   controllers: [UsersController],
