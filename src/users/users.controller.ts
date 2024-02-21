@@ -288,6 +288,9 @@ export class UsersController {
    *  유저 좋아요 클릭 -> likes 값만 업데이트
    * */
   @Patch('likes')
+  @ApiBody({
+    type: UpdateLikeUserRequestDto,
+  })
   @ApiOperation({
     summary: '단일유저 좋아요 API',
     description: '유저 1명에게 좋아요 버튼을 누르면 좋아요값이 +1 된다.',
@@ -305,20 +308,16 @@ export class UsersController {
     description:
       '존재하지 않은 회원 입니다. - 좋아요 대상 유저가 존재하지 않을 경우',
   })
-  async updateLikesValue(
-    @Req() req: RequestWithUser,
-    @Res() res: Response,
-    @Body() dto: UpdateLikeUserRequestDto,
-  ) {
+  async updateLikesValue(@Req() req: RequestWithUser, @Res() res: Response) {
     const { user, body } = req;
-    const { to, likeType } = body;
+    const { to } = body;
     try {
       // 좋아요를 준 유저(from)과 좋아요를 받은 유저(to)가 동일하면 에러발생
       const targetUserId = body.to;
       if (user.userId === targetUserId) {
         throw new BadRequestException('자기자신에게 좋아요를 줄 수 없습니다.');
       }
-
+      const likeType = body.likeType ?? 'LIKE';
       switch (likeType) {
         case 'LIKE': // 좋아요
         case 'CANCEL': // 좋아요 취소
