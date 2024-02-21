@@ -11,11 +11,7 @@ import * as bcrypt from 'bcrypt';
 import { FindUserRequestDto } from './dtos/requests/find-one-user-request.dto';
 import { ConfirmPasswordRequestDto } from './dtos/requests/confirm-password-request.dto';
 import { FindUserListRequestDto } from './dtos/requests/find-user-list-request.dto';
-import { GetUserDetailRequestDto } from './dtos/requests/get-user-detail-request.dto';
-import {
-  UpdateUserInfoServiceDto,
-  UpdateUserInfoRequestDto,
-} from './dtos/requests/update-user-info-request.dto';
+import { UpdateUserInfoServiceDto } from './dtos/requests/update-user-info-request.dto';
 import { UpdatedUserInfoType } from './types/update-user-info.type';
 import { UpdatePasswordRequestDto } from 'users/dtos/requests/update-password-request.dto';
 import { AwsService } from 'aws/aws.service';
@@ -24,7 +20,8 @@ import {
   getImageFileTypeFromMimeType,
   getKeyFromS3Url,
 } from 'commons/constants/FILE_CONSTANT';
-import { UpdateLikeUserRequestDto } from './dtos/requests/update-like-user-request.dto';
+import { UpdateLikeUserServiceRequestDto } from './dtos/requests/update-like-user-request.dto';
+import { LikesRepository } from 'likes/likes.repository';
 
 @Injectable()
 export class UsersService {
@@ -33,6 +30,7 @@ export class UsersService {
 
   constructor(
     private readonly usersRepository: UsersRepository,
+    private readonly likesRepository: LikesRepository,
     private readonly awsService: AwsService,
     private readonly redisService: RedisService,
   ) {}
@@ -296,8 +294,8 @@ export class UsersService {
   }
 
   // FIXME
-  // 좋아요
-  async updateLikeUser(dto: UpdateLikeUserRequestDto) {
+  // 좋아요 : 좋아요는 딱 한번만 가능.
+  async updateLikeUser(dto: UpdateLikeUserServiceRequestDto) {
     const { to, from, likeType } = dto;
     try {
       // 유저를 찾는다.
@@ -309,22 +307,34 @@ export class UsersService {
         throw new NotFoundException('존재하지 않은 회원입니다.');
       }
 
+      // likes 테이블에 복합키 from, to 에 매핑되는 값이 존재하는지 확인
+      const likesHistory = await this.likesRepository.findOneLikesHistory({
+        from: from,
+        to: to,
+      });
+
+      if (likeType === 'LIKE') {
+        if (likesHistory) {
+          throw new BadRequestException(
+            '한번만 좋아요 를 반영할 수 있습니다 : 이미 Likes 테이블에 등록되었습니다.',
+          );
+        }
+        await this.likesRepository.addLikesHistory({ from: from, to: to });
+      } else {
+        if (!likesHistory) {
+          throw new BadRequestException(
+            '좋아요 취소를 할 수 없습니다 : likes 테이블에 데이터가 존재하지 않습니다.',
+          );
+        }
+        await this.likesRepository.cancelLikesHistory({ from: from, to: to });
+      }
+
       // 좋아요 / 좋아요 취소 반영
       await this.updateUserInfo({
         userId: to,
         likes:
           likeType === 'LIKE' ? targetUser.likes + 1 : targetUser.likes - 1,
       });
-
-      if (likeType === 'LIKE') {
-        // likeType == 'LIKE' : 좋아요 반영
-        // likes 테이블에 추가
-      } else {
-        // likeType == 'CANCEL' : 좋아요 취소 반영
-        // from, to 에 일치하는 대상이 있는지 확인
-        // 있다면, likes 테이블 soft-delete
-        // 없다면 에러
-      }
     } catch (error) {
       return error;
     }
