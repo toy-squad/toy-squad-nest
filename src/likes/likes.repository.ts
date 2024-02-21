@@ -34,10 +34,15 @@ export class LikesRepository {
   async addLikesHistory(dto: InsertLikesHistoryDto) {
     try {
       const { from, to } = dto;
-      await this.dataSource.createQueryRunner().manager.query(`
-          INSERT INTO likes (from, to)
-          VALUE('${from}', '${to}');
-        `);
+      await this.dataSource
+        .createQueryBuilder()
+        .insert()
+        .into(Likes)
+        .values({
+          from: from,
+          to: to,
+        })
+        .execute();
     } catch (error) {
       return error;
     }
@@ -57,4 +62,10 @@ export class LikesRepository {
       return error;
     }
   }
+
+  //   // 내가 누른 좋아요 수 조회
+  //   async findGaveLikes() {}
+
+  //   // 내가 받은 좋아요 수 조회
+  //   async findReceivedLikes() {}
 }
