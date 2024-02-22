@@ -4,9 +4,15 @@ import { Likes } from './entities/likes.entity';
 import { DataSource, Repository } from 'typeorm';
 import {
   CancelLikesHistoryDto,
+  FindGaveLikesHistoryDto,
   FindOneLikesHistoryDto,
   InsertLikesHistoryDto,
+  findReceivedLikesHistoryDto,
 } from './dto/request-dtos';
+import {
+  FindGaveLikesHistoryResponseDto,
+  FindReceivedLikesHistoryDto,
+} from './dto/response-dto';
 
 @Injectable()
 export class LikesRepository {
@@ -32,8 +38,8 @@ export class LikesRepository {
   }
 
   async addLikesHistory(dto: InsertLikesHistoryDto) {
+    const { from, to } = dto;
     try {
-      const { from, to } = dto;
       await this.dataSource
         .createQueryBuilder()
         .insert()
@@ -49,8 +55,8 @@ export class LikesRepository {
   }
 
   async cancelLikesHistory(dto: CancelLikesHistoryDto) {
+    const { from, to } = dto;
     try {
-      const { from, to } = dto;
       await this.dataSource
         .getRepository(Likes)
         .createQueryBuilder('likes')
@@ -63,9 +69,45 @@ export class LikesRepository {
     }
   }
 
-  //   // 내가 누른 좋아요 수 조회
-  //   async findGaveLikes() {}
+  async findGaveLikesHistory(dto: findReceivedLikesHistoryDto) {
+    const { targetUserId } = dto;
+    try {
+      // targetUserId가 누른 좋아요 히스토리 조회 (from: targetUserId)
+      const givenHistories = await this.dataSource
+        .getRepository(Likes)
+        .createQueryBuilder('likes')
+        .where('likes.from = :from', { from: targetUserId })
+        .getMany();
 
-  //   // 내가 받은 좋아요 수 조회
-  //   async findReceivedLikes() {}
+      const responseDto: FindGaveLikesHistoryResponseDto = {
+        likeHistories: givenHistories,
+        likes: givenHistories.length ?? 0,
+      };
+
+      return responseDto;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async findReceivedLikesHistory(dto: FindGaveLikesHistoryDto) {
+    const { targetUserId } = dto;
+    try {
+      // targetUserId가  받은 좋아요 히스토리 조회 (to: targetUserId)
+      const receivedHistories = await this.dataSource
+        .getRepository(Likes)
+        .createQueryBuilder('likes')
+        .where('likes.to = :to', { to: targetUserId })
+        .getMany();
+
+      const responseDto: FindReceivedLikesHistoryDto = {
+        likeHistories: receivedHistories,
+        likes: receivedHistories.length ?? 0,
+      };
+
+      return responseDto;
+    } catch (error) {
+      return error;
+    }
+  }
 }

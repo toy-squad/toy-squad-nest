@@ -334,7 +334,9 @@ export class UsersController {
       }
       return res.status(200).json({
         message:
-          likeType === 'LIKE' ? '좋아요 반영 완료' : '좋아요 취소 반영 완료',
+          likeType === 'LIKE'
+            ? '좋아요 반영 완료했습니다.'
+            : '좋아요 취소 반영 완료했습니다.',
       });
     } catch (error) {
       if (error instanceof BadRequestException) {

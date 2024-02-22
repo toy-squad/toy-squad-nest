@@ -299,7 +299,7 @@ export class UsersService {
     const { to, from, likeType } = dto;
     try {
       // 유저를 찾는다.
-      // target 유저에 대한 likes 정보를 갖고온다.
+      // targetUser : 좋아요(좋아요 취소)를 받은 유저 = id가 dto.to 인 유저
       const targetUser = await this.findOneUser({
         userId: to,
       });
@@ -329,11 +329,18 @@ export class UsersService {
         await this.likesRepository.cancelLikesHistory({ from: from, to: to });
       }
 
+      // targetUser.id 가 받은 좋아요 수를 구한다.
+      const givenHistoriesDto =
+        await this.likesRepository.findReceivedLikesHistory({
+          targetUserId: to,
+        });
+
       // 좋아요 / 좋아요 취소 반영
       await this.updateUserInfo({
         userId: to,
-        likes:
-          likeType === 'LIKE' ? targetUser.likes + 1 : targetUser.likes - 1,
+        likes: givenHistoriesDto.likes,
+        // likes:
+        //   likeType === 'LIKE' ? targetUser.likes + 1 : targetUser.likes - 1,
       });
     } catch (error) {
       return error;

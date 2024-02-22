@@ -29,3 +29,17 @@ export class InsertLikesHistoryDto extends PartialType(
 export class CancelLikesHistoryDto extends PartialType(
   FindOneLikesHistoryDto,
 ) {}
+
+// targetUserId 가 받은 좋아요 히스토리
+export class findReceivedLikesHistoryDto {
+  @IsNotEmpty()
+  @IsString()
+  targetUserId: string;
+}
+
+// targetUserId 유저가 준 좋아요 히스토리
+export class FindGaveLikesHistoryDto {
+  @IsNotEmpty()
+  @IsString()
+  targetUserId: string;
+}
