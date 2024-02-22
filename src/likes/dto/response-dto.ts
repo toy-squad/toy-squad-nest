@@ -21,7 +21,7 @@ export class FindGaveLikesHistoryResponseDto extends PartialType(
   likes: number;
 }
 
-export class FindReceivedLikesHistoryDto extends PartialType(
+export class FindReceivedLikesHistoryResponseDto extends PartialType(
   LikesHistoriesResponseDto,
 ) {
   @ApiProperty({

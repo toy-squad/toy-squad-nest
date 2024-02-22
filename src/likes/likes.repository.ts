@@ -11,7 +11,7 @@ import {
 } from './dto/request-dtos';
 import {
   FindGaveLikesHistoryResponseDto,
-  FindReceivedLikesHistoryDto,
+  FindReceivedLikesHistoryResponseDto,
 } from './dto/response-dto';
 
 @Injectable()
@@ -94,7 +94,7 @@ export class LikesRepository {
 
   async findReceivedLikesHistory(
     dto: findReceivedLikesHistoryDto,
-  ): Promise<FindReceivedLikesHistoryDto> {
+  ): Promise<FindReceivedLikesHistoryResponseDto> {
     const { targetUserId } = dto;
     try {
       // targetUserId가  받은 좋아요 히스토리 조회 (to: targetUserId)
@@ -104,7 +104,7 @@ export class LikesRepository {
         .where('likes.to = :to', { to: targetUserId })
         .getMany();
 
-      const responseDto: FindReceivedLikesHistoryDto = {
+      const responseDto: FindReceivedLikesHistoryResponseDto = {
         likeHistories: receivedHistories,
         likes: receivedHistories.length ?? 0,
       };
