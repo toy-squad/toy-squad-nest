@@ -34,3 +34,8 @@ export class FindReceivedLikesHistoryResponseDto extends PartialType(
   })
   likes: number;
 }
+
+export interface MyPageLikesInfoResponseDto {
+  gave: FindGaveLikesHistoryResponseDto;
+  received: FindReceivedLikesHistoryResponseDto;
+}

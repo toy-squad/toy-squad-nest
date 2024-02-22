@@ -239,23 +239,50 @@ export class AppController {
   /**
    * TODO
    * 마이페이지
+   * 로그인 후 유저의 마이페이지
+   *
    * URL: /api/mypage
    *
-   * - 내가 작성한 댓글 & 답글
-   * - 내가 참여한 프로젝트
-   * - 내가 완료한 프로젝트
-   * - 내가 받은 프로젝트 제안
-   * - 내가 생성한 프로젝트
-   * - 내가 작성한 전시물
-   *
+   * - 프로필 관리
+   *    - 로그인한 유저정보: 포지션 / 평점 / 좋아요수 / 소개 / 주요스킬 / 선호분야 / 프로젝트 참여 성향 / 휴대전화 / 이메일
+   * - 프로젝트 관리
+   *    - 모집현황 (유저 오너 프로젝트 = 유저가 프로젝트 매니저)
+   *    - 진행중인 프로젝트 (유저 참여 프로젝트 + 유저오너 프로젝트)
+   *    - 완료 프로젝트
+   *    - 참여 신청
+   * - 유저관리
+   *    - 댓글/답글 관리
+   *    - 받은 좋아요
+   *    - 누른 좋아요
+   *    - 받은 리뷰
+   *    - 작성한 리뷰
    */
   @Get('/mypage')
   @ApiOperation({
     summary: '마이페이지 API',
     description: '로그인 유저 마이페이지',
   })
-  async getMyPage(@Req() request: RequestWithUser) {
-    return request.user;
+  async getMyPage(@Req() req: RequestWithUser) {
+    const { userId } = req.user;
+
+    // 1. 프로필 관리 - 유저정보
+    const profile = await this.userService.findOneUser({
+      userId: userId,
+      allowPassword: false,
+    });
+
+    // 2. 유저관리
+    // 받은좋아요 & 누른 좋아요
+    const likesInfo = await this.userService.myPageLikesInfo(userId);
+    // 댓글 / 답글 관리
+
+    return {
+      profile: profile,
+      // projects
+
+      // likes: (received)받은좋아요 & (gave)누른좋아요
+      likes: likesInfo,
+    };
   }
 
   /**

@@ -22,6 +22,7 @@ import {
 } from 'commons/constants/FILE_CONSTANT';
 import { UpdateLikeUserServiceRequestDto } from './dtos/requests/update-like-user-request.dto';
 import { LikesRepository } from 'likes/likes.repository';
+import { MyPageLikesInfoResponseDto } from 'likes/dto/response-dto';
 
 @Injectable()
 export class UsersService {
@@ -330,7 +331,7 @@ export class UsersService {
       }
 
       // targetUser.id 가 받은 좋아요 수를 구한다.
-      const givenHistoriesDto =
+      const receivedLikesHistoriesDto =
         await this.likesRepository.findReceivedLikesHistory({
           targetUserId: to,
         });
@@ -338,10 +339,34 @@ export class UsersService {
       // 좋아요 / 좋아요 취소 반영
       await this.updateUserInfo({
         userId: to,
-        likes: givenHistoriesDto.likes,
+        likes: receivedLikesHistoriesDto.likes,
         // likes:
         //   likeType === 'LIKE' ? targetUser.likes + 1 : targetUser.likes - 1,
       });
+    } catch (error) {
+      return error;
+    }
+  }
+
+  // 마이페이지 > 로그인한 유저가 받은 좋아요 & 누른 좋아요 정보
+  async myPageLikesInfo(userId: string): Promise<MyPageLikesInfoResponseDto> {
+    try {
+      // 로그인한 유저가 누른 좋아요 정보
+      const gaveLikesHistories =
+        await this.likesRepository.findGaveLikesHistory({
+          targetUserId: userId,
+        });
+
+      // 로그인한 유저가 받은 좋아요 정보
+      const receivedLikesHistories =
+        await this.likesRepository.findReceivedLikesHistory({
+          targetUserId: userId,
+        });
+
+      return {
+        gave: gaveLikesHistories, // 누른 좋아요
+        received: receivedLikesHistories, // 받은 좋아요
+      };
     } catch (error) {
       return error;
     }

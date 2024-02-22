@@ -346,16 +346,15 @@ export class UsersController {
   }
 
   /**
-   * TODO
-   * 유저 상세 페이지
+   * (공개용 페이지) 유저 프로필 페이지
    * URL: /api/users/:id/detail/
-   * - 비밀번호 포함
    */
   @Public()
   @Get(':id/detail')
   @ApiOperation({
     summary: '[public] 유저 상세페이지 API',
-    description: '유저 상세정보',
+    description:
+      '유저 상세정보 페이지 & 공개용 유저 프로필 조회 페이지 - 팀원 찾기 유저프로필 조회 & 좋아요 누른 유저 프로필 조회 등...',
   })
   @ApiParam({
     name: 'id',
@@ -363,16 +362,6 @@ export class UsersController {
   })
   @ApiOkResponse()
   async getUserDetail(@Param('id') userId: string) {
-    // FIXME:
-    // 로그인하게되면 마이페이지에 기재 유저정보
-    //
-    // 1. 좋아요(누른좋아요, 받은좋아요)
-    // 2. 댓글 & 답글 관리
-    // 3. 리뷰 (받은리뷰, 작성한 리뷰)
-    // 4. 모집현황 (본인이 프로젝트 생성자/관리자의 경우)
-    // 5. 진행중인 프로젝트
-    // 6. 완료 프로젝트
-    // 7. 참여 신청
     return await this.userService.findOneUser({ userId: userId });
   }
 
