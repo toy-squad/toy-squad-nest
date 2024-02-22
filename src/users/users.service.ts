@@ -11,11 +11,7 @@ import * as bcrypt from 'bcrypt';
 import { FindUserRequestDto } from './dtos/requests/find-one-user-request.dto';
 import { ConfirmPasswordRequestDto } from './dtos/requests/confirm-password-request.dto';
 import { FindUserListRequestDto } from './dtos/requests/find-user-list-request.dto';
-import { GetUserDetailRequestDto } from './dtos/requests/get-user-detail-request.dto';
-import {
-  UpdateUserInfoServiceDto,
-  UpdateUserInfoRequestDto,
-} from './dtos/requests/update-user-info-request.dto';
+import { UpdateUserInfoServiceDto } from './dtos/requests/update-user-info-request.dto';
 import { UpdatedUserInfoType } from './types/update-user-info.type';
 import { UpdatePasswordRequestDto } from 'users/dtos/requests/update-password-request.dto';
 import { AwsService } from 'aws/aws.service';
@@ -24,6 +20,9 @@ import {
   getImageFileTypeFromMimeType,
   getKeyFromS3Url,
 } from 'commons/constants/FILE_CONSTANT';
+import { UpdateLikeUserServiceRequestDto } from './dtos/requests/update-like-user-request.dto';
+import { LikesRepository } from 'likes/likes.repository';
+import { MyPageLikesInfoResponseDto } from 'likes/dto/response-dto';
 
 @Injectable()
 export class UsersService {
@@ -32,6 +31,7 @@ export class UsersService {
 
   constructor(
     private readonly usersRepository: UsersRepository,
+    private readonly likesRepository: LikesRepository,
     private readonly awsService: AwsService,
     private readonly redisService: RedisService,
   ) {}
@@ -189,8 +189,9 @@ export class UsersService {
 
   /**
    * 유저정보수정
-   * - dto: 정보수정 요청 데이터
-   * - defaultUserInfo: 기존 DB에 저장된 유저정보
+   * - 유저 비밀번호 수정
+   * - 유저 프로필 이미지 업로드
+   * - 유저 엔티티 필드 수정
    */
   async updateUserInfo(dto: UpdateUserInfoServiceDto) {
     try {
@@ -254,7 +255,7 @@ export class UsersService {
 
       return updatedUserInfo;
     } catch (error) {
-      throw error;
+      return error;
     }
   }
 
@@ -264,7 +265,110 @@ export class UsersService {
       // 비밀번호 재설정
       await this.usersRepository.updateUserInfo(dto);
     } catch (error) {
-      throw error;
+      return error;
+    }
+  }
+
+  // 기본이미지로 전환하기
+  async updatedDefaultProfileImage(userId: string) {
+    try {
+      // userId 를 갖는 유저가 존재하는지 확인
+      const defaultUserInfo: UpdatedUserInfoType =
+        await this.usersRepository.findOneUser({
+          userId: userId,
+        });
+      if (!defaultUserInfo) {
+        throw new NotFoundException('존재하지 않은 회원입니다.');
+      }
+
+      // 유저가 존재한다면 -> db에 저장된 imgUrl필드를 null로 변경한다.
+      await this.usersRepository.updatedDefaultProfileImage(userId);
+
+      // s3 버킷에 있는 데이터를 삭제한다.
+      const targetKey = getKeyFromS3Url(defaultUserInfo.imgUrl);
+      await this.awsService.deleteImageFromS3({
+        key: targetKey,
+      });
+    } catch (error) {
+      return error;
+    }
+  }
+
+  // FIXME
+  // 좋아요 : 좋아요는 딱 한번만 가능.
+  async updateLikeUser(dto: UpdateLikeUserServiceRequestDto) {
+    const { to, from, likeType } = dto;
+    try {
+      // 유저를 찾는다.
+      // targetUser : 좋아요(좋아요 취소)를 받은 유저 = id가 dto.to 인 유저
+      const targetUser = await this.findOneUser({
+        userId: to,
+      });
+      if (!targetUser) {
+        throw new NotFoundException('존재하지 않은 회원입니다.');
+      }
+
+      // likes 테이블에 복합키 from, to 에 매핑되는 값이 존재하는지 확인
+      const likesHistory = await this.likesRepository.findOneLikesHistory({
+        from: from,
+        to: to,
+      });
+
+      if (likeType === 'LIKE') {
+        if (likesHistory) {
+          throw new BadRequestException(
+            '한번만 좋아요 를 반영할 수 있습니다 : 이미 Likes 테이블에 등록되었습니다.',
+          );
+        }
+        await this.likesRepository.addLikesHistory({ from: from, to: to });
+      } else {
+        if (!likesHistory) {
+          throw new BadRequestException(
+            '좋아요 취소를 할 수 없습니다 : likes 테이블에 데이터가 존재하지 않습니다.',
+          );
+        }
+        await this.likesRepository.cancelLikesHistory({ from: from, to: to });
+      }
+
+      // targetUser.id 가 받은 좋아요 수를 구한다.
+      const receivedLikesHistoriesDto =
+        await this.likesRepository.findReceivedLikesHistory({
+          targetUserId: to,
+        });
+
+      // 좋아요 / 좋아요 취소 반영
+      await this.updateUserInfo({
+        userId: to,
+        likes: receivedLikesHistoriesDto.likes,
+        // likes:
+        //   likeType === 'LIKE' ? targetUser.likes + 1 : targetUser.likes - 1,
+      });
+    } catch (error) {
+      return error;
+    }
+  }
+
+  // 마이페이지 > 로그인한 유저가 받은 좋아요 & 누른 좋아요 정보
+  async myPageLikesInfo(userId: string): Promise<MyPageLikesInfoResponseDto> {
+    try {
+      // 로그인한 유저가 누른 좋아요 정보
+      const gaveLikesHistories =
+        await this.likesRepository.findGaveLikesHistory({
+          targetUserId: userId,
+        });
+
+      // 로그인한 유저가 받은 좋아요 정보
+      const receivedLikesHistories =
+        await this.likesRepository.findReceivedLikesHistory({
+          targetUserId: userId,
+        });
+
+      return {
+        gave: gaveLikesHistories, // 누른 좋아요
+        received: receivedLikesHistories, // 받은 좋아요
+      };
+    } catch (error) {
+      return error;
     }
   }
 }

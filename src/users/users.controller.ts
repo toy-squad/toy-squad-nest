@@ -6,12 +6,12 @@ import {
   Delete,
   FileTypeValidator,
   Get,
+  InternalServerErrorException,
   Logger,
   MaxFileSizeValidator,
   NotFoundException,
   Param,
   ParseFilePipe,
-  ParseFilePipeBuilder,
   ParseIntPipe,
   Patch,
   Query,
@@ -24,10 +24,10 @@ import { UsersService } from './users.service';
 import { DEFAULT_PAGE, DEFAULT_TAKE } from 'commons/dtos/pagination-query-dto';
 import {
   ApiBody,
+  ApiConsumes,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
-  ApiProperty,
   ApiQuery,
   ApiResponse,
   ApiTags,
@@ -46,7 +46,7 @@ import {
   UPLOAD_IMAGE_MAX_SIZE,
   VALID_IMAGE_FILE_TYPES_REGEX,
 } from 'commons/constants/FILE_CONSTANT';
-import { UpdateLikesValueRequestDto } from './dtos/requests/update-likes-value-request.dto';
+import { UpdateLikeUserRequestDto } from './dtos/requests/update-like-user-request.dto';
 
 @ApiTags('유저 API')
 @Controller('users')
@@ -99,15 +99,22 @@ export class UsersController {
    * URL: /api/users
    */
   @Patch()
+  @ApiOperation({
+    summary: '유저 정보 수정 API',
+    description: '유저 정보 수정 (프로필이미지 외 텍스트정보)',
+  })
+  @ApiBody({
+    type: UpdateUserInfoRequestDto,
+  })
   @ApiResponse({
     status: 404,
     description: '존재하지 않은 회원입니다.',
   })
-  async updateUserInfo(
-    @Req() req: RequestWithUser,
-    @Res() res: Response,
-    @Body() requestDto: UpdateUserInfoRequestDto,
-  ) {
+  @ApiOkResponse({
+    status: 200,
+    description: '수정완료',
+  })
+  async updateUserInfo(@Req() req: RequestWithUser, @Res() res: Response) {
     const { userId } = req.user;
     const dto = req.body;
 
@@ -118,16 +125,29 @@ export class UsersController {
     res.status(200).json('수정 완료');
   }
 
-  // 이미지 파일 업로드
+  // 프로필 이미지 파일 업로드
   @Patch('/profile')
-  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   @ApiOperation({
     summary: '유저 프로필 이미지 수정 API',
     description: '유저 프로필 이미지 수정',
   })
   @ApiOkResponse({
     status: 200,
+    description: '업로드된 프로필 이미지의 S3 주소를 반환',
   })
+  @UseInterceptors(FileInterceptor('file'))
   async uploadProfileImage(
     @Req() req: RequestWithUser,
     @Res() res: Response,
@@ -142,7 +162,7 @@ export class UsersController {
         ],
       }),
     )
-    file?: Express.Multer.File | undefined,
+    file: Express.Multer.File,
   ) {
     const { userId } = req.user;
     const updatedUserInfo = await this.userService.updateUserInfo({
@@ -154,6 +174,26 @@ export class UsersController {
     return res.status(200).json({
       profile_url: updatedUserInfo.imgUrl ?? undefined,
     });
+  }
+
+  // 프로필 이미지 파일 기본 이미지로 전환하기
+  @Delete('/profile')
+  async defaultProfileImage(@Req() req: RequestWithUser, @Res() res: Response) {
+    try {
+      const { userId } = req.user;
+      await this.userService.updatedDefaultProfileImage(userId);
+      return res.status(200).json({});
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(
+          '기본 프로필 이미지로 업로드하는데 실패하였습니다.',
+        );
+      } else if (error instanceof NotFoundException) {
+        throw new NotFoundException('존재하지 않은 회원 입니다.');
+      }
+
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   /**
@@ -248,6 +288,9 @@ export class UsersController {
    *  유저 좋아요 클릭 -> likes 값만 업데이트
    * */
   @Patch('likes')
+  @ApiBody({
+    type: UpdateLikeUserRequestDto,
+  })
   @ApiOperation({
     summary: '단일유저 좋아요 API',
     description: '유저 1명에게 좋아요 버튼을 누르면 좋아요값이 +1 된다.',
@@ -265,54 +308,53 @@ export class UsersController {
     description:
       '존재하지 않은 회원 입니다. - 좋아요 대상 유저가 존재하지 않을 경우',
   })
-  async updateLikesValue(
-    @Req() req: RequestWithUser,
-    @Res() res: Response,
-    @Body() dto: UpdateLikesValueRequestDto,
-  ) {
-    // 좋아요를 준 대상과 좋아요 받은 대상이 동일한 경우
+  async updateLikesValue(@Req() req: RequestWithUser, @Res() res: Response) {
     const { user, body } = req;
-    const targetUserId = dto.target_user_id
-      ? dto.target_user_id
-      : body.target_user_id;
-    if (user.userId === targetUserId) {
-      throw new BadRequestException('자기자신에게 좋아요를 줄 수 없습니다.');
+    const { to } = body;
+    try {
+      // 좋아요를 준 유저(from)과 좋아요를 받은 유저(to)가 동일하면 에러발생
+      const targetUserId = body.to;
+      if (user.userId === targetUserId) {
+        throw new BadRequestException('자기자신에게 좋아요를 줄 수 없습니다.');
+      }
+      const likeType = body.likeType ?? 'LIKE';
+      switch (likeType) {
+        case 'LIKE': // 좋아요
+        case 'CANCEL': // 좋아요 취소
+          await this.userService.updateLikeUser({
+            to: to,
+            from: user.userId,
+            likeType: likeType,
+          });
+          break;
+        default:
+          throw new BadRequestException(
+            'likeType는 LIKE(좋아요) / CANCEL(좋아요 취소) 값만 가능합니다.',
+          );
+      }
+      return res.status(200).json({
+        message:
+          likeType === 'LIKE'
+            ? '좋아요 반영 완료했습니다.'
+            : '좋아요 취소 반영 완료했습니다.',
+      });
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        new BadRequestException(error.message);
+      }
     }
-
-    // target 유저에 대한 likes 정보를 갖고온다.
-    const targetUser = await this.userService.findOneUser({
-      userId: dto.target_user_id,
-    });
-    if (!targetUser) {
-      throw new NotFoundException('존재하지 않은 회원입니다.');
-    }
-
-    // 좋아요값 업데이트
-    await this.userService.updateUserInfo({
-      userId: targetUserId,
-      likes: targetUser.likes + 1,
-    });
-
-    return res
-      .status(200)
-      .json(
-        `좋아요 반영 완료하였습니다 : ${targetUser.likes} -> ${
-          targetUser.likes + 1
-        }`,
-      );
   }
 
   /**
-   * TODO
-   * 유저 상세 페이지
+   * (공개용 페이지) 유저 프로필 페이지
    * URL: /api/users/:id/detail/
-   * - 비밀번호 포함
    */
   @Public()
   @Get(':id/detail')
   @ApiOperation({
     summary: '[public] 유저 상세페이지 API',
-    description: '유저 상세정보',
+    description:
+      '유저 상세정보 페이지 & 공개용 유저 프로필 조회 페이지 - 팀원 찾기 유저프로필 조회 & 좋아요 누른 유저 프로필 조회 등...',
   })
   @ApiParam({
     name: 'id',

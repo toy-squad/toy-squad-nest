@@ -16,6 +16,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { SendEmailToNewUserListener } from 'users/listeners/send-email-to-new-user.listener';
 import { CommentModule } from './comment/comment.module';
 import { AwsModule } from './aws/aws.module';
+import { LikesModule } from './likes/likes.module';
 
 @Module({
   imports: [
@@ -98,6 +99,7 @@ import { AwsModule } from './aws/aws.module';
     RoleModule,
     CommentModule,
     AwsModule,
+    LikesModule,
   ],
   controllers: [AppController],
   providers: [SendEmailToNewUserListener],

@@ -3,9 +3,14 @@ import {
   S3Client,
   PutObjectCommand,
   DeleteObjectCommand,
+  GetObjectCommand,
 } from '@aws-sdk/client-s3';
 import { ConfigService } from '@nestjs/config';
-import { deleteImageFromS3Dto, imageUploadToS3Dto } from './dtos/aws.dto';
+import {
+  deleteImageFromS3Dto,
+  getImageUrlFromS3Dto,
+  imageUploadToS3Dto,
+} from './dtos/aws.dto';
 
 @Injectable()
 export class AwsService {
@@ -49,6 +54,17 @@ export class AwsService {
     const { key } = dto;
     const command = new DeleteObjectCommand({
       Bucket: this.AWS_BUCKET_NAME, // 삭제대상 S3 버킷
+      Key: key,
+    });
+
+    await this.s3Client.send(command);
+  }
+
+  // 이미지 URL 갖고오기
+  async getImageUrlFromS3(dto: getImageUrlFromS3Dto) {
+    const { key } = dto;
+    const command = new GetObjectCommand({
+      Bucket: this.AWS_BUCKET_NAME, // 조회대상 S3버킷
       Key: key,
     });
 
