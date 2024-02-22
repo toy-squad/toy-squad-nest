@@ -69,7 +69,9 @@ export class LikesRepository {
     }
   }
 
-  async findGaveLikesHistory(dto: findReceivedLikesHistoryDto) {
+  async findGaveLikesHistory(
+    dto: FindGaveLikesHistoryDto,
+  ): Promise<FindGaveLikesHistoryResponseDto> {
     const { targetUserId } = dto;
     try {
       // targetUserId가 누른 좋아요 히스토리 조회 (from: targetUserId)
@@ -90,7 +92,9 @@ export class LikesRepository {
     }
   }
 
-  async findReceivedLikesHistory(dto: FindGaveLikesHistoryDto) {
+  async findReceivedLikesHistory(
+    dto: findReceivedLikesHistoryDto,
+  ): Promise<FindReceivedLikesHistoryDto> {
     const { targetUserId } = dto;
     try {
       // targetUserId가  받은 좋아요 히스토리 조회 (to: targetUserId)
