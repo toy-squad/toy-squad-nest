@@ -25,6 +25,7 @@ import { DEFAULT_PAGE, DEFAULT_TAKE } from 'commons/dtos/pagination-query-dto';
 import {
   ApiBody,
   ApiConsumes,
+  ApiHeader,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -99,6 +100,10 @@ export class UsersController {
    * URL: /api/users
    */
   @Patch()
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Bearer access token',
+  })
   @ApiOperation({
     summary: '유저 정보 수정 API',
     description: '유저 정보 수정 (프로필이미지 외 텍스트정보)',
@@ -127,6 +132,10 @@ export class UsersController {
 
   // 프로필 이미지 파일 업로드
   @Patch('/profile')
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Bearer access token',
+  })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -178,6 +187,10 @@ export class UsersController {
 
   // 프로필 이미지 파일 기본 이미지로 전환하기
   @Delete('/profile')
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Bearer access token',
+  })
   async defaultProfileImage(@Req() req: RequestWithUser, @Res() res: Response) {
     try {
       const { userId } = req.user;
@@ -235,6 +248,10 @@ export class UsersController {
    * - URL : /api/users/pwd
    */
   @Patch('pwd')
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Bearer access token',
+  })
   @ApiOperation({
     summary: '비밀번호 변경',
     description:
@@ -288,6 +305,10 @@ export class UsersController {
    *  유저 좋아요 클릭 -> likes 값만 업데이트
    * */
   @Patch('likes')
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Bearer access token',
+  })
   @ApiBody({
     type: UpdateLikeUserRequestDto,
   })
@@ -370,6 +391,10 @@ export class UsersController {
    * URL: /api/users
    */
   @Delete()
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Bearer access token',
+  })
   @ApiOperation({
     summary: '회원 탈퇴 API',
     description: '회원 탈퇴 및 유저계정 삭제',
