@@ -56,7 +56,11 @@ export class User extends CoreEntity {
   })
   googleAuthId: string;
 
-  @ApiProperty({ description: '이미지 프로필 이미지 URL' })
+  @ApiProperty({
+    description: '이미지 프로필 이미지 URL',
+    example:
+      'https://toy-squads-image-buckets.s3.ap-northeast-2.amazonaws.com/users/{your-user-id}/profile/profile-img-{your-user-id}.gif',
+  })
   @Column({
     name: 'img_url',
     nullable: true,
@@ -78,8 +82,13 @@ export class User extends CoreEntity {
   })
   fields: string[];
 
-  // TODO : 작업성향 type정의와 swagger example 필요...
-  @ApiProperty({ description: '작업성향' })
+  @ApiProperty({
+    description: '작업성향',
+    example: [
+      '계획 수립과 일정 관리를 통해 프로젝트를 체계적으로 추진합니다.',
+      '어려운 상황에서도 냉정하게 문제를 해결하고 팀원들에게 효과적인 해결책을 제시합니다.',
+    ],
+  })
   @Column({
     name: 'tendency',
     type: 'simple-array',
@@ -126,7 +135,6 @@ export class User extends CoreEntity {
   /**
    * 유저 : 프로젝트 = 1:N
    */
-  // @ApiProperty({ description: '유저:프로젝트 = 1:N' })
   @OneToMany(() => Project, (project) => project.user)
   @JoinColumn({ name: 'user', referencedColumnName: 'id' })
   projects: Project[];
@@ -136,7 +144,6 @@ export class User extends CoreEntity {
    * - 유저가 여러 프로젝트에 가입될 수 있음.
    * - 유저가 가입한 프로젝트의 권한은 하나이다.
    */
-  // @ApiProperty({ description: '유저:권한=1:N' })
   @OneToMany(() => Role, (role) => role.user)
   @JoinColumn({ name: 'user', referencedColumnName: 'id' })
   roles: Role[];
@@ -144,7 +151,6 @@ export class User extends CoreEntity {
   /**
    * 유저 : 댓글 = 1:N
    */
-  @ApiProperty({ description: '유저:댓글=1:N' })
   @OneToMany(() => Comment, (comment) => comment.author)
   comments: Comment[];
 }
