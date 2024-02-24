@@ -40,6 +40,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SignInRequestBody } from 'auth/dtos/requests/sign-in-user-request.dto';
 import { User } from 'users/entities/user.entity';
 import { MyPageResponseDto } from 'users/dtos/responses/my-page-response.dto';
+import { CommentService } from 'comment/comment.service';
 
 @ApiTags('공통 API')
 @Controller()
@@ -53,6 +54,7 @@ export class AppController {
     private readonly configService: ConfigService,
     private readonly authService: AuthService,
     private readonly userService: UsersService,
+    private readonly commentService: CommentService,
     private readonly eventEmitter: EventEmitter2,
   ) {
     this.REFRESH_TOKEN_EXPIRATION = +this.configService.get(
@@ -276,7 +278,7 @@ export class AppController {
     type: MyPageResponseDto,
   })
   @Get('/mypage')
-  async getMyPage(@Req() req: RequestWithUser) {
+  async getMyPage(@Req() req: RequestWithUser, @Res() res: Response) {
     const { userId } = req.user;
 
     // 1. 프로필 관리 - 유저정보
@@ -290,16 +292,22 @@ export class AppController {
     const likesInfo = await this.userService.myPageLikesInfo(userId);
 
     // TODO 3. 유저관리 - 댓글 / 답글 관리
+    const comments = await this.commentService.getAllCommentsByUserId(userId);
+
     // TODO 4. 프로젝트 관리 - 모집현황 & 진행중인 프로젝트 & 완료 프로젝트 & 참여 신청
     // TODO 5. 유저관리 - 받은 리뷰 / 작성한 리뷰
 
-    return {
+    const myInfoData: MyPageResponseDto = {
       profile: profile,
       // projects
 
       // likes: (received)받은좋아요 & (gave)누른좋아요
       likes: likesInfo,
+
+      // comments
     };
+
+    res.status(200).json(myInfoData);
   }
 
   /**
