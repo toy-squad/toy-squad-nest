@@ -257,4 +257,13 @@ export class CommentService {
       throw error;
     }
   }
+
+  async getAllCommentsByUserId(userId: string) {
+    try {
+      const comments = await this.commentRepository.findCommentByUserId(userId);
+      return comments;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
