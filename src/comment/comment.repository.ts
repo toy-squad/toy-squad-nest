@@ -133,4 +133,7 @@ export class CommentRepository {
     // soft-delete
     await this.repo.softDelete(id);
   }
+
+  // (마이페이지) 유저아이디로 코멘트 데이터 찾기
+  async findCommentByUserId(userId: string) {}
 }
