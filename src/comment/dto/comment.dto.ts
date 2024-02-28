@@ -177,3 +177,8 @@ export class findAllReplyAndMentionedCommentsRepositoryDto {
   })
   parentCommentId: string;
 }
+
+// TODO
+export class MyPageCommentsResponseDto {
+  
+}
