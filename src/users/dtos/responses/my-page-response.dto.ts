@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { MyPageLikesInfoResponseDto } from 'likes/dto/response-dto';
 import { User } from 'users/entities/user.entity';
 
-interface IMyPateResponse {
+interface IMyPageResponse {
   // 로그인 유저정보
   profile: User;
 
@@ -21,7 +21,7 @@ interface IMyPateResponse {
   // 리뷰정보
 }
 
-export class MyPageResponseDto implements IMyPateResponse {
+export class MyPageResponseDto implements IMyPageResponse {
   @ApiProperty({
     description: '마이페이지 - 프로필관리 > 유저정보 데이터',
   })
