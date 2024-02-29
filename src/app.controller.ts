@@ -292,7 +292,7 @@ export class AppController {
     const likesInfo = await this.userService.myPageLikesInfo(userId);
 
     // TODO 3. 유저관리 - 댓글 / 답글 관리
-    const comments = await this.commentService.getAllCommentsByUserId(userId);
+    const comments = await this.commentService.getWrittenComments(userId);
 
     // TODO 4. 프로젝트 관리 - 모집현황 & 진행중인 프로젝트 & 완료 프로젝트 & 참여 신청
     // TODO 5. 유저관리 - 받은 리뷰 / 작성한 리뷰
@@ -304,7 +304,8 @@ export class AppController {
       // likes: (received)받은좋아요 & (gave)누른좋아요
       likes: likesInfo,
 
-      // comments
+      // comments : 로그인한 유저가 작성한 댓글(C)/답글(R,M)
+      comments: comments,
     };
 
     res.status(200).json(myInfoData);
