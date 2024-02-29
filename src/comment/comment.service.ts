@@ -258,7 +258,7 @@ export class CommentService {
     }
   }
 
-  async getAllCommentsByUserId(userId: string) {
+  async getWrittenComments(userId: string) {
     try {
       const comments = await this.commentRepository.findCommentByUserId(userId);
       return comments;
