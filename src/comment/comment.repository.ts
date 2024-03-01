@@ -73,6 +73,7 @@ export class CommentRepository {
   async findAllCommentsByProjectWithPagination(dto: GetAllCommentsDto) {
     const { page, take, projectId } = dto;
 
+    // TODO : 커서기반 페이지네이션으로 변경예정
     // 프로젝트의 댓글을 찾는다.
     const comments = await this.dataSource
       .getRepository(Comment)
@@ -92,6 +93,7 @@ export class CommentRepository {
   async findAllReplyAndMentionedComments(
     dto: findAllReplyAndMentionedCommentsRepositoryDto,
   ) {
+    // TODO : 커서기반 페이지네이션으로 변경예정
     const { parentCommentId } = dto;
     const replyComments = await this.dataSource
       .getRepository(Comment)
@@ -135,5 +137,28 @@ export class CommentRepository {
   }
 
   // (마이페이지) 유저아이디로 코멘트 데이터 찾기
-  async findCommentByUserId(userId: string) {}
+  async findCommentByUserId(userId: string) {
+    try {
+      // TODO : 커서기반 페이지네이션으로 변경예정
+      const comments = await this.dataSource
+        .getRepository(Comment)
+        .createQueryBuilder('comment')
+        .leftJoinAndSelect('comment.author', 'user')
+        .leftJoinAndSelect('comment.project', 'project')
+        .select('comment.id') // 코멘트 아이디
+        .addSelect('comment.commentType') // 코멘트타입
+        .addSelect('comment.content') // 코멘트 내용
+        .addSelect('comment.created_at') // 코멘트 생성일
+        .addSelect('comment.mentionTarget') // 답글 멘션 대상자 아이디
+        .addSelect('comment.parent') // 답글의 부모댓글 아이디
+        .addSelect('project.id') // 프로젝트 아이디
+        .addSelect('project.name') // 프로젝트명
+        .where('comment.author = :userId', { userId: userId })
+        .orderBy('comment.createdAt', 'DESC')
+        .getRawMany();
+      return comments;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
