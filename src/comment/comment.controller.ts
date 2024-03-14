@@ -22,7 +22,7 @@ import {
   DeleteCommentDto,
   GetAllCommentsDto,
 } from './dto/comment.dto';
-import { ApiBody } from '@nestjs/swagger';
+import { ApiBody, ApiHeader } from '@nestjs/swagger';
 
 @Controller('comment')
 export class CommentController {
@@ -30,6 +30,10 @@ export class CommentController {
 
   // 프로젝트 모집공고에 댓글작성
   @Post()
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Bearer access token',
+  })
   async createComment(
     @Req() req: RequestWithUser,
     @Res() res: Response,
@@ -47,6 +51,10 @@ export class CommentController {
 
   // 대댓글 작성
   @Post('reply')
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Bearer access token',
+  })
   async generateReplyComment(
     @Req() req: RequestWithUser,
     @Res() res: Response,
@@ -67,6 +75,10 @@ export class CommentController {
 
   // 대댓글에 멘션 답글작성
   @Post('reply/mention')
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Bearer access token',
+  })
   async generateMentionReplyComment(
     @Req() req: RequestWithUser,
     @Res() res: Response,
@@ -139,6 +151,10 @@ export class CommentController {
 
   // 댓글 수정 / 대댓글 수정 / 좋아요 / 싫어요
   @Patch(':comment_id')
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Bearer access token',
+  })
   async update(
     @Param('comment_id') commentId: string,
     @Req() req: RequestWithUser,
@@ -172,6 +188,10 @@ export class CommentController {
 
   // 코멘트 아이디에 해당되는 코멘트 삭제(soft-delete)
   @Delete(':comment_id')
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Bearer access token',
+  })
   @ApiBody({
     type: DeleteCommentDto,
   })

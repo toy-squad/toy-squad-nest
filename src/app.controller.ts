@@ -19,6 +19,7 @@ import { AuthService } from 'auth/auth.service';
 import {
   ApiBody,
   ApiExcludeEndpoint,
+  ApiHeader,
   ApiOkResponse,
   ApiOperation,
   ApiResponse,
@@ -38,6 +39,8 @@ import { SendEmailToNewUserEvent } from 'users/events/send-email-to-new-user.eve
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SignInRequestBody } from 'auth/dtos/requests/sign-in-user-request.dto';
 import { User } from 'users/entities/user.entity';
+import { MyPageResponseDto } from 'users/dtos/responses/my-page-response.dto';
+import { CommentService } from 'comment/comment.service';
 
 @ApiTags('공통 API')
 @Controller()
@@ -51,6 +54,7 @@ export class AppController {
     private readonly configService: ConfigService,
     private readonly authService: AuthService,
     private readonly userService: UsersService,
+    private readonly commentService: CommentService,
     private readonly eventEmitter: EventEmitter2,
   ) {
     this.REFRESH_TOKEN_EXPIRATION = +this.configService.get(
@@ -70,8 +74,6 @@ export class AppController {
    * 회원가입 API
    * URL: /api/join
    */
-  @Public()
-  @Post('/join')
   @ApiOperation({
     summary: '[public] 회원가입 API',
     description:
@@ -93,6 +95,8 @@ export class AppController {
     status: 400,
     description: '존재하지 않은 포지션입니다 - 포지션 유효성 검사 실패',
   })
+  @Public()
+  @Post('/join')
   async generateNewUser(@Body() dto: CreateUserRequestDto) {
     const newUser = await this.userService.createUser(dto);
 
@@ -168,6 +172,10 @@ export class AppController {
   }
 
   /** 로그아웃 */
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Bearer access token',
+  })
   @ApiOperation({
     summary: '로그아웃 API',
     description: '로그아웃 - 액세스토큰/리프래시토큰 모두 삭제됨',
@@ -257,12 +265,20 @@ export class AppController {
    *    - 받은 리뷰
    *    - 작성한 리뷰
    */
-  @Get('/mypage')
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Bearer access token',
+  })
   @ApiOperation({
     summary: '마이페이지 API',
     description: '로그인 유저 마이페이지',
   })
-  async getMyPage(@Req() req: RequestWithUser) {
+  @ApiOkResponse({
+    description: '마이페이지 정상 응답 데이터',
+    type: MyPageResponseDto,
+  })
+  @Get('/mypage')
+  async getMyPage(@Req() req: RequestWithUser, @Res() res: Response) {
     const { userId } = req.user;
 
     // 1. 프로필 관리 - 유저정보
@@ -274,15 +290,25 @@ export class AppController {
     // 2. 유저관리
     // 받은좋아요 & 누른 좋아요
     const likesInfo = await this.userService.myPageLikesInfo(userId);
-    // 댓글 / 답글 관리
 
-    return {
+    // TODO 3. 유저관리 - 댓글 / 답글 관리
+    const comments = await this.commentService.getWrittenComments(userId);
+
+    // TODO 4. 프로젝트 관리 - 모집현황 & 진행중인 프로젝트 & 완료 프로젝트 & 참여 신청
+    // TODO 5. 유저관리 - 받은 리뷰 / 작성한 리뷰
+
+    const myInfoData: MyPageResponseDto = {
       profile: profile,
       // projects
 
       // likes: (received)받은좋아요 & (gave)누른좋아요
       likes: likesInfo,
+
+      // comments : 로그인한 유저가 작성한 댓글(C)/답글(R,M)
+      comments: comments,
     };
+
+    res.status(200).json(myInfoData);
   }
 
   /**
@@ -294,8 +320,8 @@ export class AppController {
     summary: '[public] 카카오 연동 로그인 API - 인가코드 요청',
     description: '카카오 인증서버로 인가코드 받기 요청',
   })
-  @Get('/sign-in/kakao')
   @Public()
+  @Get('/sign-in/kakao')
   @UseGuards(KakaoGuard)
   async signInByKakaoOnlyBE(@Req() req: Request, @Res() res: Response) {}
 
@@ -308,9 +334,9 @@ export class AppController {
    * @param res
    * @returns
    */
+  @Public()
   @ApiExcludeEndpoint()
   @Get('/oauth/kakao')
-  @Public()
   @UseGuards(KakaoGuard)
   async redirectKakao(
     @Query() code: string,
@@ -349,8 +375,8 @@ export class AppController {
     summary: '[public] 구글 연동 로그인 API',
     description: '구글 연동 로그인',
   })
-  @Get('/sign-in/google')
   @Public()
+  @Get('/sign-in/google')
   @UseGuards(GoogleGuard)
   async signInByGoogle(@Req() request: RequestWithUser) {}
 

@@ -15,7 +15,7 @@ import { ProjectModule } from 'projects/project.module';
     forwardRef(() => ProjectModule),
     TypeOrmModule.forFeature([Comment]),
   ],
-  exports: [TypeOrmModule],
+  exports: [CommentService, CommentRepository],
   controllers: [CommentController],
   providers: [CommentService, CommentRepository],
 })

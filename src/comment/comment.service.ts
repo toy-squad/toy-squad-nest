@@ -8,6 +8,7 @@ import {
   DeleteCommentDto,
   GetAllCommentsDto,
   GetAllCommentsResponseDto,
+  MyPageCommentsResponseDto,
   UpdateCommentDto,
 } from './dto/comment.dto';
 import { CommentRepository } from './comment.repository';
@@ -253,6 +254,51 @@ export class CommentService {
 
       // 로그인한 유저아이디와 코멘트작성자 아이디가 일치한지 확인한다.
       return commentAuthorId === userId;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getWrittenComments(userId: string) {
+    try {
+      const _comments = await this.commentRepository.findCommentByUserId(
+        userId,
+      );
+      const comments: MyPageCommentsResponseDto[] = await Promise.all(
+        _comments.map(async (c) => {
+          // 코멘트 타입
+          const commentType = c.comment_commentType;
+          const commentContent = c.comment_content;
+          const parentCommentId = c.parentId;
+
+          let parentCommentAuthor, parentCommentContent;
+          if (commentType === 'R' || commentType === 'M') {
+            const parentComment = await this.commentRepository.findCommentById(
+              parentCommentId,
+            );
+
+            // 부모 댓글 작성자
+            parentCommentAuthor = parentComment.comment_authorId;
+
+            // 부모 댓글 내용
+            parentCommentContent = parentComment.comment_content;
+          }
+
+          return {
+            comment_id: c.comment_id, // 코멘트 아이디
+            comment_type: commentType, // 댓글 타입 (C, R, M)
+            comment_content: commentContent, // 댓글(답글) 내용
+            project_id: c.project_id, // 프로젝트 아이디
+            project_name: c.project_name, // 프로젝트명
+            created_at: c.created_at, // 댓글생성날짜
+
+            parent_comment_author: parentCommentAuthor ?? null, // 부모 댓글 작성자
+            parent_comment_content: parentCommentContent ?? null, // 부모 댓글 내용
+          };
+        }),
+      );
+
+      return comments;
     } catch (error) {
       throw error;
     }
