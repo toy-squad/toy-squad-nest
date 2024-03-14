@@ -1,3 +1,6 @@
+# seed
+/**/seedDataSource.ts
+
 # compiled output
 /dist
 /node_modules

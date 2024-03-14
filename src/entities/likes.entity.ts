@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { CoreEntity } from 'entities/core.entity';
 import { Entity, PrimaryColumn } from 'typeorm';
 
-@Entity({ schema: process.env.DB_NAME })
+@Entity({ schema: process.env.DB_NAME, name: 'likes' })
 export class Likes extends CoreEntity {
   @ApiProperty({
     description: '좋아요를 준 유저 아이디',

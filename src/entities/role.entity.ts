@@ -11,7 +11,7 @@ import { User } from './user.entity';
  */
 export type RoleType = 'M' | 'A' | 'G';
 
-@Entity({ schema: process.env.DB_NAME })
+@Entity({ schema: process.env.DB_NAME, name: 'role' })
 export class Role extends CoreEntity {
   @Column({
     name: 'role',

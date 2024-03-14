@@ -1,4 +1,4 @@
-import { CommentType } from 'comment/dto/comment.dto';
+import * as commentDto from 'comment/dto/comment.dto';
 import { CoreEntity } from 'entities/core.entity';
 import { Project } from 'projects/entities/project.entity';
 import {
@@ -12,7 +12,7 @@ import {
 } from 'typeorm';
 import { User } from 'entities/user.entity';
 
-@Entity({ schema: process.env.DB_NAME })
+@Entity({ schema: process.env.DB_NAME, name: 'comment' })
 export class Comment extends CoreEntity {
   /** 댓글, 대댓글 모두 공통으로 갖는 필드 */
   // 댓글 내용
@@ -29,7 +29,7 @@ export class Comment extends CoreEntity {
 
   // 댓글타입
   @Column({ default: 'C' })
-  commentType: CommentType;
+  commentType: commentDto.CommentType;
 
   /**
    * 댓글:프로젝트 = N:1

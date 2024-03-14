@@ -5,7 +5,7 @@ import { Role } from 'entities/role.entity';
 import { Project } from 'projects/entities/project.entity';
 import { Comment } from 'entities/comment.entity';
 
-@Entity({ schema: process.env.DB_NAME })
+@Entity({ schema: process.env.DB_NAME, name: 'user' })
 export class User extends CoreEntity {
   @ApiProperty({ description: '이메일', example: 'test1@yopmail.com' })
   @Column({
