@@ -180,5 +180,11 @@ export class findAllReplyAndMentionedCommentsRepositoryDto {
 
 export class MyPageCommentsResponseDto {
   comment_id: string;
-  // comment;
+  comment_type: CommentType;
+  comment_content: string;
+  project_id: string;
+  project_name: string;
+  created_at: string;
+  parent_comment_author?: string;
+  parent_comment_content?: string;
 }

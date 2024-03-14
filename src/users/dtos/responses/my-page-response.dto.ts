@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { MyPageCommentsResponseDto } from 'comment/dto/comment.dto';
 import { MyPageLikesInfoResponseDto } from 'likes/dto/response-dto';
 import { User } from 'users/entities/user.entity';
 
@@ -11,7 +12,7 @@ interface IMyPageResponse {
 
   // TODO
   // 댓글/답글 정보
-  //   comments
+  comments: MyPageCommentsResponseDto[];
 
   // TODO
   // 프로젝트 관리 정보
