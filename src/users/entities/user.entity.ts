@@ -4,10 +4,14 @@ import { Column, Entity, JoinColumn, OneToMany } from 'typeorm';
 import { Role } from 'role/entities/role.entity';
 import { Project } from 'projects/entities/project.entity';
 import { Comment } from 'comment/entities/comment.entity';
+import { Factory } from 'nestjs-seeder';
+import * as bcrypt from 'bcrypt';
+import getRandomPosition from 'commons/utils/seeding-position.util';
 
 @Entity({ schema: process.env.DB_NAME })
 export class User extends CoreEntity {
   @ApiProperty({ description: '이메일', example: 'test1@yopmail.com' })
+  @Factory((faker) => faker.internet.email())
   @Column({
     name: 'email',
     unique: true,
@@ -16,6 +20,7 @@ export class User extends CoreEntity {
   email: string;
 
   @ApiProperty({ description: '패스워드', example: '8자 이상 비밀번호' })
+  @Factory(() => bcrypt.hashSync('1234', 10)) // 1234
   @Column({
     name: 'password',
     nullable: false,
@@ -24,6 +29,7 @@ export class User extends CoreEntity {
   password: string;
 
   @ApiProperty({ description: '이름', example: '석지웅' })
+  @Factory((faker) => faker.internet.userName)
   @Column({
     name: 'name',
     nullable: false,
@@ -99,6 +105,7 @@ export class User extends CoreEntity {
   tendency: string[];
 
   @ApiProperty({ description: '포지션', example: '웹 풀스택 개발자' })
+  @Factory(() => getRandomPosition())
   @Column({
     name: 'position',
     comment: '포지션',
