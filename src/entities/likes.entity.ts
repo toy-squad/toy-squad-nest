@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { CoreEntity } from 'commons/entities/core.entity';
+import { CoreEntity } from 'entities/core.entity';
 import { Entity, PrimaryColumn } from 'typeorm';
 
 @Entity({ schema: process.env.DB_NAME })

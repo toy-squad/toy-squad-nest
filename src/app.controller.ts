@@ -38,7 +38,7 @@ import { RefreshAccessTokenRequestDto } from 'auth/dtos/requests/refresh-access-
 import { SendEmailToNewUserEvent } from 'users/events/send-email-to-new-user.event';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SignInRequestBody } from 'auth/dtos/requests/sign-in-user-request.dto';
-import { User } from 'users/entities/user.entity';
+import { User } from 'entities/user.entity';
 import { MyPageResponseDto } from 'users/dtos/responses/my-page-response.dto';
 import { CommentService } from 'comment/comment.service';
 

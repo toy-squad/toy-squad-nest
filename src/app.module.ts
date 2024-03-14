@@ -82,7 +82,7 @@ import { LikesModule } from './likes/likes.module';
       username: process.env.DB_USER,
       password: process.env.DB_PWD,
       database: process.env.DB_NAME,
-      entities: [],
+      entities: ['/src/entities/*.entity.{ts,js}'],
       autoLoadEntities: true,
       synchronize: process.env.NODE_ENV !== 'production',
       logging: process.env.NODE_ENV !== 'production',

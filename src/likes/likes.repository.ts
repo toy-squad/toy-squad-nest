@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Likes } from './entities/likes.entity';
+import { Likes } from '../entities/likes.entity';
 import { DataSource, Repository } from 'typeorm';
 import {
   CancelLikesHistoryDto,

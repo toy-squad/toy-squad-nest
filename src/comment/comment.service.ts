@@ -15,7 +15,7 @@ import { CommentRepository } from './comment.repository';
 import { UsersRepository } from 'users/users.repository';
 import { ProjectsRepository } from 'projects/projects.repository';
 import { Project } from 'projects/entities/project.entity';
-import { User } from 'users/entities/user.entity';
+import { User } from 'entities/user.entity';
 
 @Injectable()
 export class CommentService {

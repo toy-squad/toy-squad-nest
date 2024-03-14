@@ -8,8 +8,8 @@ import {
   IsString,
 } from 'class-validator';
 import { ContactType } from 'projects/enums/projectType.enum';
-import { RoleType } from 'role/entities/role.entity';
-import { User } from 'users/entities/user.entity';
+import { RoleType } from 'entities/role.entity';
+import { User } from 'entities/user.entity';
 
 export interface ICreateProjectDto {
   name: string;

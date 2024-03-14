@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
-import { Likes } from 'likes/entities/likes.entity';
+import { Likes } from 'entities/likes.entity';
 
 export class LikesHistoriesResponseDto {
   likeHistories: Likes[];

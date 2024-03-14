@@ -6,15 +6,15 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
-import { CoreEntity } from '../../commons/entities/core.entity';
-import { Role } from '../../role/entities/role.entity';
+import { CoreEntity } from '../../entities/core.entity';
+import { Role } from '../../entities/role.entity';
 import {
   ContactType,
   FirstPositionType,
   SecondPositionType,
 } from '../enums/projectType.enum';
-import { User } from '../../users/entities/user.entity';
-import { Comment } from '../../comment/entities/comment.entity';
+import { User } from '../../entities/user.entity';
+import { Comment } from '../../entities/comment.entity';
 
 @Index(['name', 'intro', 'description'])
 @Entity({ schema: process.env.DB_NAME })

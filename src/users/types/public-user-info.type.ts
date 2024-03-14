@@ -1,4 +1,4 @@
-import { User } from 'users/entities/user.entity';
+import { User } from 'entities/user.entity';
 
 /**
  * password, kakaoAuthId, googleAuthId, createdAt, deletedAt

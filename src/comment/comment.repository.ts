@@ -1,5 +1,5 @@
 import { DataSource, In, Repository } from 'typeorm';
-import { Comment } from './entities/comment.entity';
+import { Comment } from '../entities/comment.entity';
 import {
   Injectable,
   InternalServerErrorException,

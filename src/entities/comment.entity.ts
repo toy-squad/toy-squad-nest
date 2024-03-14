@@ -1,5 +1,5 @@
 import { CommentType } from 'comment/dto/comment.dto';
-import { CoreEntity } from 'commons/entities/core.entity';
+import { CoreEntity } from 'entities/core.entity';
 import { Project } from 'projects/entities/project.entity';
 import {
   Column,
@@ -10,7 +10,7 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
-import { User } from 'users/entities/user.entity';
+import { User } from 'entities/user.entity';
 
 @Entity({ schema: process.env.DB_NAME })
 export class Comment extends CoreEntity {

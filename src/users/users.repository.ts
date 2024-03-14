@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, DeleteDateColumn, Repository } from 'typeorm';
-import { User } from './entities/user.entity';
+import { User } from '../entities/user.entity';
 import { CreateUserRequestDto } from './dtos/requests/create-user-request.dto';
 import { FindUserRequestDto } from './dtos/requests/find-one-user-request.dto';
 import { FindUserListRequestDto } from './dtos/requests/find-user-list-request.dto';

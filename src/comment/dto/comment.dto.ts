@@ -2,8 +2,8 @@ import { PartialType } from '@nestjs/mapped-types';
 import { IsNotEmpty, IsOptional, Min } from 'class-validator';
 import { PaginationQueryDto } from 'commons/dtos/pagination-query-dto';
 import { Project } from 'projects/entities/project.entity';
-import { User } from 'users/entities/user.entity';
-import { Comment } from 'comment/entities/comment.entity';
+import { User } from 'entities/user.entity';
+import { Comment } from 'entities/comment.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CommentDto {

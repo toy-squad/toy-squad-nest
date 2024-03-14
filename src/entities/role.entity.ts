@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
-import { CoreEntity } from '../../commons/entities/core.entity';
-import { Project } from '../../projects/entities/project.entity';
-import { User } from '../../users/entities/user.entity';
+import { CoreEntity } from './core.entity';
+import { Project } from '../projects/entities/project.entity';
+import { User } from './user.entity';
 
 /**
  * 권한 타입
