@@ -9,7 +9,7 @@ export type positionCategory = 'DEVELOPER' | 'DESIGNER' | 'MANAGER';
 
 // 세부포지션
 // map[key:positionCategory] = []
-export const POSITION = {
+export const POSITION: Record<positionCategory, string[]> = {
   MANAGER: [
     '서비스 기획자',
     '웹 기획자',
